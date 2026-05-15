@@ -1123,3 +1123,37 @@ a > i[class*="fa-"]:only-child {
 	color: #fff;
 	text-decoration: underline;
 }
+
+/* ─── Accessibility: skip-to-content link ─────────────────────────────── */
+.murailles-skip-link.screen-reader-text {
+	clip: rect(1px, 1px, 1px, 1px);
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	word-wrap: normal !important;
+}
+.murailles-skip-link:focus {
+	clip: auto !important;
+	height: auto;
+	width: auto;
+	background: #dc3545;
+	color: #fff;
+	padding: 12px 24px;
+	font-weight: 600;
+	left: 16px;
+	top: 16px;
+	z-index: 100000;
+	border-radius: 6px;
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+	text-decoration: none;
+}
+
+/* Improve focus visibility on the language switcher and main nav */
+.murailles-lang-toggle:focus-visible,
+.nav-menu a:focus-visible {
+	outline: 2px solid #dc3545;
+	outline-offset: 2px;
+	border-radius: 4px;
+}

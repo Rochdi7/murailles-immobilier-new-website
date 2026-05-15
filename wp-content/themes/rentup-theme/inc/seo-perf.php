@@ -158,6 +158,110 @@ add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $post_type ) {
 }, 10, 2 );
 
 /**
+ * Make <html lang="..."> reflect the current Polylang language instead of the
+ * site default. Polylang already does this via language_attributes, but the
+ * theme's header.php calls language_attributes() — we hook the filter that
+ * function calls to make sure the right ISO code is emitted (fr-FR / en-US).
+ */
+add_filter( 'language_attributes', function ( $output ) {
+	if ( ! function_exists( 'pll_current_language' ) ) { return $output; }
+	$locale = pll_current_language( 'locale' ); // e.g. fr_FR
+	if ( ! $locale ) { return $output; }
+	$lang = str_replace( '_', '-', $locale );    // fr-FR
+	// Strip any existing lang="..." and inject the right one.
+	$output = preg_replace( '/\blang="[^"]*"/', 'lang="' . $lang . '"', $output );
+	return $output;
+} );
+
+/**
+ * Inject a "Skip to main content" link as the first focusable element.
+ * Hidden until focused — keyboard users press Tab once and can jump past
+ * the navigation. Lighthouse Accessibility audit penalty if missing.
+ */
+add_action( 'wp_body_open', function () {
+	$label = function_exists( 'murailles_t' ) ? murailles_t( 'Aller au contenu principal', false ) : 'Skip to content';
+	echo '<a class="murailles-skip-link screen-reader-text" href="#main-wrapper">' . esc_html( $label ) . '</a>';
+} );
+
+/**
+ * Auto-add accessibility/perf attributes to <img> tags emitted by templates:
+ *   • Empty alt="" + class containing "fa", "icon", or src ends with .svg
+ *     → add aria-hidden="true" + role="presentation" (decorative icon).
+ *   • Missing width/height → add intrinsic sizes based on the file on disk
+ *     (prevents CLS on the front page).
+ *
+ * Buffered via template_redirect → ob_start → wp_footer. Runs once per
+ * page response, regex-only (no DOM parser dependency).
+ */
+add_action( 'template_redirect', function () {
+	if ( is_admin() || is_feed() || wp_doing_ajax() ) { return; }
+	ob_start( function ( $html ) {
+
+		// Decorative icons: empty alt + class hints → aria-hidden.
+		$html = preg_replace_callback(
+			'#<img\s([^>]*?)alt=""([^>]*?)>#i',
+			function ( $m ) {
+				$before = $m[1];
+				$after  = $m[2];
+				$full   = $before . $after;
+				// Skip if already has aria-hidden or role.
+				if ( stripos( $full, 'aria-hidden' ) !== false || stripos( $full, 'role=' ) !== false ) {
+					return $m[0];
+				}
+				// Only treat as decorative if class contains "icon" or src is an inline SVG / icon file.
+				$decorative = false;
+				if ( preg_match( '#class="[^"]*(inc-fleat-icon|fa-|ti-|icon|flag)[^"]*"#i', $full ) ) { $decorative = true; }
+				if ( preg_match( '#src="[^"]*(bed|bath|move|pin|verified|flaticon)[^"]*\.svg"#i', $full ) ) { $decorative = true; }
+				if ( ! $decorative ) { return $m[0]; }
+				return '<img ' . $before . 'alt="" aria-hidden="true" role="presentation"' . $after . '>';
+			},
+			$html
+		);
+
+		// Add width/height to logo + testimonial avatars when missing.
+		// These are the most common CLS culprits on this theme.
+		$known_dims = array(
+			'logo-light.png' => array( 165, 40  ),
+			'logo.png'       => array( 165, 40  ),
+			'user-1.jpg'     => array( 60,  60  ),
+			'user-2.jpg'     => array( 60,  60  ),
+			'user-3.jpg'     => array( 60,  60  ),
+			'user-4.jpg'     => array( 60,  60  ),
+			'user-5.jpg'     => array( 60,  60  ),
+			'c-1.png'        => array( 60,  60  ),
+			'c-2.png'        => array( 60,  60  ),
+			'c-3.png'        => array( 60,  60  ),
+			'c-4.png'        => array( 60,  60  ),
+			'c-5.png'        => array( 60,  60  ),
+			'trust.webp'     => array( 70,  70  ),
+			'cap.webp'       => array( 70,  70  ),
+			'clutch.webp'    => array( 70,  70  ),
+		);
+		$html = preg_replace_callback(
+			'#<img\s([^>]*?)src="([^"]+)"([^>]*?)>#i',
+			function ( $m ) use ( $known_dims ) {
+				$before = $m[1];
+				$src    = $m[2];
+				$after  = $m[3];
+				$full   = $before . $after;
+				if ( stripos( $full, ' width=' ) !== false || stripos( $full, ' height=' ) !== false ) {
+					return $m[0]; // Already has dimensions.
+				}
+				foreach ( $known_dims as $needle => $dim ) {
+					if ( stripos( $src, $needle ) !== false ) {
+						return '<img ' . $before . 'src="' . $src . '" width="' . $dim[0] . '" height="' . $dim[1] . '"' . $after . '>';
+					}
+				}
+				return $m[0];
+			},
+			$html
+		);
+
+		return $html;
+	} );
+}, 0 );
+
+/**
  * Strip Google-incompatible characters from auto-generated post excerpts.
  * Long dashes, smart quotes, and non-breaking spaces sometimes appear in
  * meta descriptions; normalize them for cleaner SERP snippets.
