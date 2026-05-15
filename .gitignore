@@ -1,0 +1,72 @@
+# ===========================================
+# Murailles Immobilier — WordPress .gitignore
+# ===========================================
+# Strategy: track everything EXCEPT secrets, user-uploaded content, logs,
+# and tooling-specific noise. Default themes are tracked because they're
+# small and easy to delete later if you want.
+
+# --- Secrets — MUST stay out of the repo ---------------------------------
+wp-config.php
+.htpasswd
+wp-config.local.php
+*.pem
+*.key
+
+# --- User uploads (property photos, blog images, etc.) -------------------
+# Uploads belong on the production server / a CDN, not in source control.
+# Restore from backups or re-upload on deployment.
+wp-content/uploads/
+
+# --- Caches, logs, debug -------------------------------------------------
+wp-content/cache/
+wp-content/upgrade/
+wp-content/wflogs/
+wp-content/debug.log
+wp-content/backup-db/
+wp-content/backups/
+wp-content/ai1wm-backups/
+wp-content/updraft/
+debug.log
+error_log
+*.log
+
+# --- Backup / temp files -------------------------------------------------
+*.sql
+*.sql.gz
+*.bak
+*.tmp
+*.swp
+*~
+backup-*.zip
+backup-*.tar.gz
+
+# --- IDE / OS noise ------------------------------------------------------
+.idea/
+.vscode/
+.cursor/
+.claude/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Node tooling (if you ever add a build step) -------------------------
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+.npm/
+
+# --- Composer (if a plugin uses it) --------------------------------------
+vendor/
+composer.lock
+
+# --- Local-only helper scripts -------------------------------------------
+/tmp/
+c:/tmp/
+
+# --- WordPress core CSS bundle (locked by Windows on this machine) -------
+# Skip the compiled block-editor / admin CSS — these are generated assets
+# from npm builds, not source. They're shipped fresh in every WP release.
+wp-includes/css/dist/
+wp-includes/blocks/
+wp-admin/css/dist/

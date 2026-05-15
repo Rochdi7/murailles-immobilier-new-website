@@ -1,0 +1,318 @@
+<?php
+/**
+ * Template Name: Pricing
+ *
+ * Auto-converted from pricing.html
+ * Preserves exact original HTML markup, classes, and structure.
+ *
+ * @package Murailles Immobilier
+ */
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+get_header();
+?>
+
+<!-- ============================ Page Title Start================================== -->
+			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( murailles_img( 'slider-3.jpg' ) ); ?>);" data-overlay="5">
+				<div class="ht-80"></div>
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-12 col-md-12">
+							<div class="_page_tetio position-relative z-1">
+								<div class="pledtio_wrap"><span>Fair & Simple Pricing</span></div>
+								<h2 class="text-light mb-0">No Extra Fees. Friendly Support</h2>
+								<p>30 days money back guarantee</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="ht-120"></div>
+			</div>
+			<!-- ============================ Page Title End ================================== -->
+			
+			<!-- ============================ Pricing Start ================================== -->
+			<section class="pt-0">
+				<div class="container">
+					
+					<div class="row align-items-center pretio_top">
+					
+						<!-- Single Package -->
+						<div class="col-lg-4 col-md-4">
+							<div class="pricing_wrap">
+								<div class="prt_head">
+									<h4>Basic</h4>
+								</div>
+								<div class="prt_price">
+									<h2><span>$</span>29</h2>
+									<span>per user, per month</span>
+								</div>
+								<div class="prt_body">
+									<ul>
+										<li>99.5% Uptime Guarantee</li>
+										<li>120GB CDN Bandwidth</li>
+										<li>5GB Cloud Storage</li>
+										<li class="none">Personal Help Support</li>
+										<li class="none">Enterprise SLA</li>
+									</ul>
+								</div>
+								<div class="prt_footer">
+									<a href="#" class="btn choose_package">Start Basic</a>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Single Package -->
+						<div class="col-lg-4 col-md-4">
+							<div class="pricing_wrap">
+								<div class="prt_head">
+									<div class="recommended">Best Value</div>
+									<h4>Standard</h4>
+								</div>
+								<div class="prt_price">
+									<h2><span>$</span>49</h2>
+									<span>per user, per month</span>
+								</div>
+								<div class="prt_body">
+									<ul>
+										<li>99.5% Uptime Guarantee</li>
+										<li>150GB CDN Bandwidth</li>
+										<li>10GB Cloud Storage</li>
+										<li>Personal Help Support</li>
+										<li class="none">Enterprise SLA</li>
+									</ul>
+								</div>
+								<div class="prt_footer">
+									<a href="#" class="btn choose_package active">Start Standard</a>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Single Package -->
+						<div class="col-lg-4 col-md-4">
+							<div class="pricing_wrap">
+								<div class="prt_head">
+									<h4>Platinum</h4>
+								</div>
+								<div class="prt_price">
+									<h2><span>$</span>79</h2>
+									<span>2 user, per month</span>
+								</div>
+								<div class="prt_body">
+									<ul>
+										<li>100% Uptime Guarantee</li>
+										<li>200GB CDN Bandwidth</li>
+										<li>20GB Cloud Storage</li>
+										<li>Personal Help Support</li>
+										<li>Enterprise SLA</li>
+									</ul>
+								</div>
+								<div class="prt_footer">
+									<a href="#" class="btn choose_package">Start Platinum</a>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+					
+				</div>
+						
+			</section>
+			<!-- ============================ Pricing End ================================== -->
+			
+			<!-- ============================ Our Partner Start ================================== -->
+			<section class="gray-simple">
+				<div class="container">
+					
+					<div class="row justify-content-center">
+						<div class="col-lg-8 col-md-10 col-sm-12">
+							<div class="reio_o9i text-center mb-5">
+								<h2>Less work, meet our partner.</h2>
+								<p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias</p>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row justify-content-center">
+						<div class="col-lg-9 col-md-10 col-sm-12 flex-wrap justify-content-center text-center">
+							<div class="pertner_flexio">
+								<img src="<?php echo esc_url( murailles_img( 'c-1.png' ) ); ?>" class="img-fluid" alt="" />
+								<h5>Google Inc</h5>
+							</div>
+							<div class="pertner_flexio">
+								<img src="<?php echo esc_url( murailles_img( 'c-2.png' ) ); ?>" class="img-fluid" alt="" />
+								<h5>Dribbbdio</h5>
+							</div>
+							<div class="pertner_flexio">
+								<img src="<?php echo esc_url( murailles_img( 'c-3.png' ) ); ?>" class="img-fluid" alt="" />
+								<h5>Lio Vission</h5>
+							</div>
+							<div class="pertner_flexio">
+								<img src="<?php echo esc_url( murailles_img( 'c-4.png' ) ); ?>" class="img-fluid" alt="" />
+								<h5>Alzerra</h5>
+							</div>
+							<div class="pertner_flexio">
+								<img src="<?php echo esc_url( murailles_img( 'c-5.png' ) ); ?>" class="img-fluid" alt="" />
+								<h5>Skyepio</h5>
+							</div>
+							<div class="pertner_flexio">
+								<img src="<?php echo esc_url( murailles_img( 'c-5.png' ) ); ?>" class="img-fluid" alt="" />
+								<h5>Twikller</h5>
+							</div>
+							<div class="pertner_flexio">
+								<img src="<?php echo esc_url( murailles_img( 'c-5.png' ) ); ?>" class="img-fluid" alt="" />
+								<h5>Sincherio</h5>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</section>
+			<!-- ============================ Our Partner End ================================== -->
+			
+			<!-- ================= Accordion Start ================= -->
+			<section>
+				<div class="container">
+					
+					<div class="row justify-content-center">
+						<div class="col-lg-7 col-md-8">
+							<div class="sec-heading center">
+								<h2>Frequently Asked Questions</h2>
+								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row justify-content-center">
+						<div class="col-lg-10 col-md-12 col-sm-12">
+							
+							<!-- Single Basics List -->
+							<div class="faq_wrap">
+								<div class="faq_wrap_title">
+									<h4>Basics</h4>
+								</div>
+								<div class="faq_wrap_body mb-5">
+									<div class="accordion" id="generalac">
+										<div class="card">
+											<div class="card-header" id="headingOne">
+											  <h2 class="mb-0">
+												<button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+													Can I update/upgrade my plan any time?
+												</button>
+											  </h2>
+											</div>
+
+											<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#generalac">
+											  <div class="card-body">
+												<p class="ac-para">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</p>
+											  </div>
+											</div>
+										</div>
+										<div class="card">
+											<div class="card-header" id="headingTwo">
+											  <h2 class="mb-0">
+												<button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+													How i can reset my password?
+												</button>
+											  </h2>
+											</div>
+											<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#generalac">
+											  <div class="card-body">
+												<p class="ac-para">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</p>
+											  </div>
+											</div>
+										</div>
+										<div class="card">
+											<div class="card-header" id="headingThree">
+											  <h2 class="mb-0">
+												<button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+													How can i submit my new property?
+												</button>
+											  </h2>
+											</div>
+											<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#generalac">
+											  <div class="card-body">
+												<p class="ac-para">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</p>
+											  </div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Single Basics Account & Settings -->
+							<div class="faq_wrap">
+								<div class="faq_wrap_title">
+									<h4>Account & Settings</h4>
+								</div>
+								<div class="faq_wrap_body">
+									<div class="accordion" id="account">
+										<div class="card">
+											<div class="card-header" id="headingEight">
+											  <h2 class="mb-0">
+												<button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapseeight" aria-expanded="true" aria-controls="collapseeight">
+													How do i widthraw my money in my account?
+												</button>
+											  </h2>
+											</div>
+
+											<div id="collapseeight" class="collapse show" aria-labelledby="headingEight" data-parent="#account">
+											  <div class="card-body">
+												<p class="ac-para">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</p>
+											  </div>
+											</div>
+										</div>
+										<div class="card">
+											<div class="card-header" id="headingNine">
+											  <h2 class="mb-0">
+												<button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsenine" aria-expanded="false" aria-controls="collapsenine">
+													Ho do i delete my account?
+												</button>
+											  </h2>
+											</div>
+											<div id="collapsenine" class="collapse" aria-labelledby="headingNine" data-parent="#account">
+											  <div class="card-body">
+												<p class="ac-para">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</p>
+											  </div>
+											</div>
+										</div>
+										<div class="card">
+											<div class="card-header" id="headingTen">
+											  <h2 class="mb-0">
+												<button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseten" aria-expanded="false" aria-controls="collapseten">
+													How do i change my email id?
+												</button>
+											  </h2>
+											</div>
+											<div id="collapseten" class="collapse" aria-labelledby="headingTen" data-parent="#account">
+											  <div class="card-body">
+												<p class="ac-para">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</p>
+											  </div>
+											</div>
+										</div>
+										<div class="card">
+											<div class="card-header" id="headingEle">
+											  <h2 class="mb-0">
+												<button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseele" aria-expanded="false" aria-controls="collapseele">
+													Can i pay using paypal or payoneer?
+												</button>
+											  </h2>
+											</div>
+											<div id="collapseele" class="collapse" aria-labelledby="headingEle" data-parent="#account">
+											  <div class="card-body">
+												<p class="ac-para">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</p>
+											  </div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- ================= Accordion End ================= -->
+
+<?php get_template_part( 'template-parts/call-to-action' ); ?>
+
+<?php get_footer(); ?>
