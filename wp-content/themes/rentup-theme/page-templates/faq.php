@@ -15,7 +15,7 @@ get_header();
 ?>
 
 <!-- ============================ Page Title ================================== -->
-<section class="image-cover faq-sec text-center" style="background:url(<?php echo esc_url( murailles_img( 'banner-home.jpg' ) ); ?>) no-repeat;" data-overlay="6">
+<section class="image-cover faq-sec text-center" style="background:url(<?php echo esc_url( murailles_img( 'faq-immobilier-marrakech.webp' ) ); ?>) no-repeat;" data-overlay="6">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12 col-md-12 position-relative z-1">

@@ -10,7 +10,7 @@ get_header();
 ?>
 
 <!-- ============================ Page Title ================================== -->
-<div class="page-title assistance-hero" style="background:linear-gradient(135deg,rgba(220,53,69,0.85),rgba(26,35,50,0.85)),url(<?php echo esc_url( murailles_img( 'banner-home.jpg' ) ); ?>) center/cover no-repeat;padding:80px 0;color:#fff;">
+<div class="page-title assistance-hero" style="background:linear-gradient(135deg,rgba(220,53,69,0.85),rgba(26,35,50,0.85)),url(<?php echo esc_url( murailles_img( 'assistance-conseils-immobilier-marrakech.webp' ) ); ?>) center/cover no-repeat;padding:100px 0;color:#fff;">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12 text-center">

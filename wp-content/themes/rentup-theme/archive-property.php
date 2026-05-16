@@ -389,6 +389,18 @@ foreach ( array( 'q','ptype','action','location','area','beds','baths','price_mi
 										if ( empty( $imgs ) ) {
 											$imgs[] = $thumb;
 										}
+										/* Pad to 3 slides with design placeholders so the Slick carousel
+										   (dots + autoplay) always animates, matching rentup index.html. */
+										if ( count( $imgs ) < 3 ) {
+											$pool  = array( 'p-1.png','p-2.png','p-3.png','p-4.png','p-5.png','p-6.png','p-7.png','p-8.png','p-9.png' );
+											$start = $pid % count( $pool );
+											$i     = 0;
+											while ( count( $imgs ) < 3 && $i < count( $pool ) ) {
+												$candidate = murailles_img( $pool[ ( $start + $i ) % count( $pool ) ] );
+												if ( ! in_array( $candidate, $imgs, true ) ) $imgs[] = $candidate;
+												$i++;
+											}
+										}
 									?>
 								<!-- Single Property -->
 								<div class="col-lg-6 col-md-6 col-sm-12" data-murailles-id="<?php echo esc_attr( $pid ); ?>">
@@ -412,10 +424,12 @@ foreach ( array( 'q','ptype','action','location','area','beds','baths','price_mi
 														<?php if ( $pbeds ) : ?><span class="_list_blickes _netork"><?php echo esc_html( $pbeds ); ?> <?php murailles_t( 'Ch.' ); ?></span><?php endif; ?>
 														<?php if ( $pcat ) : ?><span class="_list_blickes types"><?php echo esc_html( $pcat ); ?></span><?php endif; ?>
 													</div>
+													<?php if ( $pprice !== '' ) : ?>
 													<div class="_card_flex_last">
 														<h6 class="listing-card-info-price text-seegreen mb-0"><?php echo esc_html( $pprice ); ?> €</h6>
 														<?php if ( $psuffix ) : ?><small><?php echo esc_html( $psuffix ); ?></small><?php endif; ?>
 													</div>
+													<?php endif; ?>
 												</div>
 												<div class="_card_list_flex">
 													<div class="_card_flex_01">

@@ -14,7 +14,7 @@ get_header();
 ?>
 
 <!-- ============================ Page Title Start================================== -->
-			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( murailles_img( 'banner-home.jpg' ) ); ?>);" data-overlay="5">
+			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( murailles_img( 'about-agence-murailles-immobilier.webp' ) ); ?>);" data-overlay="5">
 				<div class="container">
 					<div class="row">
 						<div class="col-lg-12 col-md-12">
@@ -143,7 +143,7 @@ get_header();
 									<div class="team-grid">
 								
 										<div class="teamgrid-user">
-											<img src="<?php echo esc_url( murailles_img( 'user-1.jpg' ) ); ?>" alt="" class="img-fluid" />
+											<img src="https://i.pravatar.cc/96?img=47" alt="" class="img-fluid" />
 										</div>
 										
 										<div class="teamgrid-content">
@@ -168,7 +168,7 @@ get_header();
 									<div class="team-grid">
 								
 										<div class="teamgrid-user">
-											<img src="<?php echo esc_url( murailles_img( 'user-2.jpg' ) ); ?>" alt="" class="img-fluid" />
+											<img src="https://i.pravatar.cc/96?img=32" alt="" class="img-fluid" />
 										</div>
 										
 										<div class="teamgrid-content">
@@ -193,7 +193,7 @@ get_header();
 									<div class="team-grid">
 								
 										<div class="teamgrid-user">
-											<img src="<?php echo esc_url( murailles_img( 'user-3.jpg' ) ); ?>" alt="" class="img-fluid" />
+											<img src="https://i.pravatar.cc/96?img=12" alt="" class="img-fluid" />
 										</div>
 										
 										<div class="teamgrid-content">
@@ -218,7 +218,7 @@ get_header();
 									<div class="team-grid">
 								
 										<div class="teamgrid-user">
-											<img src="<?php echo esc_url( murailles_img( 'user-4.jpg' ) ); ?>" alt="" class="img-fluid" />
+											<img src="https://i.pravatar.cc/96?img=45" alt="" class="img-fluid" />
 										</div>
 										
 										<div class="teamgrid-content">
@@ -243,7 +243,7 @@ get_header();
 									<div class="team-grid">
 								
 										<div class="teamgrid-user">
-											<img src="<?php echo esc_url( murailles_img( 'user-5.jpg' ) ); ?>" alt="" class="img-fluid" />
+											<img src="https://i.pravatar.cc/96?img=68" alt="" class="img-fluid" />
 										</div>
 										
 										<div class="teamgrid-content">
@@ -268,7 +268,7 @@ get_header();
 									<div class="team-grid">
 								
 										<div class="teamgrid-user">
-											<img src="<?php echo esc_url( murailles_img( 'user-5.jpg' ) ); ?>" alt="" class="img-fluid" />
+											<img src="https://i.pravatar.cc/96?img=53" alt="" class="img-fluid" />
 										</div>
 										
 										<div class="teamgrid-content">
@@ -320,7 +320,7 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-1.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=47" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Susan D. Murphy</h5>
@@ -328,11 +328,6 @@ get_header();
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.7</div>
 												</div>
 											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-1.png' ) ); ?>" class="img-fluid" alt="">
-												</div>
-											</div>
 										</div>
 										
 										<div class="facts-detail">
@@ -347,7 +342,7 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-2.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=32" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Maxine E. Gagliardi</h5>
@@ -355,11 +350,6 @@ get_header();
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.5</div>
 												</div>
 											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-2.png' ) ); ?>" class="img-fluid" alt="">
-												</div>
-											</div>
 										</div>
 										
 										<div class="facts-detail">
@@ -374,7 +364,7 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-3.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=12" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Roy M. Cardona</h5>
@@ -382,11 +372,6 @@ get_header();
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.9</div>
 												</div>
 											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-3.png' ) ); ?>" class="img-fluid" alt="">
-												</div>
-											</div>
 										</div>
 										
 										<div class="facts-detail">
@@ -401,7 +386,7 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-4.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=45" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Dorothy K. Shipton</h5>
@@ -409,11 +394,6 @@ get_header();
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.7</div>
 												</div>
 											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-4.png' ) ); ?>" class="img-fluid" alt="">
-												</div>
-											</div>
 										</div>
 										
 										<div class="facts-detail">
@@ -428,17 +408,12 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-5.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=68" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Robert P. McKissack</h5>
 													<div class="_ovr_posts"><span><?php murailles_t( 'Propriétaire' ); ?></span></div>
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.7</div>
-												</div>
-											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-5.png' ) ); ?>" class="img-fluid" alt="">
 												</div>
 											</div>
 										</div>

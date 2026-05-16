@@ -85,6 +85,13 @@ function murailles_enqueue_styles()
 	// Main combined stylesheet (contains Bootstrap, FontAwesome 5 classes, all vendor CSS)
 	wp_enqueue_style('murailles-styles', $theme_uri . '/assets/css/styles.css', array(), $ver);
 
+	// Slick Carousel core CSS — required for the slider to render. Without these
+	// rules (.slick-list overflow, .slick-track display, .slick-initialized
+	// .slick-slide display:block) every slide stays display:none after JS init,
+	// which is why the single-property mobile gallery was blank. styles.css has
+	// only a few helper overrides but lacks the core layout rules.
+	wp_enqueue_style('murailles-slick', $theme_uri . '/assets/css/slick.css', array('murailles-styles'), $ver);
+
 	// Font Awesome 6 from CDN — bundled CSS lacks FA6 class names (fa-magnifying-glass,
 	// fa-scale-balanced, etc.). Loaded AFTER the theme CSS so its rules win.
 	wp_enqueue_style('murailles-fa6', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css', array('murailles-styles'), '6.5.2');
@@ -412,18 +419,52 @@ function murailles_img($filename)
 	$logo_remote = 'https://usercontent.one/wp/www.agence-immobilier-marrakech.com/wp-content/uploads/2019/05/LOGOM-e1611537046750.png?media=1768339104';
 	$riad_remote = 'https://usercontent.one/wp/www.agence-immobilier-marrakech.com/wp-content/uploads/2022/10/WhatsApp-Image-2025-12-02-at-15.37.02-1-525x328.jpeg?media=1768339104';
 
-	// Brand logos (header + footer, light + dark variants)
+	$theme_dir = get_template_directory();
+	$theme_uri = get_template_directory_uri();
+
+	// Local theme image takes priority: if you drop a real image into
+	// assets/images/ matching the filename, it's served instead of any
+	// remote fallback. This is how new branded assets ship without
+	// editing this function each time.
+	if ( file_exists( $theme_dir . '/assets/images/' . $filename ) ) {
+		return $theme_uri . '/assets/images/' . $filename;
+	}
+
+	// Brand logos (header + footer, light + dark variants) — remote fallback
+	// when the local logo file is missing.
 	if (preg_match('/^logo(-light)?\.png$/i', $filename)) {
 		return $logo_remote;
 	}
 
-	// Property/riad photos: property cards, city tiles, blog featured images,
-	// home banner and single-property galleries.
+	// Demo placeholders from the original rentup HTML kit (p-N.png, city-N.png,
+	// b-N.jpg, slider-N.jpg, banner-home.jpg). When no real image is in the
+	// theme folder we fall back to the agency's stock riad photo so cards
+	// don't render broken. Drop a real image with the same filename into
+	// assets/images/ to override per-tile (e.g. p-1.png → real riad photo).
+	// To diversify card placeholders for properties without their own photos,
+	// we rotate over a small set of branded webp files when they exist.
 	if (preg_match('/^(p-\d+\.(png|jpe?g)|city-\d+\.(png|jpe?g)|b-\d+\.(png|jpe?g)|slider-\d+\.(png|jpe?g)|banner-home\.(png|jpe?g))$/i', $filename)) {
+		$rotation = array(
+			'propriete-marrakech-default.webp',
+			'villa-luxe-marrakech-hero.webp',
+			'about-agence-murailles-immobilier.webp',
+			'nos-services-immobilier-marrakech.webp',
+			'histoire-marrakech.webp',
+			'tourisme-marrakech.webp',
+		);
+		// Stable per-filename index so a given placeholder always resolves
+		// to the same branded image (no flicker between page loads).
+		$idx = abs( crc32( $filename ) ) % count( $rotation );
+		for ( $i = 0; $i < count( $rotation ); $i++ ) {
+			$candidate = $rotation[ ( $idx + $i ) % count( $rotation ) ];
+			if ( file_exists( $theme_dir . '/assets/images/' . $candidate ) ) {
+				return $theme_uri . '/assets/images/' . $candidate;
+			}
+		}
 		return $riad_remote;
 	}
 
-	return get_template_directory_uri() . '/assets/images/' . $filename;
+	return $theme_uri . '/assets/images/' . $filename;
 }
 
 /**

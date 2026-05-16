@@ -40,7 +40,7 @@ $area_label = ! empty( $areas ) ? $areas[0] : '';
 
 // Gallery images
 $img_ids = $gallery ? array_filter( array_map( 'intval', explode( ',', $gallery ) ) ) : array();
-$main_img = ! empty( $img_ids[0] ) ? wp_get_attachment_image_url( $img_ids[0], 'large' ) : ( has_post_thumbnail() ? get_the_post_thumbnail_url( $id, 'large' ) : murailles_img( 'banner-home.jpg' ) );
+$main_img = ! empty( $img_ids[0] ) ? wp_get_attachment_image_url( $img_ids[0], 'large' ) : ( has_post_thumbnail() ? get_the_post_thumbnail_url( $id, 'large' ) : murailles_img( 'propriete-marrakech-default.webp' ) );
 
 // Amenity labels — each label runs through murailles_t() so Polylang translates them.
 $amenity_labels = array(
@@ -63,36 +63,179 @@ $similar = new WP_Query( array(
 ) );
 ?>
 
+			<?php
+			/* Build the full list of gallery images once and reuse it for both
+			   the desktop grid and the mobile swipe carousel. Both galleries
+			   open the SAME magnific-popup gallery so the lightbox's prev/next
+			   arrows cycle through every property image regardless of which
+			   thumbnail or slide was clicked.
+			   $mu_all_imgs = main image + every additional attachment. */
+			$mu_all_imgs = array( $main_img );
+			foreach ( $img_ids as $gid_index => $gid ) {
+				if ( $gid_index === 0 ) { continue; }
+				$gurl = wp_get_attachment_image_url( $gid, 'large' );
+				if ( $gurl && ! in_array( $gurl, $mu_all_imgs, true ) ) {
+					$mu_all_imgs[] = $gurl;
+				}
+			}
+			$mu_all_count = count( $mu_all_imgs );
+			?>
 			<!-- ============================ Hero Banner Start ================================== -->
 			<!-- Gallery Part Start -->
-			<section class="gallery_parts pt-2 pb-2 d-none d-sm-none d-md-none d-lg-none d-xl-block">
+			<section class="gallery_parts pt-2 pb-2 d-none d-sm-none d-md-none d-lg-none d-xl-block" data-murailles-desktop-gallery>
 				<div class="container">
 					<div class="row align-items-center">
 						<div class="col-lg-8 col-md-7 col-sm-12 pr-1">
-							<div class="gg_single_part left"><a href="<?php echo esc_url( $main_img ); ?>" class="mfp-gallery rounded"><img src="<?php echo esc_url( $main_img ); ?>" class="img-fluid mx-auto rounded" alt="" /></a></div>
+							<div class="gg_single_part left"><a href="<?php echo esc_url( $main_img ); ?>" class="murailles-lightbox rounded"><img src="<?php echo esc_url( $main_img ); ?>" class="img-fluid mx-auto rounded" alt="" /></a></div>
 						</div>
 						<div class="col-lg-4 col-md-5 col-sm-12 pl-1">
 							<?php for ( $i = 1; $i <= 3; $i++ ) :
-								$gimg = isset( $img_ids[$i] ) ? wp_get_attachment_image_url( $img_ids[$i], 'medium_large' ) : murailles_img( 'p-' . ( $i + 2 ) . '.png' );
+								/* Only attached gallery images become part of the
+								   lightbox cycle. Placeholder fallback tiles still
+								   render in the grid (so the layout always shows
+								   four images) but they're not clickable into the
+								   lightbox — otherwise prev/next would walk
+								   through fake demo placeholders. */
+								$has_real = isset( $img_ids[$i] );
+								$gimg = $has_real ? wp_get_attachment_image_url( $img_ids[$i], 'medium_large' ) : murailles_img( 'p-' . ( $i + 2 ) . '.png' );
+								$gfull = $has_real ? wp_get_attachment_image_url( $img_ids[$i], 'large' ) : $gimg;
 								$mt = $i > 1 ? ' mt-3' : '';
 							?>
-							<div class="gg_single_part-right min<?php echo $mt; ?>"><a href="<?php echo esc_url( $gimg ); ?>" class="mfp-gallery h-100"><img src="<?php echo esc_url( $gimg ); ?>" class="img-fluid full-width rounded object-fit h-100" alt="" /></a></div>
+							<div class="gg_single_part-right min<?php echo $mt; ?>">
+								<?php if ( $has_real ) : ?>
+								<a href="<?php echo esc_url( $gfull ); ?>" class="murailles-lightbox h-100"><img src="<?php echo esc_url( $gimg ); ?>" class="img-fluid full-width rounded object-fit h-100" alt="" /></a>
+								<?php else : ?>
+								<img src="<?php echo esc_url( $gimg ); ?>" class="img-fluid full-width rounded object-fit h-100" alt="" />
+								<?php endif; ?>
+							</div>
 							<?php endfor; ?>
 						</div>
 					</div>
+					<?php /* Hidden links so the lightbox has access to every gallery
+					         image, not just the four visible above. Magnific-popup
+					         picks them up via the .murailles-lightbox delegate. */ ?>
+					<?php if ( $mu_all_count > 4 ) : ?>
+					<div class="murailles-lightbox-extras" aria-hidden="true">
+						<?php foreach ( array_slice( $mu_all_imgs, 4 ) as $extra_url ) : ?>
+						<a href="<?php echo esc_url( $extra_url ); ?>" class="murailles-lightbox"></a>
+						<?php endforeach; ?>
+					</div>
+					<?php endif; ?>
 				</div>
 			</section>
 
-			<div class="featured_slick_gallery gray d-block d-md-block d-lg-block d-xl-none">
-				<div class="featured_slick_gallery-slide">
-					<div class="featured_slick_padd"><a href="<?php echo esc_url( $main_img ); ?>" class="mfp-gallery"><img src="<?php echo esc_url( $main_img ); ?>" class="img-fluid mx-auto" alt="" /></a></div>
-					<?php foreach ( array_slice( $img_ids, 1, 3 ) as $gid ) :
-						$gurl = wp_get_attachment_image_url( $gid, 'medium_large' ) ?: murailles_img( 'p-3.png' );
-					?>
-					<div class="featured_slick_padd"><a href="<?php echo esc_url( $gurl ); ?>" class="mfp-gallery"><img src="<?php echo esc_url( $gurl ); ?>" class="img-fluid mx-auto" alt="" /></a></div>
-					<?php endforeach; ?>
+			<?php /* Mobile / tablet hero — horizontal swipe carousel using native
+			         CSS scroll-snap for swipe; magnific-popup for the fullscreen
+			         lightbox triggered by tapping a slide. */ ?>
+			<section class="murailles-mobile-gallery d-block d-xl-none pt-2 pb-2" data-murailles-mobile-gallery>
+				<div class="container">
+					<div class="murailles-mobile-gallery__track" data-murailles-mobile-track>
+						<?php foreach ( $mu_all_imgs as $i => $slide_url ) : ?>
+						<div class="murailles-mobile-gallery__slide" data-murailles-slide-index="<?php echo (int) $i; ?>">
+							<a href="<?php echo esc_url( $slide_url ); ?>" class="murailles-lightbox-mobile">
+								<img src="<?php echo esc_url( $slide_url ); ?>" alt="<?php the_title_attribute(); ?>" loading="<?php echo $i === 0 ? 'eager' : 'lazy'; ?>" />
+							</a>
+						</div>
+						<?php endforeach; ?>
+					</div>
+					<?php if ( $mu_all_count > 1 ) : ?>
+					<div class="murailles-mobile-gallery__dots" data-murailles-mobile-dots>
+						<?php for ( $i = 0; $i < $mu_all_count; $i++ ) : ?>
+						<button type="button" class="<?php echo $i === 0 ? 'is-active' : ''; ?>" data-murailles-dot-index="<?php echo (int) $i; ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Image %d sur %d', false ), $i + 1, $mu_all_count ) ); ?>"></button>
+						<?php endfor; ?>
+					</div>
+					<?php endif; ?>
 				</div>
-			</div>
+			</section>
+			<?php /* Re-alias for the existing slide-sync script below. */ ?>
+			<?php $mu_slide_count = $mu_all_count; ?>
+			<script>
+			/* Per-section magnific-popup init so the lightbox prev / next
+			   arrows cycle through ALL property images, not just the four
+			   visible thumbnails on desktop. The global body-level init in
+			   custom.js uses class .mfp-gallery; we use distinct classes
+			   (.murailles-lightbox + .murailles-lightbox-mobile) so the two
+			   galleries on this page each form an isolated cycle and don't
+			   merge with each other or with any other .mfp-gallery on the
+			   page (compare bar, similar listings, etc.). */
+			( function () {
+				if ( typeof jQuery === 'undefined' ) { return; }
+				jQuery( function ( $ ) {
+					var mfpOptions = {
+						type: 'image',
+						fixedContentPos: true,
+						fixedBgPos: true,
+						closeBtnInside: false,
+						preloader: true,
+						removalDelay: 0,
+						mainClass: 'mfp-fade murailles-lightbox-mfp',
+						gallery: {
+							enabled: true,
+							navigateByImgClick: true,
+							arrowMarkup: '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"></button>',
+							tPrev: <?php echo wp_json_encode( murailles_t( 'Précédent', false ) ); ?>,
+							tNext: <?php echo wp_json_encode( murailles_t( 'Suivant', false ) ); ?>,
+							tCounter: '%curr% / %total%'
+						},
+						image: { tError: '<a href="%url%">Erreur de chargement</a>' }
+					};
+
+					var $desktop = $( '[data-murailles-desktop-gallery]' );
+					if ( $desktop.length ) {
+						$desktop.magnificPopup( $.extend( {}, mfpOptions, { delegate: 'a.murailles-lightbox' } ) );
+					}
+
+					var $mobile = $( '[data-murailles-mobile-gallery]' );
+					if ( $mobile.length ) {
+						$mobile.magnificPopup( $.extend( {}, mfpOptions, { delegate: 'a.murailles-lightbox-mobile' } ) );
+					}
+				} );
+			} )();
+			</script>
+			<?php if ( $mu_slide_count > 1 ) : ?>
+			<script>
+			/* Sync the dot indicators with the scroll position of the swipe
+			   track. Uses IntersectionObserver so the active dot updates as
+			   each slide snaps into view, including when the user taps a dot
+			   to scroll to a specific slide. */
+			( function () {
+				var track = document.querySelector( '[data-murailles-mobile-track]' );
+				var dots  = document.querySelectorAll( '[data-murailles-mobile-dots] button' );
+				if ( ! track || ! dots.length ) { return; }
+
+				function setActive( idx ) {
+					for ( var i = 0; i < dots.length; i++ ) {
+						dots[ i ].classList.toggle( 'is-active', i === idx );
+					}
+				}
+
+				// Click a dot → scroll to the matching slide.
+				dots.forEach( function ( dot ) {
+					dot.addEventListener( 'click', function () {
+						var idx = parseInt( dot.getAttribute( 'data-murailles-dot-index' ), 10 );
+						var slide = track.querySelector( '[data-murailles-slide-index="' + idx + '"]' );
+						if ( slide ) {
+							track.scrollTo( { left: slide.offsetLeft - track.offsetLeft, behavior: 'smooth' } );
+							setActive( idx );
+						}
+					} );
+				} );
+
+				// Update the active dot when the user swipes between slides.
+				if ( 'IntersectionObserver' in window ) {
+					var io = new IntersectionObserver( function ( entries ) {
+						entries.forEach( function ( e ) {
+							if ( e.isIntersecting && e.intersectionRatio > 0.6 ) {
+								var idx = parseInt( e.target.getAttribute( 'data-murailles-slide-index' ), 10 );
+								setActive( idx );
+							}
+						} );
+					}, { root: track, threshold: [ 0.6 ] } );
+					track.querySelectorAll( '[data-murailles-slide-index]' ).forEach( function ( s ) { io.observe( s ); } );
+				}
+			} )();
+			</script>
+			<?php endif; ?>
 			<!-- ============================ Hero Banner End ================================== -->
 
 			<!-- ============================ Property Detail Start ================================== -->
@@ -113,7 +256,7 @@ $similar = new WP_Query( array(
 											<?php if ( $size ) : ?><li><span class="sqft fw-medium rounded"><?php echo esc_html( $size ); ?> m²</span></li><?php endif; ?>
 										</ul>
 										<h2><?php the_title(); ?></h2>
-										<span><i class="lni-map-marker"></i> <?php echo esc_html( $address ); ?><?php if ( $area_label ) echo ', ' . esc_html( $area_label ); ?><?php if ( $loc_label ) echo ' — ' . esc_html( $loc_label ); ?></span>
+										<span><i class="fa fa-map-marker-alt me-1" aria-hidden="true"></i><?php echo esc_html( $address ); ?><?php if ( $area_label ) echo ', ' . esc_html( $area_label ); ?><?php if ( $loc_label ) echo ' — ' . esc_html( $loc_label ); ?></span>
 									</div>
 								</div>
 								<div class="property_detail_section">
@@ -260,7 +403,7 @@ $similar = new WP_Query( array(
 									$ag_phone = get_post_meta( $agent_id, '_agent_phone', true );
 									$ag_wa    = get_post_meta( $agent_id, '_agent_whatsapp', true );
 									$ag_email = get_post_meta( $agent_id, '_agent_email', true );
-									$ag_thumb = get_the_post_thumbnail_url( $agent_id, 'thumbnail' ) ?: murailles_img( 'user-5.jpg' );
+									$ag_thumb = get_the_post_thumbnail_url( $agent_id, 'thumbnail' ) ?: 'https://i.pravatar.cc/96?img=68';
 								?>
 								<div class="sider_blocks_wrap">
 									<div class="side-booking-body">

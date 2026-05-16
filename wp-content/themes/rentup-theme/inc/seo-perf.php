@@ -61,7 +61,7 @@ add_filter( 'script_loader_tag', function ( $tag, $handle ) {
 add_action( 'wp_head', function () {
 	if ( ! is_front_page() ) { return; }
 	if ( ! function_exists( 'murailles_img' ) ) { return; }
-	$hero = murailles_img( 'banner-home.jpg' );
+	$hero = murailles_img( 'villa-luxe-marrakech-hero.webp' );
 	if ( ! $hero ) { return; }
 	printf(
 		'<link rel="preload" as="image" href="%s" fetchpriority="high">' . "\n",

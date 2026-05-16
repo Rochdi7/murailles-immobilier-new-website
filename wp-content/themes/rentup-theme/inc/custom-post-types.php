@@ -139,7 +139,6 @@ function murailles_get_all_meta_keys() {
 // Champs obligatoires
 function murailles_get_required_fields() {
 	return array(
-		'_property_price'   => 'Prix',
 		'_property_address' => 'Adresse',
 		'_property_size'    => 'Superficie',
 		'_property_bedrooms'=> 'Chambres',
@@ -159,6 +158,20 @@ function murailles_validate_property( $post_id ) {
 			$errors[] = $label;
 		}
 	}
+
+	// Taxonomy: at least one Catégorie de bien is required. WordPress posts
+	// the taxonomy input under `tax_input[property_category]` (array of term IDs)
+	// from the standard category metabox.
+	$cat_terms = $_POST['tax_input']['property_category'] ?? array();
+	if ( is_array( $cat_terms ) ) {
+		$cat_terms = array_filter( array_map( 'intval', $cat_terms ) );
+	} else {
+		$cat_terms = array_filter( array_map( 'intval', explode( ',', (string) $cat_terms ) ) );
+	}
+	if ( empty( $cat_terms ) ) {
+		$errors[] = 'Catégorie de bien';
+	}
+
 	if ( $errors ) {
 		set_transient( 'murailles_property_errors_' . $post_id, $errors, 60 );
 	} else {
@@ -217,9 +230,9 @@ function murailles_render_tabbed_metabox( $post ) {
 			<div class="murailles-section-title">Tarification</div>
 
 			<div class="murailles-field-row">
-				<div class="murailles-field-label">Prix <span class="murailles-required">*</span><small>Prix en MAD</small></div>
+				<div class="murailles-field-label">Prix<small>Prix en MAD (facultatif)</small></div>
 				<div class="murailles-field-input">
-					<input type="text" name="_property_price" value="<?php echo esc_attr( $m('_property_price') ); ?>" placeholder="1 500 000" required />
+					<input type="text" name="_property_price" value="<?php echo esc_attr( $m('_property_price') ); ?>" placeholder="1 500 000" />
 				</div>
 			</div>
 			<div class="murailles-field-row">

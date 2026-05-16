@@ -33,7 +33,7 @@ function murailles_social_image() {
 		}
 	}
 	if ( function_exists( 'murailles_img' ) ) {
-		return murailles_img( 'banner-home.jpg' );
+		return murailles_img( 'villa-luxe-marrakech-hero.webp' );
 	}
 	return '';
 }

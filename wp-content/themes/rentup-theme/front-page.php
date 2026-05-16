@@ -15,7 +15,7 @@ get_header();
 ?>
 
 <!-- ============================ Hero Banner  Start================================== -->
-			<div class="image-cover hero_banner" style="background:url(<?php echo esc_url( murailles_img( 'banner-home.jpg' ) ); ?>) no-repeat;" data-overlay="4">
+			<div class="image-cover hero_banner" style="background:url(<?php echo esc_url( murailles_img( 'villa-luxe-marrakech-hero.webp' ) ); ?>) no-repeat;" data-overlay="4">
 				<div class="container">
 					
 					<h1 class="big-header-capt mb-0"><?php murailles_t( 'Trouvez votre prochain bien' ); ?></h1>
@@ -360,11 +360,11 @@ get_header();
 						</div>
 					</div>
 					
-					<div class="row g-4 justify-content-center">
+					<div class="item-slide murailles-featured-slide space" data-murailles-featured-carousel>
 						<?php
 						$_featured = new WP_Query( array(
 							'post_type'      => 'property',
-							'posts_per_page' => 3,
+							'posts_per_page' => 9,
 							'post_status'    => 'publish',
 							'orderby'        => 'date',
 							'order'          => 'DESC',
@@ -394,9 +394,21 @@ get_header();
 									}
 								}
 								if ( empty( $imgs ) ) $imgs[] = $thumb;
+								/* Pad to 3 slides with design placeholders so the Slick carousel
+								   (dots + autoplay) always animates, matching rentup index.html. */
+								if ( count( $imgs ) < 3 ) {
+									$pool  = array( 'p-1.png','p-2.png','p-3.png','p-4.png','p-5.png','p-6.png','p-7.png','p-8.png','p-9.png' );
+									$start = $pid % count( $pool );
+									$i     = 0;
+									while ( count( $imgs ) < 3 && $i < count( $pool ) ) {
+										$candidate = murailles_img( $pool[ ( $start + $i ) % count( $pool ) ] );
+										if ( ! in_array( $candidate, $imgs, true ) ) $imgs[] = $candidate;
+										$i++;
+									}
+								}
 						?>
 						<!-- Single Property (dynamic) -->
-						<div class="col-lg-4 col-md-6 col-sm-12" data-murailles-id="<?php echo esc_attr( $pid ); ?>">
+						<div class="single_items" data-murailles-id="<?php echo esc_attr( $pid ); ?>">
 							<div class="property-listing property-2 h-100">
 
 								<div class="listing-img-wrapper">
@@ -417,9 +429,11 @@ get_header();
 												<?php if ( $pbeds ) : ?><span class="_list_blickes _netork"><?php echo esc_html( $pbeds ); ?> <?php murailles_t( 'Ch.' ); ?></span><?php endif; ?>
 												<?php if ( $pcat ) : ?><span class="_list_blickes types"><?php echo esc_html( $pcat ); ?></span><?php endif; ?>
 											</div>
+											<?php if ( $pprice !== '' ) : ?>
 											<div class="_card_flex_last">
 												<h6 class="listing-card-info-price mb-0"><?php echo esc_html( $pprice ); ?> €<?php if ( $psuffix ) echo ' ' . esc_html( $psuffix ); ?></h6>
 											</div>
+											<?php endif; ?>
 										</div>
 										<div class="_card_list_flex">
 											<div class="_card_flex_01">
@@ -502,7 +516,7 @@ get_header();
 							$_browse = esc_url( murailles_bien_url() );
 							foreach ( $_demo as $d ) :
 						?>
-						<div class="col-lg-4 col-md-6 col-sm-12">
+						<div class="single_items">
 							<div class="property-listing property-2 h-100">
 								<div class="listing-img-wrapper">
 									<div class="_exlio_125"><?php echo esc_html( $d['action'] ); ?></div>
@@ -552,8 +566,40 @@ get_header();
 							</div>
 						</div>
 						<?php endforeach; endif; ?>
-					</div>	
-					
+					</div>
+
+					<script>
+					/* Featured biens carousel — auto-scroll every 5s. The wrapper carries
+					   the .item-slide class so custom.js initializes slick on it; we wait
+					   for slick to attach then bump autoplaySpeed up from 2500ms to 5000ms. */
+					( function () {
+						function tuneFeaturedCarousel() {
+							if ( typeof jQuery === 'undefined' ) { return; }
+							var $car = jQuery( '[data-murailles-featured-carousel]' );
+							if ( ! $car.length ) { return; }
+							if ( ! $car.hasClass( 'slick-initialized' ) ) {
+								setTimeout( tuneFeaturedCarousel, 80 );
+								return;
+							}
+							$car.slick( 'slickSetOption', 'autoplaySpeed', 5000, true );
+							$car.slick( 'slickPlay' );
+						}
+						if ( document.readyState === 'loading' ) {
+							document.addEventListener( 'DOMContentLoaded', tuneFeaturedCarousel );
+						} else {
+							tuneFeaturedCarousel();
+						}
+					} )();
+					</script>
+
+					<div class="row mt-5">
+						<div class="col-lg-12 text-center">
+							<a href="<?php echo esc_url( murailles_bien_url() ); ?>" class="btn btn-danger px-4">
+								<?php murailles_t( 'Voir tous les biens' ); ?><i class="fa fa-arrow-right ms-2"></i>
+							</a>
+						</div>
+					</div>
+
 				</div>
 			</section>
 			<!-- ============================ Biens End ================================== -->
@@ -630,7 +676,7 @@ get_header();
 
 						<div class="col-lg-6 col-md-12 col-sm-12 mb-4 mb-lg-0">
 							<div class="position-relative">
-								<img src="<?php echo esc_url( murailles_img( 'banner-home.jpg' ) ); ?>" class="img-fluid rounded" alt="Agence Murailles Immobilier" style="width:100%;border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,0.08);">
+								<img src="<?php echo esc_url( murailles_img( 'about-agence-murailles-immobilier.webp' ) ); ?>" class="img-fluid rounded" alt="Agence Murailles Immobilier" style="width:100%;border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,0.08);">
 								<div style="position:absolute;bottom:-20px;right:-20px;background:#dc3545;color:#fff;padding:24px 32px;border-radius:12px;box-shadow:0 12px 24px rgba(220,53,69,0.3);">
 									<div style="font-size:32px;font-weight:800;line-height:1;">15+</div>
 									<div style="font-size:13px;letter-spacing:0.5px;text-transform:uppercase;"><?php murailles_t( "Années d'expérience" ); ?></div>
@@ -866,7 +912,7 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-1.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=47" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Susan D. Murphy</h5>
@@ -874,11 +920,6 @@ get_header();
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.7</div>
 												</div>
 											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-1.png' ) ); ?>" class="img-fluid" alt="">
-												</div>
-											</div>
 										</div>
 										
 										<div class="facts-detail">
@@ -893,7 +934,7 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-2.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=32" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Maxine E. Gagliardi</h5>
@@ -901,11 +942,6 @@ get_header();
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.5</div>
 												</div>
 											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-2.png' ) ); ?>" class="img-fluid" alt="">
-												</div>
-											</div>
 										</div>
 										
 										<div class="facts-detail">
@@ -920,7 +956,7 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-3.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=12" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Roy M. Cardona</h5>
@@ -928,11 +964,6 @@ get_header();
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.9</div>
 												</div>
 											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-3.png' ) ); ?>" class="img-fluid" alt="">
-												</div>
-											</div>
 										</div>
 										
 										<div class="facts-detail">
@@ -947,7 +978,7 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-4.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=45" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Dorothy K. Shipton</h5>
@@ -955,11 +986,6 @@ get_header();
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.7</div>
 												</div>
 											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-4.png' ) ); ?>" class="img-fluid" alt="">
-												</div>
-											</div>
 										</div>
 										
 										<div class="facts-detail">
@@ -974,17 +1000,12 @@ get_header();
 										<div class="_testimonial_flex">
 											<div class="_testimonial_flex_first">
 												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'user-5.jpg' ) ); ?>" class="img-fluid" alt="">
+													<img src="https://i.pravatar.cc/96?img=68" class="img-fluid" alt="">
 												</div>
 												<div class="_tsl_flex_capst">
 													<h5>Robert P. McKissack</h5>
 													<div class="_ovr_posts"><span><?php murailles_t( 'Propriétaire' ); ?></span></div>
 													<div class="_ovr_rates"><span><i class="fa fa-star"></i></span>4.7</div>
-												</div>
-											</div>
-											<div class="_testimonial_flex_first_last">
-												<div class="_tsl_flex_thumb">
-													<img src="<?php echo esc_url( murailles_img( 'c-5.png' ) ); ?>" class="img-fluid" alt="">
 												</div>
 											</div>
 										</div>
@@ -1004,7 +1025,7 @@ get_header();
 			<!-- ============================ Smart Testimonials End ================================== -->
 
 			<!-- ============================ Property Tag Start ================================== -->
-			<section class="image-cover" style="background:#122947 url(<?php echo esc_url( murailles_img( 'banner-home.jpg' ) ); ?>) no-repeat;" data-overlay="4">
+			<section class="image-cover" style="background:#122947 url(<?php echo esc_url( murailles_img( 'nos-services-immobilier-marrakech.webp' ) ); ?>) no-repeat;" data-overlay="4">
 				<div class="container">
 					<div class="row">
 						<div class="col-xl-6 col-lg-6 col-md-8 col-sm-12">

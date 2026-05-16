@@ -14,7 +14,7 @@ get_header();
 ?>
 
 <!-- ============================ Page Title Start================================== -->
-			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( murailles_img( 'slider-3.jpg' ) ); ?>);" data-overlay="5">
+			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( murailles_img( 'contact-agence-immobiliere-marrakech.webp' ) ); ?>);" data-overlay="5">
 				<div class="ht-80"></div>
 				<div class="container">
 					<div class="row">

@@ -83,6 +83,11 @@ function murailles_i18n_dictionary() {
 		'Nouveau'                  => 'New',
 		'Populaire'                => 'Hot',
 
+		// === Single-property mobile gallery accessibility ==================
+		'Image %d sur %d'          => 'Image %d of %d',
+		'Précédent'                => 'Previous',
+		'Suivant'                  => 'Next',
+
 		// === Error page (404/403/500/503/maintenance) ======================
 		'Page introuvable'         => 'Page not found',
 		"La page que vous cherchez n'existe pas, a été déplacée, ou son lien est obsolète. Pas d'inquiétude — utilisez la recherche ou explorez nos catégories pour trouver le bien qu'il vous faut."
@@ -905,6 +910,53 @@ function murailles_i18n_dictionary() {
 		'Catégories'                   => 'Categories',
 		'Articles récents'             => 'Recent posts',
 		'Étiquettes'                   => 'Tags',
+
+		// === Submit Property page =========================================
+		// Form labels: backend stores option `value` attributes in French
+		// (e.g. `vente`, `riad`, `casablanca`, `Climatisation`) — these are
+		// taxonomy slugs / post-meta values consumed by inc/forms.php. Only
+		// the visible labels translate.
+		'Déposez votre annonce'        => 'Submit your listing',
+		'Pas besoin de compte : remplissez le formulaire et notre équipe vous recontactera sous 24 h.'
+			=> 'No account needed: fill in the form and our team will get back to you within 24 hours.',
+		'Informations générales'       => 'General information',
+		"Titre de l'annonce"           => 'Listing title',
+		'Commerce'                     => 'Shop',
+		'Prix'                         => 'Price',
+		'Montant en €'                 => 'Amount in €',
+		'Surface (m²)'                 => 'Area (m²)',
+		'Galerie photos'               => 'Photo gallery',
+		'Ajouter des photos'           => 'Add photos',
+		'Glissez vos photos ici ou cliquez pour parcourir'
+			=> 'Drag your photos here or click to browse',
+		'JPG ou PNG — vous pouvez sélectionner plusieurs photos.'
+			=> 'JPG or PNG — you can select multiple photos.',
+		'Casablanca'                   => 'Casablanca',
+		'Marrakech'                    => 'Marrakech',
+		'Rabat'                        => 'Rabat',
+		'Tanger'                       => 'Tangier',
+		'Fès'                          => 'Fez',
+		'Agadir'                       => 'Agadir',
+		'Région'                       => 'Region',
+		'Code postal'                  => 'Postal code',
+		'Détails du bien'              => 'Property details',
+		'Description'                  => 'Description',
+		'Année de construction (facultatif)'
+			=> 'Year built (optional)',
+		'Garage (facultatif)'          => 'Garage (optional)',
+		'Pièces (facultatif)'          => 'Rooms (optional)',
+		'Équipements (facultatif)'     => 'Amenities (optional)',
+		'0 à 5 ans'                    => '0 to 5 years',
+		'5 à 10 ans'                   => '5 to 10 years',
+		'10 à 15 ans'                  => '10 to 15 years',
+		'15 à 20 ans'                  => '15 to 20 years',
+		'Plus de 20 ans'               => 'Over 20 years',
+		'Cuisine équipée'              => 'Fitted kitchen',
+		'Vue mer'                      => 'Sea view',
+		'Internet'                     => 'Internet',
+		'Coordonnées'                  => 'Contact details',
+		'Téléphone (facultatif)'       => 'Phone (optional)',
+		'Publier mon annonce'          => 'Publish my listing',
 
 	);
 }

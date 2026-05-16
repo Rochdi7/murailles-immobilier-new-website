@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 get_header();
 ?>
 
-<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( murailles_img( 'banner-home.jpg' ) ); ?>);" data-overlay="5">
+<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( murailles_img( 'faq-immobilier-marrakech.webp' ) ); ?>);" data-overlay="5">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12 col-md-12">
