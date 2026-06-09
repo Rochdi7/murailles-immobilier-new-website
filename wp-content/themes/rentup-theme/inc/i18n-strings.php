@@ -82,6 +82,10 @@ function murailles_i18n_dictionary() {
 		// === Blog card badges ==============================================
 		'Nouveau'                  => 'New',
 		'Populaire'                => 'Hot',
+		'Tendance'                 => 'Trending',
+
+		// === Home CTA banner ===============================================
+		'Votre projet immobilier'  => 'Your real-estate project',
 
 		// === Single-property mobile gallery accessibility ==================
 		'Image %d sur %d'          => 'Image %d of %d',
@@ -128,6 +132,9 @@ function murailles_i18n_dictionary() {
 		'Ville / Quartier'             => 'City / Neighbourhood',
 		'Type de bien'                 => 'Property type',
 		'Fourchette de prix'           => 'Price range',
+		'Toutes les villes'            => 'All cities',
+		'Tous les types'               => 'All types',
+		'Tous les budgets'             => 'All budgets',
 		'De 40 000 € à 100 000 €'      => '€40,000 – €100,000',
 		'De 100 000 € à 250 000 €'     => '€100,000 – €250,000',
 		'De 250 000 € à 500 000 €'     => '€250,000 – €500,000',
@@ -164,11 +171,11 @@ function murailles_i18n_dictionary() {
 
 		// === Front page: how it works ======================================
 		'Comment ça marche ?'          => 'How it works?',
-		"Trois étapes simples pour trouver le bien immobilier qui vous correspond avec l'Agence Murailles : créez votre compte, parcourez nos annonces et réservez votre coup de cœur."
-			=> "Three simple steps to find the property that suits you with Agence Murailles: create your account, browse our listings and book your favourite.",
-		'Créez votre compte'           => 'Create your account',
-		'Inscrivez-vous gratuitement en quelques clics pour accéder à toutes nos annonces et enregistrer vos favoris.'
-			=> 'Sign up for free in a few clicks to access all our listings and save your favourites.',
+		"Trois étapes simples pour trouver le bien immobilier qui vous correspond avec l'Agence Murailles : explorez nos annonces, affinez votre recherche et réservez votre coup de cœur."
+			=> "Three simple steps to find the property that suits you with Agence Murailles: browse our listings, refine your search and book your favourite.",
+		'Explorez nos annonces'        => 'Browse our listings',
+		'Parcourez notre sélection de riads, villas et appartements à Marrakech, en location ou à la vente.'
+			=> 'Browse our selection of riads, villas and apartments in Marrakech, for rent or for sale.',
 		'Trouvez votre bien'           => 'Find your property',
 		'Filtrez par ville, type de bien et budget pour découvrir les riads, villas et appartements qui correspondent à vos critères.'
 			=> 'Filter by city, property type and budget to discover the riads, villas and apartments that match your criteria.',

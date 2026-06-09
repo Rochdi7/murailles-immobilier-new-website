@@ -77,7 +77,7 @@ function murailles_schema_decode_entities( $value ) {
 add_action( 'wp_head', function () {
 	$ci   = murailles_schema_agency_data();
 	$home = home_url( '/' );
-	$logo = function_exists( 'murailles_img' ) ? murailles_img( 'logo.png' ) : ( $home . 'wp-content/themes/rentup-theme/assets/images/logo.png' );
+	$logo = function_exists( 'murailles_img' ) ? murailles_img( 'logo.webp' ) : ( $home . 'wp-content/themes/rentup-theme/assets/images/logo.webp' );
 
 	$social = array_filter( array(
 		! empty( $ci['facebook'] )  && $ci['facebook']  !== '#' ? $ci['facebook']  : null,

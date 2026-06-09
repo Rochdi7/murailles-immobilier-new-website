@@ -23,6 +23,7 @@
 ._testimonial_flex_first_last ._tsl_flex_thumb img { max-width:55px; height:auto; display:block; }
 ._awards_group ._awards_list_wrap .rats-thumb     { flex:0 0 80px; min-width:80px; margin-right:14px; }
 ._awards_group ._awards_list_wrap .rats-thumb img { width:70px; height:auto; max-height:70px; object-fit:contain; display:block; }
+._awards_group ._awards_list_wrap .rats-thumb i   { display:flex; align-items:center; justify-content:center; width:70px; height:70px; }
 
 /* ─── 2. Single-property gallery grid (1 hero + 3 stacked thumbs) ──
    The left hero and the three stacked thumbnails on the right must
@@ -106,6 +107,52 @@
 }
 @media (min-width: 768px) {
 	.murailles-mobile-gallery__slide a { height: 460px; }
+}
+
+/* ─── 2b. Home-page CTA banner (Property Tag section) ──────────────
+   Hero-style cover banner with a refined glass card on top. Avoids
+   the plain white box look from the old .tab_exclusive style. */
+.murailles-cta-banner { padding: 110px 0; background-attachment: scroll; }
+.murailles-cta-banner__card {
+	position: relative;
+	z-index: 2;
+	background: #fff;
+	border-radius: 14px;
+	padding: 44px 44px 40px;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+	border-left: 6px solid #dc3545;
+}
+.murailles-cta-banner__eyebrow {
+	display: inline-block;
+	color: #dc3545;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+	font-size: 12px;
+	margin-bottom: 10px;
+}
+.murailles-cta-banner__card h2 {
+	font-size: 30px;
+	line-height: 1.25;
+	color: #1a2332;
+	margin: 0 0 14px;
+	font-weight: 800;
+}
+.murailles-cta-banner__card p {
+	color: #5b6470;
+	font-size: 15px;
+	line-height: 1.7;
+	margin: 0 0 22px;
+}
+.murailles-cta-banner__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+@media (max-width: 768px) {
+	.murailles-cta-banner { padding: 70px 0; }
+	.murailles-cta-banner__card { padding: 30px 24px; }
+	.murailles-cta-banner__card h2 { font-size: 24px; }
 }
 
 /* ─── 3. Nav z-index + back-to-top ─────────────────────────────────── */
@@ -1330,5 +1377,95 @@ a > i[class*="fa-"]:only-child {
 	.murailles-compare-th img {
 		max-width: 110px;
 		height: 75px;
+	}
+}
+
+/* ─── Hero search — mobile readability & compactness ──────────────────
+   On small screens the hero card was showing visually empty selects:
+   the placeholder option was &nbsp; and the native control rendered
+   the inline label with very low contrast on white. We tighten the
+   vertical rhythm, give labels weight & colour, and style the native
+   selects with a visible caret and dark text so users can scan and
+   tap each field without guessing what's there. */
+@media (max-width: 767px) {
+	.hero_banner .big-header-capt {
+		font-size: 22px;
+		line-height: 1.25;
+		margin-top: 1.25rem;
+	}
+	.hero_banner p {
+		font-size: 14px;
+		line-height: 1.4;
+		margin-bottom: 0.5rem;
+	}
+	.hero_banner .row.justify-content-center.mt-5 {
+		margin-top: 1.25rem !important;
+	}
+	.full_search_box.hero_search-radius.modern {
+		padding: 14px 14px 6px;
+		background: #ffffff;
+		border-radius: 10px;
+		box-shadow: 0 10px 30px rgba(8, 14, 28, 0.12);
+	}
+	.full_search_box.lightanic_search.modern .form-group {
+		background: #ffffff;
+		border: 1px solid #e1e6f1;
+		border-radius: 8px;
+		margin-bottom: 10px;
+		padding: 8px 12px 6px;
+	}
+	.full_search_box.modern label {
+		font-size: 12px;
+		font-weight: 600;
+		color: #4a5872;
+		text-transform: uppercase;
+		letter-spacing: 0.3px;
+		margin-bottom: 2px;
+	}
+	.full_search_box.nexio_search .form-group .input-with-icon {
+		border: none;
+		padding: 0;
+		background: transparent;
+	}
+	.full_search_box.nexio_search .form-group select.form-control {
+		height: 38px;
+		padding: 0 28px 0 0;
+		font-size: 15px;
+		font-weight: 500;
+		color: #1a2236;
+		background-color: transparent;
+		border: none;
+		box-shadow: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23a02a37' d='M6 8L0 0h12z'/></svg>");
+		background-repeat: no-repeat;
+		background-position: right 4px center;
+		background-size: 10px 7px;
+		width: 100%;
+	}
+	.full_search_box.nexio_search .form-group select.form-control:focus {
+		outline: none;
+	}
+	.full_search_box.lightanic_search.modern .form-group:focus-within {
+		border-color: #a02a37;
+		box-shadow: 0 0 0 3px rgba(160, 42, 55, 0.12);
+	}
+	.lightanic_search.hero_search-radius.modern .btn.search-btn,
+	.full_search_box.nexio_search .small-padd .btn.btn-danger {
+		height: 52px;
+		border-radius: 8px;
+		font-size: 16px;
+		font-weight: 600;
+	}
+	.full_search_box.nexio_search .small-padd {
+		padding: 4px 0 0 !important;
+	}
+	.full_search_box.nexio_search .small-padd .form-group {
+		background: transparent;
+		border: none;
+		padding: 0;
+		margin-bottom: 0;
 	}
 }

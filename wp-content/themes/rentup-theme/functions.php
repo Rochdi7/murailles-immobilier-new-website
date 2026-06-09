@@ -71,6 +71,16 @@ function murailles_theme_setup()
 	if (! isset($content_width)) {
 		$content_width = 1140;
 	}
+
+	// Elementor compatibility — opt-in only. Adding theme support tells Elementor
+	// that the theme cooperates with the page builder; per-post-type support lets
+	// editors click "Edit with Elementor" on pages, posts, and property listings.
+	// Existing PHP templates remain in control — Elementor only activates on a
+	// post when an editor explicitly opens it in the Elementor editor.
+	add_theme_support('elementor');
+	add_post_type_support('page', 'elementor');
+	add_post_type_support('post', 'elementor');
+	add_post_type_support('property', 'elementor');
 }
 add_action('after_setup_theme', 'murailles_theme_setup');
 

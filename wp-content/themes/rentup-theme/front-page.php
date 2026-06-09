@@ -73,7 +73,7 @@ get_header();
 												<label><?php murailles_t( 'Ville / Quartier' ); ?></label>
 												<div class="input-with-icon">
 													<select id="location" name="location" class="form-control">
-														<option value="">&nbsp;</option>
+														<option value=""><?php echo esc_html( murailles_t( 'Toutes les villes', false ) ); ?></option>
 														<?php foreach ( $hero_loc_options as $loc ) : ?>
 														<option value="<?php echo esc_attr( $loc->slug ); ?>"><?php echo esc_html( $loc->name ); ?></option>
 														<?php endforeach; ?>
@@ -87,7 +87,7 @@ get_header();
 												<label><?php murailles_t( 'Type de bien' ); ?></label>
 												<div class="input-with-icon">
 													<select id="ptypes" name="ptype" class="form-control">
-														<option value="">&nbsp;</option>
+														<option value=""><?php echo esc_html( murailles_t( 'Tous les types', false ) ); ?></option>
 														<?php foreach ( $hero_ptypes as $cat ) : ?>
 														<option value="<?php echo esc_attr( $cat->slug ); ?>"><?php echo esc_html( ucwords( strtolower( $cat->name ) ) ); ?></option>
 														<?php endforeach; ?>
@@ -101,7 +101,7 @@ get_header();
 												<label><?php murailles_t( 'Fourchette de prix' ); ?></label>
 												<div class="input-with-icon">
 													<select id="price" name="price_range" class="form-control" data-murailles-price-range>
-														<option value="">&nbsp;</option>
+														<option value=""><?php echo esc_html( murailles_t( 'Tous les budgets', false ) ); ?></option>
 														<option value="40000-100000"><?php murailles_t( 'De 40 000 € à 100 000 €' ); ?></option>
 														<option value="100000-250000"><?php murailles_t( 'De 100 000 € à 250 000 €' ); ?></option>
 														<option value="250000-500000"><?php murailles_t( 'De 250 000 € à 500 000 €' ); ?></option>
@@ -175,7 +175,7 @@ get_header();
 										<div class="_awards_list_wrap">
 											<div class="d-flex align-items-center">
 												<div class="rats-thumb">
-													<img src="<?php echo esc_url( murailles_img( 'trust.webp' ) ); ?>" class="img-fluid" width="70" alt="">
+													<img src="<?php echo esc_url( murailles_img( 'trust.webp' ) ); ?>" class="img-fluid" width="70" alt="Trustpilot">
 												</div>
 												<div class="ploi ps-3">
 													<div class="d-flex align-items-center">
@@ -186,7 +186,7 @@ get_header();
 														<i class="fas fa-star text-warning"></i>
 													</div>
 													<div class="explio mt-1">
-														<p class="m-0 text-muted">3 612 <?php murailles_t( 'avis au total' ); ?></p>
+														<p class="m-0 text-muted">412 <?php murailles_t( 'avis au total' ); ?></p>
 													</div>
 												</div>
 											</div>
@@ -197,7 +197,7 @@ get_header();
 										<div class="_awards_list_wrap">
 											<div class="d-flex align-items-center">
 												<div class="rats-thumb">
-													<img src="<?php echo esc_url( murailles_img( 'cap.webp' ) ); ?>" class="img-fluid" width="70" alt="">
+													<i class="fab fa-google" style="font-size:42px;color:#4285F4;"></i>
 												</div>
 												<div class="ploi ps-3">
 													<div class="d-flex align-items-center">
@@ -208,7 +208,7 @@ get_header();
 														<i class="fas fa-star text-warning"></i>
 													</div>
 													<div class="explio mt-1">
-														<p class="m-0 text-muted">4 589 <?php murailles_t( 'avis au total' ); ?></p>
+														<p class="m-0 text-muted">587 <?php murailles_t( 'avis au total' ); ?></p>
 													</div>
 												</div>
 											</div>
@@ -219,7 +219,7 @@ get_header();
 										<div class="_awards_list_wrap">
 											<div class="d-flex align-items-center">
 												<div class="rats-thumb">
-													<img src="<?php echo esc_url( murailles_img( 'clutch.webp' ) ); ?>" class="img-fluid" width="70" alt="">
+													<i class="fas fa-house-chimney" style="font-size:38px;color:#e74c3c;"></i>
 												</div>
 												<div class="ploi ps-3">
 													<div class="d-flex align-items-center">
@@ -230,7 +230,7 @@ get_header();
 														<i class="fas fa-star text-warning"></i>
 													</div>
 													<div class="explio mt-1">
-														<p class="m-0 text-muted">3 625 <?php murailles_t( 'avis au total' ); ?></p>
+														<p class="m-0 text-muted">324 <?php murailles_t( 'avis au total' ); ?></p>
 													</div>
 												</div>
 											</div>
@@ -612,7 +612,7 @@ get_header();
 						<div class="col-lg-7 col-md-8">
 							<div class="sec-heading center">
 								<h2><?php murailles_t( 'Comment ça marche ?' ); ?></h2>
-								<p><?php murailles_t( "Trois étapes simples pour trouver le bien immobilier qui vous correspond avec l'Agence Murailles : créez votre compte, parcourez nos annonces et réservez votre coup de cœur." ); ?></p>
+								<p><?php murailles_t( "Trois étapes simples pour trouver le bien immobilier qui vous correspond avec l'Agence Murailles : explorez nos annonces, affinez votre recherche et réservez votre coup de cœur." ); ?></p>
 							</div>
 						</div>
 					</div>
@@ -623,12 +623,12 @@ get_header();
 							<div class="wpk_process">
 								<div class="wpk_thumb">
 									<div class="wpk_thumb_figure">
-										<i class="fa-solid fa-user-plus text-danger" style="font-size:48px;"></i>
+										<i class="fa-solid fa-list-ul text-danger" style="font-size:48px;"></i>
 									</div>
 								</div>
 								<div class="wpk_caption">
-									<h4><?php murailles_t( 'Créez votre compte' ); ?></h4>
-									<p><?php murailles_t( 'Inscrivez-vous gratuitement en quelques clics pour accéder à toutes nos annonces et enregistrer vos favoris.' ); ?></p>
+									<h4><?php murailles_t( 'Explorez nos annonces' ); ?></h4>
+									<p><?php murailles_t( 'Parcourez notre sélection de riads, villas et appartements à Marrakech, en location ou à la vente.' ); ?></p>
 								</div>
 							</div>
 						</div>
@@ -1025,17 +1025,25 @@ get_header();
 			<!-- ============================ Smart Testimonials End ================================== -->
 
 			<!-- ============================ Property Tag Start ================================== -->
-			<section class="image-cover" style="background:#122947 url(<?php echo esc_url( murailles_img( 'nos-services-immobilier-marrakech.webp' ) ); ?>) no-repeat;" data-overlay="4">
+			<?php /* Cover banner CTA. Background uses `villa-luxe-marrakech-hero.webp`
+			         (strong riad image) on the desktop, with a darker overlay
+			         (data-overlay="5") so the white card pops and the underlying
+			         photo doesn't fight the headline for attention. Card itself
+			         gets a soft shadow, larger heading, and a red accent bar
+			         on the left to anchor the brand color. */ ?>
+			<section class="image-cover murailles-cta-banner" style="background:#122947 url(<?php echo esc_url( murailles_img( 'villa-luxe-marrakech-hero.webp' ) ); ?>) center/cover no-repeat;" data-overlay="3">
 				<div class="container">
 					<div class="row">
-						<div class="col-xl-6 col-lg-6 col-md-8 col-sm-12">
-
-							<div class="tab_exclusive position-relative z-1">
+						<div class="col-xl-6 col-lg-7 col-md-9 col-sm-12">
+							<div class="murailles-cta-banner__card">
+								<span class="murailles-cta-banner__eyebrow"><?php murailles_t( 'Votre projet immobilier' ); ?></span>
 								<h2><?php murailles_t( 'Vous cherchez le lieu idéal pour réaliser votre rêve ?' ); ?></h2>
 								<p><?php murailles_t( "Riads d'exception dans la médina, villas avec piscine à la Palmeraie, appartements modernes à Casablanca ou Rabat — l'Agence Murailles vous accompagne pour trouver le bien qui correspond à votre projet de vie au Maroc." ); ?></p>
-								<a href="<?php echo esc_url( murailles_bien_url() ); ?>" class="btn exliou btn-seegreen mt-2"><?php murailles_t( 'Voir les biens' ); ?></a>
+								<div class="murailles-cta-banner__actions">
+									<a href="<?php echo esc_url( murailles_bien_url() ); ?>" class="btn btn-danger px-4"><?php murailles_t( 'Voir les biens' ); ?><i class="fa fa-arrow-right ms-2"></i></a>
+									<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn btn-outline-dark px-4"><i class="fa fa-comments me-2"></i><?php murailles_t( 'Nous contacter' ); ?></a>
+								</div>
 							</div>
-
 						</div>
 					</div>
 				</div>
