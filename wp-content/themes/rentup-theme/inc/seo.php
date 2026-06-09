@@ -152,8 +152,14 @@ function murailles_seo_description() {
 
 /**
  * Emit <meta name="description"> in <head>.
+ * Suppressed when Yoast SEO, Rank Math, AIOSEO, or SEOPress is active
+ * to prevent duplicate meta description tags.
  */
 add_action( 'wp_head', function () {
+	if ( defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ||
+	     class_exists( 'AIOSEO\Plugin\AIOSEO' ) || defined( 'SEOPRESS_VERSION' ) ) {
+		return;
+	}
 	$desc = murailles_seo_description();
 	if ( ! $desc ) { return; }
 	$desc = trim( wp_strip_all_tags( $desc ) );

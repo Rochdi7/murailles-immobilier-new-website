@@ -43,6 +43,12 @@ function murailles_social_image() {
  * Hooked at priority 5 so they appear near the top of <head>, before scripts.
  */
 add_action( 'wp_head', function () {
+	// Defer OG/Twitter tags to SEO plugin when one is active — prevents duplicates.
+	if ( defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ||
+	     class_exists( 'AIOSEO\Plugin\AIOSEO' ) || defined( 'SEOPRESS_VERSION' ) ) {
+		return;
+	}
+
 	$site   = get_bloginfo( 'name' );
 	$locale = function_exists( 'pll_current_language' ) ? pll_current_language( 'locale' ) : get_locale();
 	if ( ! $locale ) { $locale = 'fr_FR'; }
@@ -50,7 +56,7 @@ add_action( 'wp_head', function () {
 	$title = function_exists( 'wp_get_document_title' ) ? wp_get_document_title() : $site;
 	$desc  = function_exists( 'murailles_seo_description' ) ? murailles_seo_description() : '';
 	$image = murailles_social_image();
-	$url   = is_singular() ? get_permalink() : ( is_front_page() ? home_url( '/' ) : ( isset( $_SERVER['REQUEST_URI'] ) ? home_url( $_SERVER['REQUEST_URI'] ) : home_url( '/' ) ) );
+	$url   = is_singular() ? get_permalink() : ( is_front_page() ? home_url( '/' ) : home_url( wp_parse_url( add_query_arg( array() ), PHP_URL_PATH ) ?: '/' ) );
 
 	$type = 'website';
 	if ( is_singular( 'post' ) )      { $type = 'article'; }

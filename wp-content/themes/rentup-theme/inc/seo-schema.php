@@ -75,6 +75,13 @@ function murailles_schema_decode_entities( $value ) {
  * engines can resolve the brand entity from any entry point.
  */
 add_action( 'wp_head', function () {
+	// When a dedicated SEO plugin is active it outputs its own Organization/WebSite
+	// schema — suppress ours to avoid duplicate @type entries that confuse validators.
+	if ( defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ||
+	     class_exists( 'AIOSEO\Plugin\AIOSEO' ) || defined( 'SEOPRESS_VERSION' ) ) {
+		return;
+	}
+
 	$ci   = murailles_schema_agency_data();
 	$home = home_url( '/' );
 	$logo = function_exists( 'murailles_img' ) ? murailles_img( 'logo.webp' ) : ( $home . 'wp-content/themes/rentup-theme/assets/images/logo.webp' );
@@ -367,7 +374,7 @@ add_action( 'wp_head', function () {
 			murailles_schema_print( array(
 				'@context'      => 'https://schema.org',
 				'@type'         => 'CollectionPage',
-				'@id'           => ( isset( $_SERVER['REQUEST_URI'] ) ? home_url( $_SERVER['REQUEST_URI'] ) : home_url( '/bien/' ) ) . '#collection',
+				'@id'           => home_url( wp_parse_url( add_query_arg( array() ), PHP_URL_PATH ) ?: '/bien/' ) . '#collection',
 				'mainEntity'    => array(
 					'@type'           => 'ItemList',
 					'numberOfItems'   => count( $items ),

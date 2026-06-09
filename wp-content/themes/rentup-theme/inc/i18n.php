@@ -247,7 +247,7 @@ function murailles_lang_switcher_fallback() {
 
 	// Build the URL toggling to the alternate language. Strips any existing
 	// ?lang= and appends the new one to the current request URI.
-	$current_uri = ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	$current_uri = home_url( wp_parse_url( add_query_arg( array() ), PHP_URL_PATH ) ?: '/' );
 	$toggle_url  = esc_url( add_query_arg( 'lang', $alt, remove_query_arg( 'lang', $current_uri ) ) );
 	?>
 	<li class="murailles-lang-switcher">

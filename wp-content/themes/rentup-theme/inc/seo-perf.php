@@ -45,12 +45,11 @@ add_filter('script_loader_tag', function ($tag, $handle) {
 		'murailles-dropdown',
 		'murailles-uploader',
 		'murailles-single-property',
-		'slick',
-		'magnific-popup',
-		'ion-rangeslider',
-		'lightbox',
-		'dropzone',
-		'fontawesome',
+		'murailles-slick',
+		'murailles-magnific',
+		'murailles-rangeslider',
+		'murailles-lightbox',
+		'murailles-dropzone',
 		'murailles-fa6',
 	);
 	foreach ($defer as $h) {
@@ -225,7 +224,7 @@ add_action('wp_body_open', function () {
  * page response, regex-only (no DOM parser dependency).
  */
 add_action('template_redirect', function () {
-	if (is_admin() || is_feed() || wp_doing_ajax()) {
+	if (is_admin() || is_feed() || wp_doing_ajax() || (function_exists('wp_doing_cron') && wp_doing_cron())) {
 		return;
 	}
 	ob_start(function ($html) {
@@ -260,9 +259,8 @@ add_action('template_redirect', function () {
 		// Add width/height to logo + testimonial avatars when missing.
 		// These are the most common CLS culprits on this theme.
 		$known_dims = array(
-			'logo.webp' => array(165, 40),
-			'logo.png'       => array(165, 40),
 			'logo.webp'      => array(165, 40),
+			'logo.png'       => array(165, 40),
 			'user-1.jpg'     => array(60,  60),
 			'user-2.jpg'     => array(60,  60),
 			'user-3.jpg'     => array(60,  60),

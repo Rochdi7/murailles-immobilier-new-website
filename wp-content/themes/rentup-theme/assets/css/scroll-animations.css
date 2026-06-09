@@ -1,0 +1,175 @@
+/*
+ * Murailles Immobilier — Scroll Animations
+ * Safe approach: animate only sections entering the viewport.
+ * Nothing is hidden on page load. No opacity:0 anywhere.
+ * Elements slide up from their natural painted position via translateY.
+ * JS adds [data-anim-state="in"] to each <section> when it intersects.
+ */
+
+/* ── Reduced-motion: disable everything ───────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    section { animation: none !important; }
+    section * { animation: none !important; transition: none !important; }
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────── */
+@keyframes mu-rise {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes mu-rise-sm {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes mu-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes mu-left {
+    from { opacity: 0; transform: translateX(-32px); }
+    to   { opacity: 1; transform: translateX(0);     }
+}
+
+/* ── Section enters viewport → animate its direct content ────────── */
+
+/* Section headings */
+section[data-anim-state="in"] .sec-heading,
+section[data-anim-state="in"] .sec-heading2 {
+    animation: mu-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Awards bar */
+section[data-anim-state="in"] ._awards_group {
+    animation: mu-fade 0.7s ease both;
+}
+
+/* Category boxes — stagger via nth-child */
+section[data-anim-state="in"] ._category_box {
+    animation: mu-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+section[data-anim-state="in"] .col-lg-3:nth-child(1) ._category_box,
+section[data-anim-state="in"] .col-md-4:nth-child(1) ._category_box { animation-delay: 0.05s; }
+section[data-anim-state="in"] .col-lg-3:nth-child(2) ._category_box,
+section[data-anim-state="in"] .col-md-4:nth-child(2) ._category_box { animation-delay: 0.14s; }
+section[data-anim-state="in"] .col-lg-3:nth-child(3) ._category_box,
+section[data-anim-state="in"] .col-md-4:nth-child(3) ._category_box { animation-delay: 0.23s; }
+section[data-anim-state="in"] .col-lg-3:nth-child(4) ._category_box,
+section[data-anim-state="in"] .col-md-4:nth-child(4) ._category_box { animation-delay: 0.32s; }
+section[data-anim-state="in"] .col-lg-3:nth-child(5) ._category_box { animation-delay: 0.41s; }
+section[data-anim-state="in"] .col-lg-3:nth-child(6) ._category_box { animation-delay: 0.50s; }
+
+/* Property listing cards */
+section[data-anim-state="in"] .property-listing {
+    animation: mu-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+section[data-anim-state="in"] [class*="col-"]:nth-child(1) .property-listing { animation-delay: 0.04s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(2) .property-listing { animation-delay: 0.13s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(3) .property-listing { animation-delay: 0.22s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(4) .property-listing { animation-delay: 0.31s; }
+
+/* How it works steps */
+section[data-anim-state="in"] .wpk_process {
+    animation: mu-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+section[data-anim-state="in"] [class*="col-"]:nth-child(1) .wpk_process { animation-delay: 0.05s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(2) .wpk_process { animation-delay: 0.16s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(3) .wpk_process { animation-delay: 0.27s; }
+
+/* About / story */
+section[data-anim-state="in"] .story-wrap {
+    animation: mu-left 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+section[data-anim-state="in"] ._about_box {
+    animation: mu-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+/* City location tiles */
+section[data-anim-state="in"] .img-wrap {
+    animation: mu-rise-sm 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+section[data-anim-state="in"] [class*="col-"]:nth-child(1) .img-wrap { animation-delay: 0.04s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(2) .img-wrap { animation-delay: 0.12s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(3) .img-wrap { animation-delay: 0.20s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(4) .img-wrap { animation-delay: 0.28s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(5) .img-wrap { animation-delay: 0.36s; }
+
+/* CTA banner card */
+section[data-anim-state="in"] .murailles-cta-banner__card {
+    animation: mu-left 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+/* Blog grid cards */
+section[data-anim-state="in"] .grid_blog_box {
+    animation: mu-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+section[data-anim-state="in"] [class*="col-"]:nth-child(1) .grid_blog_box { animation-delay: 0.04s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(2) .grid_blog_box { animation-delay: 0.14s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(3) .grid_blog_box { animation-delay: 0.24s; }
+
+/* Contact boxes */
+section[data-anim-state="in"] .contact-box {
+    animation: mu-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+section[data-anim-state="in"] [class*="col-"]:nth-child(1) .contact-box { animation-delay: 0.04s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(2) .contact-box { animation-delay: 0.14s; }
+section[data-anim-state="in"] [class*="col-"]:nth-child(3) .contact-box { animation-delay: 0.24s; }
+
+/* FAQ */
+section[data-anim-state="in"] .faq_wrap {
+    animation: mu-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Footer widgets */
+section[data-anim-state="in"] .footer_widget,
+footer[data-anim-state="in"] .footer_widget {
+    animation: mu-rise-sm 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+footer[data-anim-state="in"] [class*="col-"]:nth-child(1) .footer_widget { animation-delay: 0.04s; }
+footer[data-anim-state="in"] [class*="col-"]:nth-child(2) .footer_widget { animation-delay: 0.12s; }
+footer[data-anim-state="in"] [class*="col-"]:nth-child(3) .footer_widget { animation-delay: 0.20s; }
+footer[data-anim-state="in"] [class*="col-"]:nth-child(4) .footer_widget { animation-delay: 0.28s; }
+
+/* Single property */
+section[data-anim-state="in"] .listing-detail-wrapper {
+    animation: mu-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+section[data-anim-state="in"] ._sidebar_wrap {
+    animation: mu-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+/* ── Generic column animations (inner pages with inline-styled content) ──
+   Targets direct Bootstrap column children of .row inside any animated
+   section. Works on assistance-conseils, nos-services, histoire-marrakech,
+   tourisme-marrakech, faq, contact, about-us — any page using .col-* grids.
+   Staggered by nth-child so multi-column rows cascade nicely.
+   These rules are intentionally lower-specificity than the named-class
+   rules above, so named targets keep their own animation values.          */
+
+section[data-anim-state="in"] .row > [class*="col-"] {
+    animation: mu-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Stagger delays: up to 6 columns */
+section[data-anim-state="in"] .row > [class*="col-"]:nth-child(1) { animation-delay: 0.04s; }
+section[data-anim-state="in"] .row > [class*="col-"]:nth-child(2) { animation-delay: 0.13s; }
+section[data-anim-state="in"] .row > [class*="col-"]:nth-child(3) { animation-delay: 0.22s; }
+section[data-anim-state="in"] .row > [class*="col-"]:nth-child(4) { animation-delay: 0.31s; }
+section[data-anim-state="in"] .row > [class*="col-"]:nth-child(5) { animation-delay: 0.40s; }
+section[data-anim-state="in"] .row > [class*="col-"]:nth-child(n+6) { animation-delay: 0.49s; }
+
+/* Heading rows (justify-content-center single col) — fade-up only, no delay */
+section[data-anim-state="in"] .row.justify-content-center > [class*="col-"] {
+    animation: mu-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.02s both;
+}
+
+/* footer */
+footer[data-anim-state="in"] .row > [class*="col-"] {
+    animation: mu-rise-sm 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+footer[data-anim-state="in"] .row > [class*="col-"]:nth-child(1) { animation-delay: 0.04s; }
+footer[data-anim-state="in"] .row > [class*="col-"]:nth-child(2) { animation-delay: 0.12s; }
+footer[data-anim-state="in"] .row > [class*="col-"]:nth-child(3) { animation-delay: 0.20s; }
+footer[data-anim-state="in"] .row > [class*="col-"]:nth-child(4) { animation-delay: 0.28s; }

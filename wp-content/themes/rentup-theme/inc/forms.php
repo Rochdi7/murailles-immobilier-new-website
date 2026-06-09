@@ -34,13 +34,13 @@ add_action( 'phpmailer_init', function ( $phpmailer ) {
 	}
 	$phpmailer->isSMTP();
 	$phpmailer->Host       = MURAILLES_SMTP_HOST;
-	$phpmailer->Port       = MURAILLES_SMTP_PORT;
-	$phpmailer->SMTPSecure = MURAILLES_SMTP_SECURE;
+	$phpmailer->Port       = defined( 'MURAILLES_SMTP_PORT' )     ? MURAILLES_SMTP_PORT     : 587;
+	$phpmailer->SMTPSecure = defined( 'MURAILLES_SMTP_SECURE' )   ? MURAILLES_SMTP_SECURE   : 'tls';
 	$phpmailer->SMTPAuth   = true;
 	$phpmailer->Username   = MURAILLES_SMTP_USER;
 	$phpmailer->Password   = MURAILLES_SMTP_PASS;
-	$phpmailer->From       = MURAILLES_SMTP_FROM;
-	$phpmailer->FromName   = MURAILLES_SMTP_FROM_NAME;
+	$phpmailer->From       = defined( 'MURAILLES_SMTP_FROM' )      ? MURAILLES_SMTP_FROM      : MURAILLES_SMTP_USER;
+	$phpmailer->FromName   = defined( 'MURAILLES_SMTP_FROM_NAME' ) ? MURAILLES_SMTP_FROM_NAME : get_bloginfo( 'name' );
 	$phpmailer->CharSet    = 'UTF-8';
 
 	// Local XAMPP has no CA bundle by default — TLS handshake fails silently.

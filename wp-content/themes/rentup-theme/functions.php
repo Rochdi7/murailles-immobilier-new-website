@@ -123,6 +123,9 @@ function murailles_enqueue_styles()
 		? filemtime(get_template_directory() . '/assets/css/murailles-dropdown.css')
 		: $ver;
 	wp_enqueue_style('murailles-dropdown', $theme_uri . '/assets/css/murailles-dropdown.css', array('murailles-styles', 'murailles-theme-style'), $dropdown_css_ver);
+
+	$scroll_css = get_stylesheet_directory() . '/assets/css/scroll-animations.css';
+	wp_enqueue_style('murailles-scroll-anim', get_stylesheet_directory_uri() . '/assets/css/scroll-animations.css', array(), file_exists($scroll_css) ? filemtime($scroll_css) : $ver);
 }
 add_action('wp_enqueue_scripts', 'murailles_enqueue_styles');
 
@@ -190,6 +193,9 @@ function murailles_enqueue_scripts()
 		? filemtime(get_template_directory() . '/assets/js/murailles-uploader.js')
 		: $ver;
 	wp_enqueue_script('murailles-uploader', $theme_uri . '/assets/js/murailles-uploader.js', array(), $uploader_js_ver, true);
+
+	$scroll_js = get_stylesheet_directory() . '/assets/js/scroll-animations.js';
+	wp_enqueue_script('murailles-scroll-anim', get_stylesheet_directory_uri() . '/assets/js/scroll-animations.js', array(), file_exists($scroll_js) ? filemtime($scroll_js) : $ver, true);
 
 	// Page-specific scripts — loaded only on their pages via is_page_template().
 	if (is_singular('property') || is_page_template('page-templates/single-property-1.php')) {
