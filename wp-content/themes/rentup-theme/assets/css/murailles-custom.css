@@ -112,14 +112,29 @@
 /* ─── 2b. Home-page CTA banner (Property Tag section) ──────────────
    Hero-style cover banner with a refined glass card on top. Avoids
    the plain white box look from the old .tab_exclusive style. */
-.murailles-cta-banner { padding: 110px 0; background-attachment: scroll; }
-.murailles-cta-banner__card {
+.murailles-cta-banner {
+	padding: 110px 0;
+	background-attachment: scroll;
 	position: relative;
-	z-index: 2;
-	background: #fff;
+}
+/* Subtle light scrim so photo stays vivid — no dark overlay pseudo-element */
+.murailles-cta-banner::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to right, rgba(255,255,255,0.15) 0%, transparent 70%);
+	pointer-events: none;
+	z-index: 0;
+}
+.murailles-cta-banner .container {
+	position: relative;
+	z-index: 1;
+}
+.murailles-cta-banner__card {
+	background: #ffffff;
 	border-radius: 14px;
 	padding: 44px 44px 40px;
-	box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+	box-shadow: 0 8px 40px rgba(0,0,0,0.10);
 	border-left: 6px solid #dc3545;
 }
 .murailles-cta-banner__eyebrow {
@@ -1469,3 +1484,40 @@ a > i[class*="fa-"]:only-child {
 		margin-bottom: 0;
 	}
 }
+
+/* === Affaires du Mois badge ======================================= */
+/* === Carousel card equal-height fix =============================== */
+.murailles-featured-slide .single_items,
+.murailles-adm-slide .single_items {
+	display: flex !important;
+	flex-direction: column;
+}
+.murailles-featured-slide .property-listing.property-2,
+.murailles-adm-slide .property-listing.property-2 {
+	display: flex !important;
+	flex-direction: column;
+	height: 100% !important;
+}
+/* Lock image area to a fixed height so all cards align */
+.murailles-featured-slide .listing-img-wrapper,
+.murailles-adm-slide .listing-img-wrapper,
+.murailles-featured-slide .list-img-slide,
+.murailles-adm-slide .list-img-slide {
+	height: 220px !important;
+	min-height: 220px !important;
+	max-height: 220px !important;
+	overflow: hidden;
+	flex-shrink: 0;
+}
+.murailles-featured-slide .listing-img-wrapper img,
+.murailles-adm-slide .listing-img-wrapper img {
+	width: 100%;
+	height: 220px !important;
+	object-fit: cover;
+}
+/* Push footer to bottom of card */
+.murailles-featured-slide .listing-detail-footer,
+.murailles-adm-slide .listing-detail-footer {
+	margin-top: auto;
+}
+

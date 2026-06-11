@@ -242,7 +242,11 @@ get_header();
 								
 								<div class="block-body">
 									<div class="map-container">
-										<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15090.183774083564!2d72.82822336977539!3d18.99565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7cef0d17ace6f%3A0xba0d758b25d8b289!2sICICI%20Bank%20Curry%20Road%2C%20Mumbai-Branch%20%26%20ATM!5e0!3m2!1sen!2sin!4v1624183548415!5m2!1sen!2sin" class="full-width" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+<?php
+$_prop_address = get_post_meta( get_the_ID(), '_property_address', true );
+$_map_q        = urlencode( $_prop_address ?: 'Marrakech, Maroc' );
+?>
+										<iframe src="https://maps.google.com/maps?q=<?php echo esc_attr( $_map_q ); ?>&z=14&hl=fr&output=embed" class="full-width" height="450" style="border:0;" allowfullscreen="" loading="lazy" title="<?php esc_attr_e( 'Localisation du bien', 'murailles' ); ?>"></iframe>
 									</div>
 
 								</div>

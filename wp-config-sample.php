@@ -89,30 +89,7 @@ define( 'WP_DEBUG', false );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
-/* ────────────────────────────────────────────────────────────────────────
- * Murailles Immobilier — SMTP credentials
- *
- * These constants drive the contact form, newsletter form, and lead-notification
- * emails (Properties → Submit a Listing → admin alert).
- *
- * Get a Gmail App Password at https://myaccount.google.com/apppasswords
- * (2-Factor Authentication required on the Google account).
- * ──────────────────────────────────────────────────────────────────────── */
-// define( 'MURAILLES_SMTP_HOST',      'smtp.gmail.com' );
-// define( 'MURAILLES_SMTP_PORT',      587 );
-// define( 'MURAILLES_SMTP_SECURE',    'tls' );
-// define( 'MURAILLES_SMTP_USER',      'contact@murailles-immobilier.com' );
-// define( 'MURAILLES_SMTP_PASS',      'xxxx xxxx xxxx xxxx' );
-// define( 'MURAILLES_SMTP_FROM',      'contact@murailles-immobilier.com' );
-// define( 'MURAILLES_SMTP_FROM_NAME', 'Agence Murailles' );
-// define( 'MURAILLES_LEAD_NOTIFY',    'contact@murailles-immobilier.com' );
-// define( 'MURAILLES_WHATSAPP_NUMBER','212661425150' );
 
-/* ────────────────────────────────────────────────────────────────────────
- * Production security flags (uncomment on the live server).
- * ──────────────────────────────────────────────────────────────────────── */
-// define( 'DISALLOW_FILE_EDIT', true );  // hides admin theme/plugin editor
-// define( 'FORCE_SSL_ADMIN',    true );  // forces HTTPS for /wp-admin/
 
 /* That's all, stop editing! Happy publishing. */
 

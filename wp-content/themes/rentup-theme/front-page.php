@@ -245,108 +245,165 @@ get_header();
 			</section>
 			<!-- ============================ Our Awards End ================================== -->
 			
-			<!-- ============================ Property Category Start ================================== -->
-			<section class="min">
+			<!-- ============================ Property Category End ================================== -->
+
+			<!-- ============================ Affaires du Mois Start ================================== -->
+			<?php
+			$_adm_ids = array_filter( array_map( 'intval', (array) get_option( 'murailles_affaires_du_mois', array() ) ) );
+			if ( ! empty( $_adm_ids ) ) :
+			?>
+			<section class="pt-0">
 				<div class="container">
-					
+
 					<div class="row justify-content-center">
 						<div class="col-lg-7 col-md-8">
 							<div class="sec-heading center">
-								<h2><?php murailles_t( 'Choisissez votre catégorie' ); ?></h2>
-								<p><?php murailles_t( "Explorez nos biens immobiliers par type : riads d'exception, appartements, villas, terrains et locaux professionnels au cœur du Maroc." ); ?></p>
+								<h2><?php murailles_t( 'Affaires du Mois' ); ?></h2>
+								<p><?php murailles_t( 'Notre sélection du moment : les meilleures opportunités immobilières à ne pas manquer ce mois-ci.' ); ?></p>
 							</div>
 						</div>
 					</div>
-					
-					<div class="row justify-content-center mt-4">
-					<?php
-					/**
-					 * Dynamic property-category tiles.
-					 * Pulls real terms from the `property_category` taxonomy, ordered by
-					 * descending property count, capped at 8 tiles for the grid. Each tile
-					 * links to the actual term archive (/categorie-bien/{slug}/).
-					 *
-					 * Icon + color mapping is keyed by term slug with a graceful fallback
-					 * cycle for unmapped terms.
-					 */
-					$cat_terms = get_terms( array(
-						'taxonomy'   => 'property_category',
-						'hide_empty' => false,
-						'orderby'    => 'count',
-						'order'      => 'DESC',
-						'number'     => 8,
-					) );
 
-					$icon_map = array(
-						'appartement'      => array( 'icon' => 'fa-building',                'color' => 'text-info' ),
-						'bureaux'          => array( 'icon' => 'fa-house-laptop',            'color' => 'text-primary' ),
-						'commerce'         => array( 'icon' => 'fa-store',                   'color' => 'text-purple' ),
-						'ferme'            => array( 'icon' => 'fa-tractor',                 'color' => 'text-success' ),
-						'maison-dhote'     => array( 'icon' => 'fa-bed',                     'color' => 'text-warning' ),
-						'hotel'            => array( 'icon' => 'fa-hotel',                   'color' => 'text-danger' ),
-						'palais'           => array( 'icon' => 'fa-landmark',                'color' => 'text-warning' ),
-						'riad-habitation'  => array( 'icon' => 'fa-house-circle-check',      'color' => 'text-warning' ),
-						'riad-renove'      => array( 'icon' => 'fa-house-chimney',           'color' => 'text-orange' ),
-						'riad-a-renover'   => array( 'icon' => 'fa-house-crack',             'color' => 'text-danger' ),
-						'terrain'          => array( 'icon' => 'fa-mountain',                'color' => 'text-seegreen' ),
-						'villa'            => array( 'icon' => 'fa-house',                   'color' => 'text-success' ),
-					);
-					$fallback_styles = array(
-						array( 'icon' => 'fa-house',                  'color' => 'text-info' ),
-						array( 'icon' => 'fa-house-circle-check',     'color' => 'text-warning' ),
-						array( 'icon' => 'fa-building',               'color' => 'text-success' ),
-						array( 'icon' => 'fa-house-crack',            'color' => 'text-purple' ),
-						array( 'icon' => 'fa-house-fire',             'color' => 'text-seegreen' ),
-						array( 'icon' => 'fa-igloo',                  'color' => 'text-danger' ),
-						array( 'icon' => 'fa-house-laptop',           'color' => 'text-primary' ),
-						array( 'icon' => 'fa-building-circle-check',  'color' => 'text-orange' ),
-					);
+					<div class="item-slide murailles-adm-slide space" data-murailles-adm-carousel>
+						<?php
+						$_adm_query = new WP_Query( array(
+							'post_type'      => 'property',
+							'post__in'       => $_adm_ids,
+							'orderby'        => 'post__in',
+							'posts_per_page' => count( $_adm_ids ),
+							'post_status'    => 'publish',
+						) );
+						if ( $_adm_query->have_posts() ) :
+							while ( $_adm_query->have_posts() ) : $_adm_query->the_post();
+								$pid    = get_the_ID();
+								$plink  = get_permalink();
+								$pprice = get_post_meta( $pid, '_property_price', true );
+								$psuffix= get_post_meta( $pid, '_property_price_suffix', true );
+								$paction= get_post_meta( $pid, '_property_action', true );
+								$paddr  = get_post_meta( $pid, '_property_address', true );
+								$psize  = get_post_meta( $pid, '_property_size', true );
+								$pbeds  = get_post_meta( $pid, '_property_bedrooms', true );
+								$pbaths = get_post_meta( $pid, '_property_bathrooms', true );
+								$pcats  = wp_get_post_terms( $pid, 'property_category', array( 'fields' => 'names' ) );
+								$plocs  = wp_get_post_terms( $pid, 'property_location', array( 'fields' => 'names' ) );
+								$pcat   = $pcats ? $pcats[0] : '';
+								$ploc   = $plocs ? $plocs[0] : '';
+								$thumb  = has_post_thumbnail() ? get_the_post_thumbnail_url( $pid, 'medium_large' ) : murailles_img( 'p-' . ( ( $pid % 9 ) + 1 ) . '.png' );
+								$gallery= get_post_meta( $pid, '_property_gallery_ids', true );
+								$imgs   = array();
+								if ( $gallery ) {
+									foreach ( array_slice( array_filter( explode( ',', $gallery ) ), 0, 3 ) as $gid ) {
+										$u = wp_get_attachment_image_url( intval( $gid ), 'medium_large' );
+										if ( $u ) $imgs[] = $u;
+									}
+								}
+								if ( empty( $imgs ) ) $imgs[] = $thumb;
+								if ( count( $imgs ) < 3 ) {
+									$pool  = array( 'p-1.png','p-2.png','p-3.png','p-4.png','p-5.png','p-6.png','p-7.png','p-8.png','p-9.png' );
+									$start = $pid % count( $pool );
+									$i     = 0;
+									while ( count( $imgs ) < 3 && $i < count( $pool ) ) {
+										$candidate = murailles_img( $pool[ ( $start + $i ) % count( $pool ) ] );
+										if ( ! in_array( $candidate, $imgs, true ) ) $imgs[] = $candidate;
+										$i++;
+									}
+								}
+						?>
+						<!-- Affaire du Mois Card -->
+						<div class="single_items" data-murailles-id="<?php echo esc_attr( $pid ); ?>">
+							<div class="property-listing property-2 h-100">
 
-					if ( ! is_wp_error( $cat_terms ) && ! empty( $cat_terms ) ) :
-						$idx = 0;
-						foreach ( $cat_terms as $term ) :
-							$style = isset( $icon_map[ $term->slug ] )
-								? $icon_map[ $term->slug ]
-								: $fallback_styles[ $idx % count( $fallback_styles ) ];
-							// Route to the property archive's `ptype` filter so the user
-							// lands on the polished archive-property.php layout (filters
-							// sidebar, sort dropdown, pagination) pre-filtered to this
-							// category. Skips needing a taxonomy-property_category.php
-							// template just to wrap the archive.
-							$term_url = add_query_arg( 'ptype', $term->slug, murailles_bien_url() );
-							$cat_name  = ucwords( strtolower( $term->name ) );
-							$count_lbl = sprintf(
-								murailles_t( $term->count > 1 ? '%s Biens' : '%s Bien', false ),
-								number_format_i18n( $term->count )
-							);
-							$idx++;
-					?>
-						<!-- Single Category -->
-						<div class="col-lg-3 col-md-4 col-sm-6">
-							<div class="_category_box">
-								<a href="<?php echo esc_url( $term_url ); ?>">
-									<div class="_category_elio">
-										<div class="_category_thumb">
-											<i class="fa-solid <?php echo esc_attr( $style['icon'] ); ?> <?php echo esc_attr( $style['color'] ); ?>"></i>
-										</div>
-										<div class="_category_caption">
-											<h5><?php echo esc_html( $cat_name ); ?></h5>
-											<span><?php echo esc_html( $count_lbl ); ?></span>
+								<div class="listing-img-wrapper">
+									<?php if ( $paction ) : ?><div class="_exlio_125"><?php echo esc_html( $paction ); ?></div><?php endif; ?>
+		<div class="list-img-slide">
+										<div class="click">
+											<?php foreach ( $imgs as $img_url ) : ?>
+											<div><a href="<?php echo esc_url( $plink ); ?>"><img src="<?php echo esc_url( $img_url ); ?>" class="img-fluid mx-auto" alt="<?php the_title_attribute(); ?>" /></a></div>
+											<?php endforeach; ?>
 										</div>
 									</div>
-								</a>
+								</div>
+
+								<div class="listing-detail-wrapper">
+									<div class="listing-short-detail-wrap">
+										<div class="_card_list_flex mb-2">
+											<div class="_card_flex_01">
+												<?php if ( $pbeds ) : ?><span class="_list_blickes _netork"><?php echo esc_html( $pbeds ); ?> <?php murailles_t( 'Ch.' ); ?></span><?php endif; ?>
+												<?php if ( $pcat ) : ?><span class="_list_blickes types"><?php echo esc_html( $pcat ); ?></span><?php endif; ?>
+											</div>
+											<?php if ( $pprice !== '' ) : ?>
+											<div class="_card_flex_last">
+												<h6 class="listing-card-info-price mb-0"><?php echo esc_html( $pprice ); ?> €<?php if ( $psuffix ) echo ' ' . esc_html( $psuffix ); ?></h6>
+											</div>
+											<?php endif; ?>
+										</div>
+										<div class="_card_list_flex">
+											<div class="_card_flex_01">
+												<h4 class="listing-name verified"><a href="<?php echo esc_url( $plink ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h4>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="price-features-wrapper">
+									<div class="list-fx-features">
+										<?php if ( $pbeds ) : ?>
+										<div class="listing-card-info-icon">
+											<div class="inc-fleat-icon"><img src="<?php echo esc_url( murailles_img( 'bed.svg' ) ); ?>" width="15" alt="" /></div><?php echo esc_html( $pbeds ); ?> <?php murailles_t( 'Ch.' ); ?>
+										</div>
+										<?php endif; ?>
+										<?php if ( $pbaths ) : ?>
+										<div class="listing-card-info-icon">
+											<div class="inc-fleat-icon"><img src="<?php echo esc_url( murailles_img( 'bathtub.svg' ) ); ?>" width="15" alt="" /></div><?php echo esc_html( $pbaths ); ?> <?php murailles_t( 'SdB' ); ?>
+										</div>
+										<?php endif; ?>
+										<?php if ( $psize ) : ?>
+										<div class="listing-card-info-icon">
+											<div class="inc-fleat-icon"><img src="<?php echo esc_url( murailles_img( 'move.svg' ) ); ?>" width="15" alt="" /></div><?php echo esc_html( $psize ); ?> m²
+										</div>
+										<?php endif; ?>
+									</div>
+								</div>
+
+								<div class="listing-detail-footer">
+									<div class="footer-first">
+										<div class="foot-location"><img src="<?php echo esc_url( murailles_img( 'pin.svg' ) ); ?>" width="18" alt="" /><?php echo esc_html( $paddr ?: $ploc ); ?></div>
+									</div>
+									<div class="footer-flex">
+										<ul class="selio_style">
+											<li>
+												<div class="prt_saveed_12lk">
+													<label class="toggler toggler-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Enregistrer le bien', false ) ); ?>"><input type="checkbox"><i class="fa-solid fa-heart"></i></label>
+												</div>
+											</li>
+											<li>
+												<div class="prt_saveed_12lk">
+													<a href="<?php echo esc_url( home_url( '/compare-property/' ) ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Comparer le bien', false ) ); ?>"><i class="fa-solid fa-share"></i></a>
+												</div>
+											</li>
+											<li>
+												<div class="prt_saveed_12lk">
+													<a href="<?php echo esc_url( $plink ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>"><i class="fa-regular fa-circle-right"></i></a>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div>
+
 							</div>
 						</div>
-					<?php
-						endforeach;
-					endif;
-					?>
+						<?php
+							endwhile;
+							wp_reset_postdata();
+						endif;
+						?>
 					</div>
-					
+
 				</div>
 			</section>
-			<!-- ============================ Property Category End ================================== -->
-			
+			<?php endif; ?>
+			<!-- ============================ Affaires du Mois End ================================== -->
+
 			<!-- ============================ Biens Start ================================== -->
 			<section class="pt-0">
 				<div class="container">
@@ -366,7 +423,7 @@ get_header();
 							'post_type'      => 'property',
 							'posts_per_page' => 9,
 							'post_status'    => 'publish',
-							'orderby'        => 'date',
+							'orderby'        => 'modified',
 							'order'          => 'DESC',
 						) );
 						if ( $_featured->have_posts() ) :
@@ -1031,7 +1088,7 @@ get_header();
 			         photo doesn't fight the headline for attention. Card itself
 			         gets a soft shadow, larger heading, and a red accent bar
 			         on the left to anchor the brand color. */ ?>
-			<section class="image-cover murailles-cta-banner" style="background:#122947 url(<?php echo esc_url( murailles_img( 'villa-luxe-marrakech-hero.webp' ) ); ?>) center/cover no-repeat;" data-overlay="3">
+			<section class="image-cover murailles-cta-banner" style="background:url(<?php echo esc_url( murailles_img( 'villa-luxe-marrakech-hero.webp' ) ); ?>) center/cover no-repeat;">
 				<div class="container">
 					<div class="row">
 						<div class="col-xl-6 col-lg-7 col-md-9 col-sm-12">

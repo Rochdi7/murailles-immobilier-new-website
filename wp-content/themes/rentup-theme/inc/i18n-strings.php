@@ -151,6 +151,12 @@ function murailles_i18n_dictionary() {
 		'%s Bien'                      => '%s Property',
 		'%s Biens'                     => '%s Properties',
 
+		// === Front page: affaires du mois =================================
+		'Affaires du Mois'             => 'Deals of the Month',
+		'Notre sélection du moment : les meilleures opportunités immobilières à ne pas manquer ce mois-ci.'
+			=> 'Our current selection: the best property deals you cannot miss this month.',
+		'Affaire du mois'              => 'Deal of the Month',
+
 		// === Front page: featured properties ==============================
 		'Biens immobiliers à la une'   => 'Featured properties',
 		'Une sélection exclusive de riads, villas et appartements à Marrakech, Casablanca, Rabat et dans les plus belles villes du Maroc.'

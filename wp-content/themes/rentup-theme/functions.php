@@ -540,6 +540,11 @@ function murailles_create_pages()
 		'home-5'                     => array('Home 5',                      'page-templates/home-5.php'),
 		'home-6'                     => array('Home 6',                      'page-templates/home-6.php'),
 		'home-7'                     => array('Home 7',                      'page-templates/home-7.php'),
+		// Inner service/editorial pages — linked from nav and footer.
+		'nos-services'               => array('Nos Services',                'page-templates/nos-services.php'),
+		'assistance-conseils'        => array('Assistance & Conseils',       'page-templates/assistance-conseils.php'),
+		'histoire-marrakech'         => array('Histoire de Marrakech',       'page-templates/histoire-marrakech.php'),
+		'tourisme-marrakech'         => array('Tourisme à Marrakech',        'page-templates/tourisme-marrakech.php'),
 	);
 
 	foreach ($pages as $slug => $data) {
@@ -702,3 +707,159 @@ function murailles_contact_info()
 		'twitter'       => defined('MURAILLES_TWITTER')       ? MURAILLES_TWITTER       : '#',
 	);
 }
+
+// ============================================================
+// AFFAIRES DU MOIS — back-office settings page
+// Lets the admin pick which published properties appear in the
+// "Affaires du Mois" carousel on the homepage.
+// ============================================================
+
+function murailles_adm_register_settings() {
+	register_setting(
+		'murailles_adm_group',
+		'murailles_affaires_du_mois',
+		array(
+			'type'              => 'array',
+			'sanitize_callback' => 'murailles_adm_sanitize',
+			'default'           => array(),
+		)
+	);
+}
+add_action( 'admin_init', 'murailles_adm_register_settings' );
+
+function murailles_adm_sanitize( $value ) {
+	if ( ! is_array( $value ) ) {
+		return array();
+	}
+	return array_values( array_filter( array_map( 'absint', $value ) ) );
+}
+
+function murailles_adm_add_menu() {
+	add_submenu_page(
+		'themes.php',
+		__( 'Affaires du Mois', 'murailles' ),
+		__( 'Affaires du Mois', 'murailles' ),
+		'manage_options',
+		'murailles-affaires-du-mois',
+		'murailles_adm_settings_page'
+	);
+}
+add_action( 'admin_menu', 'murailles_adm_add_menu' );
+
+function murailles_adm_settings_page() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$saved_ids = array_filter( array_map( 'intval', (array) get_option( 'murailles_affaires_du_mois', array() ) ) );
+
+	// All published properties for the picker
+	$all_props = get_posts( array(
+		'post_type'      => 'property',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'orderby'        => 'title',
+		'order'          => 'ASC',
+	) );
+	?>
+	<div class="wrap">
+		<h1><?php esc_html_e( 'Affaires du Mois', 'murailles' ); ?></h1>
+		<p><?php esc_html_e( 'Sélectionnez les biens à afficher dans le carrousel "Affaires du Mois" sur la page d\'accueil. L\'ordre de sélection est conservé.', 'murailles' ); ?></p>
+
+		<?php settings_errors( 'murailles_adm_group' ); ?>
+
+		<form method="post" action="options.php">
+			<?php settings_fields( 'murailles_adm_group' ); ?>
+
+			<?php if ( empty( $all_props ) ) : ?>
+				<p><em><?php esc_html_e( 'Aucun bien publié trouvé. Publiez d\'abord des biens immobiliers.', 'murailles' ); ?></em></p>
+			<?php else : ?>
+			<table class="widefat striped" style="max-width:800px;margin-top:16px;">
+				<thead>
+					<tr>
+						<th style="width:40px;"><?php esc_html_e( 'Inclure', 'murailles' ); ?></th>
+						<th><?php esc_html_e( 'Bien', 'murailles' ); ?></th>
+						<th><?php esc_html_e( 'Catégorie', 'murailles' ); ?></th>
+						<th><?php esc_html_e( 'Prix', 'murailles' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php foreach ( $all_props as $prop ) :
+					$pid      = $prop->ID;
+					$checked  = in_array( $pid, $saved_ids, true ) ? 'checked' : '';
+					$price    = get_post_meta( $pid, '_property_price', true );
+					$cats     = wp_get_post_terms( $pid, 'property_category', array( 'fields' => 'names' ) );
+					$cat_name = $cats ? implode( ', ', $cats ) : '—';
+				?>
+					<tr>
+						<td style="text-align:center;">
+							<input type="checkbox"
+								name="murailles_affaires_du_mois[]"
+								value="<?php echo esc_attr( $pid ); ?>"
+								<?php echo $checked; ?>
+							/>
+						</td>
+						<td>
+							<strong><?php echo esc_html( get_the_title( $pid ) ); ?></strong><br>
+							<small><a href="<?php echo esc_url( get_permalink( $pid ) ); ?>" target="_blank"><?php esc_html_e( 'Voir le bien', 'murailles' ); ?></a>
+							&nbsp;|&nbsp;
+							<a href="<?php echo esc_url( get_edit_post_link( $pid ) ); ?>"><?php esc_html_e( 'Modifier', 'murailles' ); ?></a></small>
+						</td>
+						<td><?php echo esc_html( $cat_name ); ?></td>
+						<td><?php echo $price ? esc_html( $price ) . ' €' : '—'; ?></td>
+					</tr>
+				<?php endforeach; ?>
+				</tbody>
+			</table>
+			<?php endif; ?>
+
+			<?php submit_button( __( 'Enregistrer la sélection', 'murailles' ) ); ?>
+		</form>
+
+		<?php if ( ! empty( $saved_ids ) ) : ?>
+		<hr>
+		<h2><?php esc_html_e( 'Biens actuellement sélectionnés', 'murailles' ); ?> (<?php echo count( $saved_ids ); ?>)</h2>
+		<ul>
+			<?php foreach ( $saved_ids as $sid ) : ?>
+			<li><?php echo esc_html( get_the_title( $sid ) ); ?> — ID <?php echo esc_html( $sid ); ?></li>
+			<?php endforeach; ?>
+		</ul>
+		<?php endif; ?>
+	</div>
+	<?php
+}
+
+/**
+ * Enqueue the Slick carousel init script for the ADM section on the frontend.
+ * Reuses the already-loaded slick.js — just inlines the init call.
+ */
+function murailles_adm_inline_carousel() {
+	if ( ! is_front_page() ) {
+		return;
+	}
+	$adm_ids = array_filter( array_map( 'intval', (array) get_option( 'murailles_affaires_du_mois', array() ) ) );
+	if ( empty( $adm_ids ) ) {
+		return;
+	}
+	wp_add_inline_script(
+		'murailles-custom',
+		"(function($){
+			$(function(){
+				$('[data-murailles-adm-carousel]').slick({
+					dots: true,
+					infinite: true,
+					speed: 400,
+					slidesToShow: 3,
+					slidesToScroll: 1,
+					autoplay: true,
+					autoplaySpeed: 3500,
+					responsive: [
+						{ breakpoint: 1024, settings: { slidesToShow: 2 } },
+						{ breakpoint: 640,  settings: { slidesToShow: 1 } }
+					]
+				});
+			});
+		}(jQuery));"
+	);
+}
+add_action( 'wp_enqueue_scripts', 'murailles_adm_inline_carousel', 20 );

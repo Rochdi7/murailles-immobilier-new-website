@@ -128,7 +128,26 @@ add_action( 'wp_head', function () {
 			array( '@type' => 'City', 'name' => 'Fes' ),
 			array( '@type' => 'Country', 'name' => 'Morocco' ),
 		),
-		'priceRange' => '€€€',
+		'priceRange'    => '€€€',
+		'geo'           => array(
+			'@type'     => 'GeoCoordinates',
+			'latitude'  => 31.633176,
+			'longitude' => -8.004951,
+		),
+		'openingHoursSpecification' => array(
+			array(
+				'@type'     => 'OpeningHoursSpecification',
+				'dayOfWeek' => array( 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday' ),
+				'opens'     => '09:00',
+				'closes'    => '18:00',
+			),
+			array(
+				'@type'     => 'OpeningHoursSpecification',
+				'dayOfWeek' => 'Saturday',
+				'opens'     => '09:00',
+				'closes'    => '13:00',
+			),
+		),
 	);
 	if ( $social ) {
 		$org['sameAs'] = array_values( $social );

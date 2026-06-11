@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Wrap a body of HTML in the Agence Murailles brand chrome.
  */
 function murailles_email_wrap( $title, $intro_html, $body_html, $cta_label = '', $cta_url = '' ) {
-	$logo  = 'https://usercontent.one/wp/www.agence-immobilier-marrakech.com/wp-content/uploads/2019/05/LOGOM-e1611537046750.png?media=1768339104';
+	$logo  = function_exists( 'murailles_img' ) ? murailles_img( 'logo.png' ) : home_url( '/wp-content/themes/rentup-theme/assets/images/logo.png' );
 	$brand = 'Agence Murailles';
 	$site  = home_url( '/' );
 	$year  = date( 'Y' );
