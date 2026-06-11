@@ -13,6 +13,8 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
+// Theme options panel + murailles_opt() helper
+require_once get_template_directory() . '/inc/theme-options.php';
 // Load Custom Post Types, Taxonomies, and Meta Boxes
 require_once get_template_directory() . '/inc/custom-post-types.php';
 require_once get_template_directory() . '/inc/agent-post-type.php';

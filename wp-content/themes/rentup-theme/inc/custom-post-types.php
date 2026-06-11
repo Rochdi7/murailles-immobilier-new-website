@@ -43,8 +43,58 @@ function murailles_register_property_cpt() {
 		'menu_position'      => 5,
 		'menu_icon'          => 'dashicons-building',
 		'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt', 'comments' ),
-		'show_in_rest'       => false,
+		// REST enabled so Royal MCP can list, search, read and update properties
+		// via wp/v2/property. Gutenberg is still disabled below — REST ≠ block editor.
+		'show_in_rest'       => true,
+		'rest_base'          => 'property',
 	) );
+
+	// Expose all property meta fields + SEO fields to the REST API so Royal MCP
+	// can read and update them with wp_get_post_meta / wp_update_post_meta.
+	$property_meta_keys = array(
+		'_property_price'                 => 'string',
+		'_property_price_suffix'          => 'string',
+		'_property_price_label'           => 'string',
+		'_property_address'               => 'string',
+		'_property_postal_code'           => 'string',
+		'_property_country'               => 'string',
+		'_property_size'                  => 'string',
+		'_property_land_size'             => 'string',
+		'_property_rooms'                 => 'string',
+		'_property_bedrooms'              => 'string',
+		'_property_bathrooms'             => 'string',
+		'_property_owner_note'            => 'string',
+		'_property_status'                => 'string',
+		'_property_action'                => 'string',
+		'_property_premium'               => 'string',
+		'_property_gallery_ids'           => 'string',
+		'_property_video_url'             => 'string',
+		'_property_year_built'            => 'string',
+		'_property_garages'               => 'string',
+		'_property_garage_size'           => 'string',
+		'_property_available_from'        => 'string',
+		'_property_basement'              => 'string',
+		'_property_external_construction' => 'string',
+		'_property_roofing'               => 'string',
+		'_property_map_embed'             => 'string',
+		'_property_amenities'             => 'string',
+		'_property_agent_id'              => 'string',
+		// SEO fields (shared with pages/posts, registered in seo.php)
+		'_seo_title'                      => 'string',
+		'_seo_description'                => 'string',
+		'_seo_focus_keyword'              => 'string',
+		'_seo_og_image'                   => 'string',
+		'_seo_canonical'                  => 'string',
+		'_seo_noindex'                    => 'string',
+	);
+	foreach ( $property_meta_keys as $key => $type ) {
+		register_meta( 'post', $key, array(
+			'object_subtype' => 'property',
+			'type'           => $type,
+			'single'         => true,
+			'show_in_rest'   => true,
+		) );
+	}
 }
 add_action( 'init', 'murailles_register_property_cpt' );
 
