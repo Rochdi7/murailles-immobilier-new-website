@@ -15,6 +15,7 @@ wp-config.local.php
 # --- User uploads (property photos, blog images, etc.) -------------------
 # Uploads belong on the production server / a CDN, not in source control.
 # Restore from backups or re-upload on deployment.
+wp-content/plugins/
 wp-content/uploads/
 
 # --- Caches, logs, debug -------------------------------------------------

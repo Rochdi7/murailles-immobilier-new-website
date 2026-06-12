@@ -15,6 +15,7 @@ if (! defined('ABSPATH')) {
 
 // Theme options panel + murailles_opt() helper
 require_once get_template_directory() . '/inc/theme-options.php';
+require_once get_template_directory() . '/inc/page-editor.php';
 // Load Custom Post Types, Taxonomies, and Meta Boxes
 require_once get_template_directory() . '/inc/custom-post-types.php';
 require_once get_template_directory() . '/inc/agent-post-type.php';
@@ -63,6 +64,14 @@ function murailles_theme_setup()
 		'caption',
 	));
 
+	// Block editor compatibility for pages that use Gutenberg for freeform
+	// content in addition to template-controlled sections.
+	add_theme_support( 'align-wide' );
+	add_theme_support( 'responsive-embeds' );
+	add_theme_support( 'editor-styles' );
+	add_theme_support( 'wp-block-styles' );
+	add_editor_style( 'assets/css/editor-admin.css' );
+
 	// Register navigation menus
 	register_nav_menus(array(
 		'primary'       => __('Primary Menu', 'murailles'),
@@ -85,6 +94,222 @@ function murailles_theme_setup()
 	add_post_type_support('property', 'elementor');
 }
 add_action('after_setup_theme', 'murailles_theme_setup');
+
+/**
+ * Force the bare site root to the default Polylang language.
+ *
+ * Some installs keep serving the last `pll_language` cookie on `/`, which
+ * opens the English homepage even though French is the default language. The
+ * expected behavior for this theme is: `/` resolves to the default language,
+ * while translated homes live under `/fr/` and `/en/`.
+ */
+function murailles_force_default_language_home() {
+	if ( is_admin() || wp_doing_ajax() || ! function_exists( 'pll_default_language' ) ) {
+		return;
+	}
+
+	$request_path = isset( $_SERVER['REQUEST_URI'] )
+		? (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH )
+		: '';
+
+	$home_path = (string) wp_parse_url( get_option( 'home' ), PHP_URL_PATH );
+	$home_path = rtrim( $home_path, '/' );
+
+	$normalized_request = rtrim( $request_path, '/' );
+	if ( '' === $normalized_request ) {
+		$normalized_request = '/';
+	}
+	if ( '' === $home_path ) {
+		$home_path = '/';
+	}
+
+	if ( $normalized_request !== $home_path ) {
+		return;
+	}
+
+	$default_lang = pll_default_language( 'slug' );
+	if ( ! $default_lang ) {
+		return;
+	}
+
+	$target = function_exists( 'pll_home_url' ) ? pll_home_url( $default_lang ) : '';
+	if ( ! $target ) {
+		$target = rtrim( get_option( 'home' ), '/' ) . '/' . $default_lang . '/';
+	}
+	if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
+		$target .= '?' . ltrim( (string) wp_unslash( $_SERVER['QUERY_STRING'] ), '?' );
+	}
+
+	if ( ! headers_sent() ) {
+		setcookie( 'pll_language', $default_lang, time() + YEAR_IN_SECONDS, COOKIEPATH ?: '/', COOKIE_DOMAIN );
+		$_COOKIE['pll_language'] = $default_lang;
+	}
+
+	$target_path = (string) wp_parse_url( $target, PHP_URL_PATH );
+	$target_path = rtrim( $target_path, '/' );
+	if ( '' === $target_path ) {
+		$target_path = '/';
+	}
+
+	if ( $target_path === $home_path ) {
+		$current_lang = function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : '';
+		if ( $current_lang && $current_lang !== $default_lang ) {
+			wp_safe_redirect( $target, 302, 'murailles-default-language-home' );
+			exit;
+		}
+		return;
+	}
+
+	wp_safe_redirect( $target, 302, 'murailles-default-language-home' );
+	exit;
+}
+add_action( 'template_redirect', 'murailles_force_default_language_home', 0 );
+
+function murailles_front_page_id_for_language( $lang = '' ) {
+	$front_id = (int) get_option( 'page_on_front' );
+	if ( ! $front_id ) {
+		return 0;
+	}
+
+	if ( ! $lang || ! function_exists( 'pll_get_post_translations' ) ) {
+		return $front_id;
+	}
+
+	$current_lang = function_exists( 'pll_get_post_language' ) ? pll_get_post_language( $front_id, 'slug' ) : '';
+	if ( $current_lang === $lang ) {
+		return $front_id;
+	}
+
+	$translations = pll_get_post_translations( $front_id );
+	if ( ! empty( $translations[ $lang ] ) ) {
+		return (int) $translations[ $lang ];
+	}
+
+	return $front_id;
+}
+
+function murailles_detect_language_root_request() {
+	if ( is_admin() ) {
+		return '';
+	}
+
+	$request_path = isset( $_SERVER['REQUEST_URI'] )
+		? (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH )
+		: '';
+	if ( '' === $request_path ) {
+		return '';
+	}
+
+	$normalized = trim( $request_path, '/' );
+	if ( '' === $normalized ) {
+		return '';
+	}
+
+	$segments = explode( '/', $normalized );
+	$home_path = trim( (string) wp_parse_url( get_option( 'home' ), PHP_URL_PATH ), '/' );
+	if ( '' !== $home_path ) {
+		$home_segments = explode( '/', $home_path );
+		if ( $segments && $home_segments && $segments[0] === end( $home_segments ) ) {
+			array_shift( $segments );
+		}
+	}
+
+	if ( 1 !== count( $segments ) ) {
+		return '';
+	}
+
+	$lang = sanitize_key( $segments[0] );
+	if ( ! function_exists( 'pll_languages_list' ) ) {
+		return in_array( $lang, array( 'fr', 'en' ), true ) ? $lang : '';
+	}
+
+	$languages = (array) pll_languages_list( array( 'fields' => 'slug' ) );
+	return in_array( $lang, $languages, true ) ? $lang : '';
+}
+
+function murailles_bind_language_root_front_page( $wp ) {
+	if ( ! $wp instanceof WP || empty( $wp->query_vars['lang'] ) ) {
+		return;
+	}
+
+	$lang = murailles_detect_language_root_request();
+	if ( ! $lang ) {
+		return;
+	}
+
+	$front_id = murailles_front_page_id_for_language( $lang );
+	if ( ! $front_id ) {
+		return;
+	}
+
+	$wp->query_vars['page_id'] = $front_id;
+	unset( $wp->query_vars['pagename'], $wp->query_vars['name'], $wp->query_vars['error'] );
+	$wp->matched_query = 'lang=' . rawurlencode( $lang ) . '&page_id=' . $front_id;
+}
+add_action( 'parse_request', 'murailles_bind_language_root_front_page', 20 );
+
+function murailles_request_language_root_front_page( $query_vars ) {
+	$lang = murailles_detect_language_root_request();
+	if ( ! $lang ) {
+		return $query_vars;
+	}
+
+	$front_id = murailles_front_page_id_for_language( $lang );
+	if ( ! $front_id ) {
+		return $query_vars;
+	}
+
+	$query_vars['lang']    = $lang;
+	$query_vars['page_id'] = $front_id;
+	unset( $query_vars['pagename'], $query_vars['name'], $query_vars['error'] );
+
+	return $query_vars;
+}
+add_filter( 'request', 'murailles_request_language_root_front_page', 20 );
+
+function murailles_rescue_language_root_404( $preempt, $wp_query ) {
+	if ( ! $wp_query instanceof WP_Query ) {
+		return $preempt;
+	}
+
+	$lang = murailles_detect_language_root_request();
+	if ( ! $lang ) {
+		return $preempt;
+	}
+
+	if ( $wp_query->is_front_page() || $wp_query->is_page() ) {
+		return $preempt;
+	}
+
+	$front_id   = murailles_front_page_id_for_language( $lang );
+	$front_post = $front_id ? get_post( $front_id ) : null;
+	if ( ! $front_post || 'page' !== $front_post->post_type ) {
+		return $preempt;
+	}
+
+	$wp_query->posts             = array( $front_post );
+	$wp_query->post              = $front_post;
+	$wp_query->queried_object    = $front_post;
+	$wp_query->queried_object_id = $front_post->ID;
+	$wp_query->found_posts       = 1;
+	$wp_query->post_count        = 1;
+	$wp_query->max_num_pages     = 1;
+	$wp_query->is_404            = false;
+	$wp_query->is_page           = true;
+	$wp_query->is_singular       = true;
+	$wp_query->is_home           = false;
+	$wp_query->is_front_page     = true;
+
+	if ( ! headers_sent() ) {
+		status_header( 200 );
+	}
+
+	global $post;
+	$post = $front_post;
+
+	return true;
+}
+add_filter( 'pre_handle_404', 'murailles_rescue_language_root_404', 10, 2 );
 
 /**
  * Enqueue Styles
@@ -430,9 +655,44 @@ add_filter('excerpt_more', 'murailles_excerpt_more');
  * Falls back to home_url('/bien/') when no post-type archive URL is resolvable
  * (e.g. during a fresh install before CPTs are fully flushed).
  */
-function murailles_bien_url() {
-	$url = get_post_type_archive_link( 'property' );
-	return $url ? $url : home_url( '/bien/' );
+if ( ! function_exists( 'murailles_bien_url' ) ) {
+	function murailles_bien_url() {
+		$url = get_post_type_archive_link( 'property' );
+		return $url ? $url : home_url( '/bien/' );
+	}
+}
+
+/**
+ * Render the current page's saved editor content inside otherwise static
+ * templates so WPBakery, shortcodes, and core blocks still output normally.
+ */
+function murailles_render_page_builder_content() {
+	if ( ! is_singular( 'page' ) ) {
+		return;
+	}
+
+	global $post;
+
+	$page = get_queried_object();
+	if ( ! ( $page instanceof WP_Post ) || 'page' !== $page->post_type ) {
+		return;
+	}
+
+	$content = get_post_field( 'post_content', $page );
+	if ( ! is_string( $content ) || '' === trim( $content ) ) {
+		return;
+	}
+
+	$post = $page;
+	setup_postdata( $post );
+	?>
+	<section class="murailles-page-builder-content">
+		<div class="article-content">
+			<?php echo apply_filters( 'the_content', $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		</div>
+	</section>
+	<?php
+	wp_reset_postdata();
 }
 
 /**
@@ -497,11 +757,88 @@ function murailles_img($filename)
 	return $theme_uri . '/assets/images/' . $filename;
 }
 
+function murailles_find_seed_page( $slug, $lang = '', $title = '' ) {
+	global $wpdb;
+
+	$candidates = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT ID FROM {$wpdb->posts}
+			WHERE post_type = 'page'
+				AND post_status IN ('publish', 'draft', 'private')
+				AND ( post_name = %s OR post_title = %s )
+			ORDER BY ID ASC",
+			$slug,
+			$title
+		)
+	);
+
+	if ( empty( $candidates ) ) {
+		return null;
+	}
+
+	foreach ( $candidates as $candidate ) {
+		$post = get_post( (int) $candidate->ID );
+		if ( ! $post ) {
+			continue;
+		}
+
+		if ( '' === $lang || ! function_exists( 'pll_get_post_language' ) ) {
+			return $post;
+		}
+
+		if ( pll_get_post_language( $post->ID, 'slug' ) === $lang ) {
+			return $post;
+		}
+	}
+
+	return null;
+}
+
+function murailles_copy_seed_page_data( $target_id, $source_id ) {
+	if ( ! $target_id || ! $source_id || $target_id === $source_id ) {
+		return;
+	}
+
+	$source = get_post( $source_id );
+	if ( ! $source ) {
+		return;
+	}
+
+	wp_update_post(
+		array(
+			'ID'           => $target_id,
+			'post_content' => $source->post_content,
+			'post_excerpt' => $source->post_excerpt,
+		)
+	);
+
+	$thumb_id = get_post_thumbnail_id( $source_id );
+	if ( $thumb_id ) {
+		set_post_thumbnail( $target_id, $thumb_id );
+	}
+
+	$meta_keys = array(
+		'_wp_page_template',
+		'murailles_page_sections',
+		'_yoast_wpseo_title',
+		'_yoast_wpseo_metadesc',
+		'_yoast_wpseo_focuskw',
+		'_yoast_wpseo_canonical',
+	);
+
+	foreach ( $meta_keys as $meta_key ) {
+		$value = get_post_meta( $source_id, $meta_key, true );
+		if ( '' !== $value && null !== $value ) {
+			update_post_meta( $target_id, $meta_key, $value );
+		}
+	}
+}
+
 /**
  * Auto-create all WordPress pages with correct templates on theme activation.
  * This maps every page template to a WordPress page so all navigation links work.
  */
-function murailles_create_pages( $force = false )
+function murailles_create_pages_legacy( $force = false )
 {
 	// Only run once unless forced
 	if ( ! $force && get_option('murailles_pages_created') ) {
@@ -605,7 +942,209 @@ function murailles_create_pages( $force = false )
 	$wp_rewrite->set_permalink_structure('/%postname%/');
 	$wp_rewrite->flush_rules( false );
 
-	update_option('murailles_pages_created', true);
+update_option('murailles_pages_created', true);
+}
+
+function murailles_create_pages( $force = false )
+{
+	if ( ! $force && get_option( 'murailles_pages_created' ) ) {
+		return;
+	}
+
+	$pages = array(
+		'home'                      => array( 'title' => 'Home', 'template' => '', 'titles' => array( 'fr' => 'Accueil', 'en' => 'Home' ) ),
+		'about-us'                  => array( 'title' => 'About Us', 'template' => 'page-templates/about-us.php', 'titles' => array( 'fr' => 'A propos', 'en' => 'About Us' ) ),
+		'contact'                   => array( 'title' => 'Contact', 'template' => 'page-templates/contact.php', 'titles' => array( 'fr' => 'Contact', 'en' => 'Contact' ) ),
+		'blog'                      => array( 'title' => 'Blog', 'template' => '', 'titles' => array( 'fr' => 'Blog', 'en' => 'Blog' ) ),
+		'faq'                       => array( 'title' => 'FAQ', 'template' => 'page-templates/faq.php' ),
+		'pricing'                   => array( 'title' => 'Pricing', 'template' => 'page-templates/pricing.php' ),
+		'privacy'                   => array( 'title' => 'Politique de confidentialite', 'template' => 'page-templates/privacy.php', 'titles' => array( 'fr' => 'Politique de confidentialite', 'en' => 'Privacy Policy' ) ),
+		'conditions-generales'      => array( 'title' => 'Conditions generales', 'template' => 'page-templates/terms.php', 'titles' => array( 'fr' => 'Conditions generales', 'en' => 'Terms and Conditions' ) ),
+		'checkout'                  => array( 'title' => 'Checkout', 'template' => 'page-templates/checkout.php' ),
+		'component'                 => array( 'title' => 'Components', 'template' => 'page-templates/component.php' ),
+		'dashboard'                 => array( 'title' => 'Dashboard', 'template' => 'page-templates/dashboard.php' ),
+		'my-profile'                => array( 'title' => 'My Profile', 'template' => 'page-templates/my-profile.php' ),
+		'my-property'               => array( 'title' => 'My Property', 'template' => 'page-templates/my-property.php' ),
+		'messages'                  => array( 'title' => 'Messages', 'template' => 'page-templates/messages.php' ),
+		'bookmark-list'             => array( 'title' => 'Bookmark List', 'template' => 'page-templates/bookmark-list.php' ),
+		'favoris'                   => array( 'title' => 'Mes favoris', 'template' => 'page-templates/favoris.php', 'titles' => array( 'fr' => 'Mes favoris', 'en' => 'My Favourites' ) ),
+		'submit-property'           => array( 'title' => 'Submit Property', 'template' => 'page-templates/submit-property.php', 'titles' => array( 'fr' => 'Deposer une annonce', 'en' => 'Submit Property' ) ),
+		'compare-property'          => array( 'title' => 'Compare Property', 'template' => 'page-templates/compare-property.php' ),
+		'single-property-1'         => array( 'title' => 'Single Property 1', 'template' => 'page-templates/single-property-1.php' ),
+		'single-property-2'         => array( 'title' => 'Single Property 2', 'template' => 'page-templates/single-property-2.php' ),
+		'single-property-3'         => array( 'title' => 'Single Property 3', 'template' => 'page-templates/single-property-3.php' ),
+		'single-property-4'         => array( 'title' => 'Single Property 4', 'template' => 'page-templates/single-property-4.php' ),
+		'agents'                    => array( 'title' => 'Agents', 'template' => 'page-templates/agents.php' ),
+		'agents-2'                  => array( 'title' => 'Agents Grid 2', 'template' => 'page-templates/agents-2.php' ),
+		'agent-page'                => array( 'title' => 'Agent Detail', 'template' => 'page-templates/agent-page.php' ),
+		'agencies'                  => array( 'title' => 'Agencies', 'template' => 'page-templates/agencies.php' ),
+		'agency-page'               => array( 'title' => 'Agency Detail', 'template' => 'page-templates/agency-page.php' ),
+		'grid-layout-with-sidebar'  => array( 'title' => 'Grid Layout With Sidebar', 'template' => 'page-templates/grid-layout-with-sidebar.php' ),
+		'grid-layout-2'             => array( 'title' => 'Grid Layout 2', 'template' => 'page-templates/grid-layout-2.php' ),
+		'grid-layout-3'             => array( 'title' => 'Grid Layout 3', 'template' => 'page-templates/grid-layout-3.php' ),
+		'grid-layout-with-map'      => array( 'title' => 'Grid Layout With Map', 'template' => 'page-templates/grid-layout-with-map.php' ),
+		'list-layout-with-sidebar'  => array( 'title' => 'List Layout With Sidebar', 'template' => 'page-templates/list-layout-with-sidebar.php' ),
+		'list-layout-with-map'      => array( 'title' => 'List Layout With Map', 'template' => 'page-templates/list-layout-with-map.php' ),
+		'list-layout-with-map-2'    => array( 'title' => 'List Layout With Map 2', 'template' => 'page-templates/list-layout-with-map-2.php' ),
+		'classical-layout-with-map' => array( 'title' => 'Classical Layout With Map', 'template' => 'page-templates/classical-layout-with-map.php' ),
+		'half-map'                  => array( 'title' => 'Half Map', 'template' => 'page-templates/half-map.php' ),
+		'half-map-2'                => array( 'title' => 'Half Map 2', 'template' => 'page-templates/half-map-2.php' ),
+		'map-home'                  => array( 'title' => 'Map Home', 'template' => 'page-templates/map.php' ),
+		'home-2'                    => array( 'title' => 'Home 2', 'template' => 'page-templates/home-2.php' ),
+		'home-3'                    => array( 'title' => 'Home 3', 'template' => 'page-templates/home-3.php' ),
+		'home-4'                    => array( 'title' => 'Home 4', 'template' => 'page-templates/home-4.php' ),
+		'home-5'                    => array( 'title' => 'Home 5', 'template' => 'page-templates/home-5.php' ),
+		'home-6'                    => array( 'title' => 'Home 6', 'template' => 'page-templates/home-6.php' ),
+		'home-7'                    => array( 'title' => 'Home 7', 'template' => 'page-templates/home-7.php' ),
+		'nos-services'              => array( 'title' => 'Nos Services', 'template' => 'page-templates/nos-services.php', 'titles' => array( 'fr' => 'Nos Services', 'en' => 'Our Services' ) ),
+		'assistance-conseils'       => array( 'title' => 'Assistance & Conseils', 'template' => 'page-templates/assistance-conseils.php', 'titles' => array( 'fr' => 'Assistance & Conseils', 'en' => 'Assistance & Advice' ) ),
+		'histoire-marrakech'        => array( 'title' => 'Histoire de Marrakech', 'template' => 'page-templates/histoire-marrakech.php', 'titles' => array( 'fr' => 'Histoire de Marrakech', 'en' => 'History of Marrakech' ) ),
+		'tourisme-marrakech'        => array( 'title' => 'Tourisme a Marrakech', 'template' => 'page-templates/tourisme-marrakech.php', 'titles' => array( 'fr' => 'Tourisme a Marrakech', 'en' => 'Tourism in Marrakech' ) ),
+	);
+
+	$default_lang    = function_exists( 'pll_default_language' ) ? pll_default_language( 'slug' ) : '';
+	$available_langs = function_exists( 'pll_languages_list' ) ? pll_languages_list( array( 'fields' => 'slug' ) ) : array();
+	$source_lang     = in_array( 'fr', $available_langs, true ) ? 'fr' : $default_lang;
+	$english_lang    = in_array( 'en', $available_langs, true ) && 'en' !== $source_lang ? 'en' : '';
+	$home_page_id    = 0;
+	$blog_page_id    = 0;
+
+	foreach ( $pages as $slug => $data ) {
+		$title       = $data['title'];
+		$template    = $data['template'];
+		$lang_titles = isset( $data['titles'] ) ? $data['titles'] : array();
+
+		if ( ! $source_lang || ! function_exists( 'pll_set_post_language' ) || ! function_exists( 'pll_save_post_translations' ) ) {
+			$existing = get_page_by_path( $slug );
+			if ( ! $existing ) {
+				$page_id = wp_insert_post(
+					array(
+						'post_title'   => $title,
+						'post_name'    => $slug,
+						'post_status'  => 'publish',
+						'post_type'    => 'page',
+						'post_content' => '',
+					)
+				);
+				$existing = ( $page_id && ! is_wp_error( $page_id ) ) ? get_post( $page_id ) : null;
+			}
+
+			if ( $existing && $template ) {
+				update_post_meta( $existing->ID, '_wp_page_template', $template );
+			}
+
+			if ( $existing && 'home' === $slug ) {
+				$home_page_id = (int) $existing->ID;
+			}
+
+			if ( $existing && 'blog' === $slug ) {
+				$blog_page_id = (int) $existing->ID;
+			}
+
+			continue;
+		}
+
+		$default_title = isset( $lang_titles[ $source_lang ] ) ? $lang_titles[ $source_lang ] : $title;
+		$default_page  = murailles_find_seed_page( $slug, $source_lang, $default_title );
+		$english_title = isset( $lang_titles['en'] ) ? $lang_titles['en'] : $title;
+		$english_page  = $english_lang ? murailles_find_seed_page( $slug, $english_lang, $english_title ) : null;
+
+		if ( ! $default_page && $english_page && function_exists( 'pll_get_post_translations' ) ) {
+			$translations = pll_get_post_translations( $english_page->ID );
+			if ( ! empty( $translations[ $source_lang ] ) ) {
+				$default_page = get_post( (int) $translations[ $source_lang ] );
+			}
+		}
+
+		if ( ! $english_page && $default_page && function_exists( 'pll_get_post_translations' ) && $english_lang ) {
+			$translations = pll_get_post_translations( $default_page->ID );
+			if ( ! empty( $translations[ $english_lang ] ) ) {
+				$english_page = get_post( (int) $translations[ $english_lang ] );
+			}
+		}
+
+		if ( ! $default_page ) {
+			$default_id = wp_insert_post(
+				array(
+					'post_title'   => $default_title,
+					'post_name'    => $slug,
+					'post_status'  => 'publish',
+					'post_type'    => 'page',
+					'post_content' => $english_page ? $english_page->post_content : '',
+					'post_excerpt' => $english_page ? $english_page->post_excerpt : '',
+				)
+			);
+
+			if ( $default_id && ! is_wp_error( $default_id ) ) {
+				pll_set_post_language( $default_id, $source_lang );
+				$default_page = get_post( $default_id );
+				if ( $english_page ) {
+					murailles_copy_seed_page_data( $default_id, $english_page->ID );
+				}
+			}
+		}
+
+		if ( $default_page && $template ) {
+			update_post_meta( $default_page->ID, '_wp_page_template', $template );
+		}
+
+		if ( $english_lang && ! $english_page ) {
+			$english_id = wp_insert_post(
+				array(
+					'post_title'   => $english_title,
+					'post_name'    => $slug,
+					'post_status'  => 'publish',
+					'post_type'    => 'page',
+					'post_content' => $default_page ? $default_page->post_content : '',
+					'post_excerpt' => $default_page ? $default_page->post_excerpt : '',
+				)
+			);
+
+			if ( $english_id && ! is_wp_error( $english_id ) ) {
+				pll_set_post_language( $english_id, $english_lang );
+				$english_page = get_post( $english_id );
+				if ( $default_page ) {
+					murailles_copy_seed_page_data( $english_id, $default_page->ID );
+				}
+			}
+		}
+
+		if ( $english_page && $template ) {
+			update_post_meta( $english_page->ID, '_wp_page_template', $template );
+		}
+
+		if ( $default_page && $english_page && $english_lang ) {
+			pll_save_post_translations(
+				array(
+					$source_lang  => (int) $default_page->ID,
+					$english_lang => (int) $english_page->ID,
+				)
+			);
+		}
+
+		if ( 'home' === $slug && $default_page ) {
+			$home_page_id = (int) $default_page->ID;
+		}
+
+		if ( 'blog' === $slug && $default_page ) {
+			$blog_page_id = (int) $default_page->ID;
+		}
+	}
+
+	if ( $home_page_id ) {
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_on_front', $home_page_id );
+	}
+
+	if ( $blog_page_id ) {
+		update_option( 'page_for_posts', $blog_page_id );
+	}
+
+	global $wp_rewrite;
+	$wp_rewrite->set_permalink_structure( '/%postname%/' );
+	$wp_rewrite->flush_rules( false );
+
+	update_option( 'murailles_pages_created', true );
 }
 // Page creation is intentionally NOT wired to after_switch_theme.
 // An admin notice with a manual button triggers it instead (see murailles_admin_setup_notice).

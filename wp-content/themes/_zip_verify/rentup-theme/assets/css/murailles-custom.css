@@ -1,0 +1,1602 @@
+/**
+ * Murailles Immobilier — Custom theme overrides
+ *
+ * Consolidated CSS extracted from inline blocks for better caching + SEO.
+ * Loaded by murailles_enqueue_styles() in functions.php after the main theme stylesheet.
+ *
+ * Sections:
+ *   1. Awards bar + testimonial avatars
+ *   2. Single-property gallery grid
+ *   3. Nav z-index + back-to-top
+ *   4. Modern form controls (selects, text inputs, date inputs)
+ *   5. Booking sidebar date picker
+ *   6. "Trier par" dropdown
+ *   7. Global icon-text spacing
+ *   8. Property header save/share buttons
+ *   9. Favoris page card layout
+ *   10. WhatsApp floating button
+ */
+
+/* ─── 1. Awards bar + testimonial avatars ─────────────────────────── */
+._testimonial_flex_first ._tsl_flex_thumb       { display:block !important; flex:0 0 70px; min-width:70px; }
+._testimonial_flex_first ._tsl_flex_thumb img   { width:70px; height:70px; object-fit:cover; display:block; }
+._testimonial_flex_first_last ._tsl_flex_thumb img { max-width:55px; height:auto; display:block; }
+._awards_group ._awards_list_wrap .rats-thumb     { flex:0 0 80px; min-width:80px; margin-right:14px; }
+._awards_group ._awards_list_wrap .rats-thumb img { width:70px; height:auto; max-height:70px; object-fit:contain; display:block; }
+._awards_group ._awards_list_wrap .rats-thumb i   { display:flex; align-items:center; justify-content:center; width:70px; height:70px; }
+
+/* ─── 2. Single-property gallery grid (1 hero + 3 stacked thumbs) ──
+   The left hero and the three stacked thumbnails on the right must
+   span the EXACT same total height so the four images line up flush
+   top and bottom (matching the rentup reference layout). Centralising
+   the height via a CSS custom property + calc() keeps the math
+   self-consistent: change --gallery-h once and every piece follows.
+
+   Math: each right thumb = (hero height − 2 × gap) / 3.
+   With --gallery-h:601px and --gallery-gap:16px → 189.67px per thumb,
+   giving 3 × 189.67 + 2 × 16 = 601px on the right side too. */
+.gallery_parts {
+	--gallery-h: 601px;
+	--gallery-gap: 16px;
+}
+.gallery_parts .gg_single_part.left,
+.gallery_parts .gg_single_part.left a       { display:block; height:var(--gallery-h); border-radius:8px; overflow:hidden; }
+.gallery_parts .gg_single_part.left img     { width:100%; height:100%; object-fit:cover; border-radius:8px; display:block; }
+.gallery_parts .gg_single_part-right.min    { height: calc( (var(--gallery-h) - 2 * var(--gallery-gap)) / 3 ); border-radius:8px; overflow:hidden; }
+.gallery_parts .gg_single_part-right.min a  { display:block; width:100%; height:100%; }
+.gallery_parts .gg_single_part-right.min img{ width:100%; height:100%; object-fit:cover; border-radius:8px; display:block; }
+/* Use the same gap value Bootstrap's mt-3 implies so the three thumbs
+   inherit a consistent rhythm. Overrides the .mt-3 margin so it always
+   matches --gallery-gap even if the design later wants a different gap. */
+.gallery_parts .gg_single_part-right.min + .gg_single_part-right.min { margin-top: var(--gallery-gap) !important; }
+.gallery_parts .pr-1 { padding-right:6px; }
+.gallery_parts .pl-1 { padding-left:6px; }
+/* Hidden lightbox link list — keeps extra gallery images out of layout but
+   discoverable by magnific-popup's gallery delegate so the lightbox arrows
+   cycle through every image even when only four are shown in the grid. */
+.murailles-lightbox-extras { display: none; }
+
+/* Single-property mobile / tablet hero gallery — horizontal swipe carousel
+   built on native CSS scroll-snap. Each slide is 100% of the container
+   width and snaps into place as the user swipes. No JS framework needed
+   for scrolling; a tiny inline script just updates the dot indicators.
+   Slick was previously initialized here but failed on small viewports
+   (centerMode + few slides = collapsed slide width); native scroll-snap
+   is simpler, accessible, and matches how iOS users already expect a
+   photo carousel to feel. */
+.murailles-mobile-gallery__track {
+	display:flex;
+	overflow-x:auto;
+	overflow-y:hidden;
+	scroll-snap-type: x mandatory;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+	border-radius:10px;
+	box-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+.murailles-mobile-gallery__track::-webkit-scrollbar { display:none; }
+.murailles-mobile-gallery__slide {
+	flex: 0 0 100%;
+	scroll-snap-align: center;
+	scroll-snap-stop: always;
+}
+.murailles-mobile-gallery__slide a { display:block; width:100%; height:260px; }
+.murailles-mobile-gallery__slide img { width:100%; height:100%; object-fit:cover; display:block; }
+/* Dots indicator under the swipe track. */
+.murailles-mobile-gallery__dots {
+	display:flex;
+	justify-content:center;
+	gap:8px;
+	margin-top:12px;
+}
+.murailles-mobile-gallery__dots button {
+	width:8px; height:8px;
+	padding:0;
+	border:none;
+	border-radius:50%;
+	background:#cbd1d8;
+	transition: background .2s ease, transform .2s ease;
+	cursor:pointer;
+}
+.murailles-mobile-gallery__dots button.is-active {
+	background:#dc3545;
+	transform: scale(1.25);
+}
+@media (min-width: 576px) {
+	.murailles-mobile-gallery__slide a { height: 340px; }
+}
+@media (min-width: 768px) {
+	.murailles-mobile-gallery__slide a { height: 460px; }
+}
+
+/* ─── 2b. Home-page CTA banner (Property Tag section) ──────────────
+   Hero-style cover banner with a refined glass card on top. Avoids
+   the plain white box look from the old .tab_exclusive style. */
+.murailles-cta-banner {
+	padding: 110px 0;
+	background-attachment: scroll;
+	position: relative;
+}
+/* Subtle light scrim so photo stays vivid — no dark overlay pseudo-element */
+.murailles-cta-banner::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to right, rgba(255,255,255,0.15) 0%, transparent 70%);
+	pointer-events: none;
+	z-index: 0;
+}
+.murailles-cta-banner .container {
+	position: relative;
+	z-index: 1;
+}
+.murailles-cta-banner__card {
+	background: #ffffff;
+	border-radius: 14px;
+	padding: 44px 44px 40px;
+	box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+	border-left: 6px solid #dc3545;
+}
+.murailles-cta-banner__eyebrow {
+	display: inline-block;
+	color: #dc3545;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+	font-size: 12px;
+	margin-bottom: 10px;
+}
+.murailles-cta-banner__card h2 {
+	font-size: 30px;
+	line-height: 1.25;
+	color: #1a2332;
+	margin: 0 0 14px;
+	font-weight: 800;
+}
+.murailles-cta-banner__card p {
+	color: #5b6470;
+	font-size: 15px;
+	line-height: 1.7;
+	margin: 0 0 22px;
+}
+.murailles-cta-banner__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+@media (max-width: 768px) {
+	.murailles-cta-banner { padding: 70px 0; }
+	.murailles-cta-banner__card { padding: 30px 24px; }
+	.murailles-cta-banner__card h2 { font-size: 24px; }
+}
+
+/* ─── 3. Nav z-index + back-to-top ─────────────────────────────────── */
+.header        { position:relative; z-index:1000; }
+.nav-dropdown  { z-index:1001; }
+.gallery_parts { position:relative; z-index:1; }
+#back2Top {
+	width:44px !important;
+	height:44px !important;
+	line-height:44px !important;
+	bottom:24px !important;
+	right:24px !important;
+	border-radius:50% !important;
+	box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* ─── 4. Modern form controls (selects, text inputs) ──────────────── */
+.sidebar-widgets select.form-control,
+.simple-input select,
+select.form-control.murailles-select {
+	appearance:none;
+	-webkit-appearance:none;
+	-moz-appearance:none;
+	background-color:#fff;
+	background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23dc3545' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='1,1 6,6 11,1'/></svg>");
+	background-repeat:no-repeat;
+	background-position:right 14px center;
+	background-size:12px 8px;
+	padding:12px 40px 12px 16px !important;
+	height:auto !important;
+	min-height:46px;
+	border:1.5px solid #e5e7eb;
+	border-radius:10px;
+	font-size:14px;
+	font-weight:500;
+	color:#1a2332;
+	line-height:1.4;
+	cursor:pointer;
+	transition:border-color .2s, box-shadow .2s, transform .15s;
+}
+.sidebar-widgets select.form-control:hover,
+.simple-input select:hover { border-color:#dc3545; }
+.sidebar-widgets select.form-control:focus,
+.simple-input select:focus {
+	outline:none;
+	border-color:#dc3545;
+	box-shadow:0 0 0 4px rgba(220,53,69,0.12);
+}
+.sidebar-widgets input[type="text"].form-control,
+.sidebar-widgets input[type="number"].form-control,
+.sidebar-widgets input[type="email"].form-control,
+.sidebar-widgets input[type="search"].form-control {
+	min-height:46px;
+	border:1.5px solid #e5e7eb;
+	border-radius:10px;
+	padding:10px 16px;
+	font-size:14px;
+	color:#1a2332;
+	transition:border-color .2s, box-shadow .2s;
+}
+.sidebar-widgets input[type="text"].form-control:focus,
+.sidebar-widgets input[type="number"].form-control:focus,
+.sidebar-widgets input[type="email"].form-control:focus,
+.sidebar-widgets input[type="search"].form-control:focus {
+	outline:none;
+	border-color:#dc3545;
+	box-shadow:0 0 0 4px rgba(220,53,69,0.12);
+}
+
+/* Date inputs — same look as text inputs */
+input[type="date"].form-control {
+	min-height:46px;
+	border:1.5px solid #e5e7eb;
+	border-radius:10px;
+	padding:10px 16px;
+	font-size:14px;
+	color:#1a2332;
+	font-family:inherit;
+	background:#fff;
+	cursor:pointer;
+	transition:border-color .2s, box-shadow .2s;
+	position:relative;
+}
+input[type="date"].form-control:hover { border-color:#dc3545; }
+input[type="date"].form-control:focus {
+	outline:none;
+	border-color:#dc3545;
+	box-shadow:0 0 0 4px rgba(220,53,69,0.12);
+}
+input[type="date"].form-control::-webkit-calendar-picker-indicator {
+	background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dc3545' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='18' rx='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/></svg>");
+	background-size:20px 20px;
+	background-repeat:no-repeat;
+	background-position:center;
+	width:24px;
+	height:24px;
+	cursor:pointer;
+	opacity:0.85;
+	transition:opacity .15s;
+}
+input[type="date"].form-control::-webkit-calendar-picker-indicator:hover { opacity:1; }
+
+/* ─── 5. Booking sidebar date picker (.cld-box wrapper) ───────────── */
+.side-booking-body .form-group { margin-bottom:14px !important; }
+.side-booking-body .form-group label {
+	display:block;
+	font-size:12px;
+	font-weight:700;
+	text-transform:uppercase;
+	letter-spacing:0.5px;
+	color:#6c757d;
+	margin-bottom:6px;
+}
+.side-booking-body .cld-box {
+	position:relative;
+	height:auto;
+	min-height:50px;
+	background:#fff;
+	border:1.5px solid #e5e7eb;
+	border-radius:10px;
+	padding:0 12px;
+	display:flex;
+	align-items:center;
+	gap:10px;
+	transition:border-color .2s, box-shadow .2s;
+}
+.side-booking-body .cld-box:hover,
+.side-booking-body .cld-box:focus-within {
+	border-color:#dc3545;
+	box-shadow:0 0 0 4px rgba(220,53,69,0.12);
+}
+.side-booking-body .cld-box > i:first-child {
+	position:static !important;
+	top:auto !important;
+	left:auto !important;
+	color:#dc3545;
+	font-size:18px;
+	flex-shrink:0;
+}
+.side-booking-body .cld-box input[type="date"].form-control {
+	border:none !important;
+	padding:8px 0 !important;
+	background:transparent !important;
+	height:auto;
+	min-height:0;
+	box-shadow:none !important;
+	font-size:15px;
+	font-weight:600;
+	color:#1a2332;
+	flex:1;
+	width:100%;
+}
+.side-booking-body .cld-box input[type="date"].form-control:focus { box-shadow:none !important; }
+.side-booking-body .cld-box input[type="date"]::-webkit-calendar-picker-indicator {
+	opacity:0.4;
+	padding:6px;
+	margin-right:-6px;
+	cursor:pointer;
+}
+.side-booking-body .cld-box input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity:0.9; }
+
+/* ─── 6. "Trier par" dropdown ─────────────────────────────────────── */
+.shorting-right .dropdown-toggle.btn-filter {
+	border:1.5px solid #e5e7eb;
+	background:#fff;
+	color:#1a2332;
+	font-weight:600;
+	padding:10px 40px 10px 16px !important;
+	border-radius:10px;
+	min-width:170px;
+	text-align:left;
+	position:relative;
+	transition:border-color .2s, box-shadow .2s;
+}
+.shorting-right .dropdown-toggle.btn-filter::after {
+	border:none;
+	content:"";
+	width:10px;
+	height:10px;
+	background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23dc3545' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='1,1 6,6 11,1'/></svg>") no-repeat center / contain;
+	position:absolute;
+	right:16px;
+	top:50%;
+	margin:0;
+	transform:translateY(-50%);
+}
+.shorting-right .dropdown-toggle.btn-filter:hover { border-color:#dc3545; }
+.shorting-right .dropdown-menu.drp-select {
+	border:none;
+	border-radius:10px;
+	box-shadow:0 12px 32px rgba(0,0,0,0.12);
+	padding:8px;
+	margin-top:6px;
+	min-width:170px;
+}
+.shorting-right .dropdown-menu.drp-select .dropdown-item {
+	padding:10px 14px;
+	border-radius:6px;
+	font-size:14px;
+	font-weight:500;
+	color:#1a2332;
+	transition:background .15s;
+}
+.shorting-right .dropdown-menu.drp-select .dropdown-item:hover {
+	background:#fff5f6;
+	color:#dc3545;
+}
+
+/* ─── 7. Global icon-text spacing inside buttons/links ────────────── */
+.btn > i.fa,
+.btn > i.fas,
+.btn > i.far,
+.btn > i.fab,
+.btn > i[class*="fa-solid"],
+.btn > i[class*="fa-regular"],
+.btn > i[class*="fa-brands"],
+button > i[class*="fa-"],
+a > i[class*="fa-"] {
+	margin-right:6px;
+}
+.btn > i[class*="fa-"]:only-child,
+button > i[class*="fa-"]:only-child,
+a > i[class*="fa-"]:only-child {
+	margin-right:0;
+}
+
+/* ─── 8. Property header save/share buttons ───────────────────────── */
+._share_lists { display:flex; gap:10px; list-style:none; padding:0; margin:0; }
+._share_lists li { display:inline-block; }
+._share_lists a {
+	display:inline-flex;
+	align-items:center;
+	gap:8px;
+	padding:10px 18px;
+	border:1.5px solid #e5e7eb;
+	border-radius:10px;
+	background:#fff;
+	color:#1a2332;
+	font-size:13px;
+	font-weight:600;
+	text-decoration:none;
+	cursor:pointer;
+	transition:all .2s ease;
+	line-height:1;
+}
+._share_lists a i { font-size:15px; color:#6c757d; transition:color .2s; }
+._share_lists a:hover {
+	border-color:#dc3545;
+	color:#dc3545;
+	transform:translateY(-1px);
+	box-shadow:0 4px 12px rgba(220,53,69,0.15);
+}
+._share_lists a:hover i { color:#dc3545; }
+._share_lists a.is-saved {
+	background:#dc3545;
+	border-color:#dc3545;
+	color:#fff !important;
+}
+._share_lists a.is-saved i { color:#fff !important; }
+.murailles-prop-label { font-weight:600; }
+
+/* ─── 9. Favoris page card layout ─────────────────────────────────── */
+#murailles-favoris-list .property-listing {
+	background:#fff;
+	border-radius:12px;
+	overflow:hidden;
+	box-shadow:0 4px 20px rgba(0,0,0,0.08);
+	height:100%;
+	display:flex;
+	flex-direction:column;
+	transition:transform .25s ease, box-shadow .25s ease;
+}
+#murailles-favoris-list .property-listing:hover {
+	transform:translateY(-4px);
+	box-shadow:0 12px 28px rgba(0,0,0,0.12);
+}
+#murailles-favoris-list .listing-img-wrapper {
+	position:relative;
+	height:220px;
+	overflow:hidden;
+}
+#murailles-favoris-list .listing-img-wrapper img {
+	width:100%;
+	height:100%;
+	object-fit:cover;
+	display:block;
+	transition:transform .4s ease;
+}
+#murailles-favoris-list .property-listing:hover .listing-img-wrapper img {
+	transform:scale(1.05);
+}
+#murailles-favoris-list .listing-img-wrapper ._exlio_125 {
+	position:absolute;
+	top:14px;
+	left:14px;
+	background:#dc3545;
+	color:#fff;
+	padding:6px 14px;
+	border-radius:20px;
+	font-size:12px;
+	font-weight:600;
+	z-index:2;
+	text-transform:uppercase;
+	letter-spacing:0.4px;
+}
+#murailles-favoris-list .fav-card-body {
+	padding:18px 20px 16px;
+	flex:1;
+	display:flex;
+	flex-direction:column;
+}
+#murailles-favoris-list .fav-card-top {
+	display:flex;
+	align-items:flex-start;
+	justify-content:space-between;
+	gap:12px;
+	margin-bottom:10px;
+}
+#murailles-favoris-list .fav-category {
+	font-size:11px;
+	font-weight:700;
+	text-transform:uppercase;
+	letter-spacing:0.5px;
+	color:#0e8763;
+	background:rgba(14,135,99,0.1);
+	padding:4px 10px;
+	border-radius:20px;
+	white-space:nowrap;
+}
+#murailles-favoris-list .fav-price {
+	font-size:18px;
+	font-weight:800;
+	color:#dc3545;
+	white-space:nowrap;
+}
+#murailles-favoris-list .fav-title {
+	font-size:16px;
+	font-weight:600;
+	color:#1a2332;
+	line-height:1.4;
+	margin:0 0 12px;
+	display:-webkit-box;
+	-webkit-line-clamp:2;
+	line-clamp:2;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+}
+#murailles-favoris-list .fav-title a { color:inherit; text-decoration:none; }
+#murailles-favoris-list .fav-title a:hover { color:#dc3545; }
+#murailles-favoris-list .fav-specs {
+	display:flex;
+	justify-content:flex-start;
+	gap:14px;
+	flex-wrap:wrap;
+	font-size:13px;
+	color:#6c757d;
+	margin-top:auto;
+	padding-top:8px;
+	text-align:left;
+}
+#murailles-favoris-list .fav-specs span { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+#murailles-favoris-list .fav-specs i { color:#dc3545; flex-shrink:0; }
+#murailles-favoris-list .fav-card-footer {
+	padding:14px 20px;
+	border-top:1px solid #f0f0f0;
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	background:#fafbfc;
+}
+#murailles-favoris-list .fav-location {
+	font-size:13px;
+	color:#6c757d;
+	display:flex;
+	align-items:center;
+	gap:6px;
+}
+#murailles-favoris-list .fav-location i { color:#dc3545; }
+#murailles-favoris-list .murailles-remove-fav {
+	font-size:12px;
+	padding:6px 12px;
+}
+
+/* ─── 10. Floating WhatsApp button ────────────────────────────────── */
+@keyframes murailles-wa-pulse {
+	0%   { transform: scale(1);   opacity: 0.7; }
+	100% { transform: scale(1.5); opacity: 0;   }
+}
+#murailles-whatsapp-btn {
+	position:fixed;
+	left:24px;
+	bottom:24px;
+	z-index:9998;
+	width:60px;
+	height:60px;
+	border-radius:50%;
+	background:#25D366;
+	color:#fff;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	font-size:30px;
+	text-decoration:none;
+	box-shadow:0 8px 24px rgba(37,211,102,0.45);
+	transition:transform .2s ease, box-shadow .2s ease;
+}
+#murailles-whatsapp-btn:hover { transform:scale(1.08); box-shadow:0 12px 32px rgba(37,211,102,0.6); }
+#murailles-whatsapp-btn .murailles-wa-pulse {
+	position:absolute;
+	inset:0;
+	border-radius:50%;
+	border:3px solid #25D366;
+	animation:murailles-wa-pulse 2s infinite;
+}
+#murailles-whatsapp-btn .murailles-wa-tip {
+	position:absolute;
+	left:72px;
+	top:50%;
+	transform:translateY(-50%);
+	background:#1a2332;
+	color:#fff;
+	padding:8px 14px;
+	border-radius:6px;
+	font-size:13px;
+	font-weight:600;
+	white-space:nowrap;
+	font-family:Arial,Helvetica,sans-serif;
+	opacity:0;
+	pointer-events:none;
+	transition:opacity .2s;
+}
+#murailles-whatsapp-btn:hover .murailles-wa-tip { opacity:1; }
+
+/* ─── 11. Compare-property page table cells ───────────────────────── */
+.murailles-compare-th {
+	text-align:center;
+	vertical-align:top;
+	padding:16px;
+}
+.murailles-compare-th img {
+	width:100%;
+	max-width:240px;
+	height:140px;
+	object-fit:cover;
+	border-radius:8px;
+	margin-bottom:12px;
+}
+.murailles-compare-th h4 {
+	margin:0;
+	font-size:15px;
+	line-height:1.3;
+	color:#fff;
+}
+.murailles-compare-th-price {
+	margin-top:6px;
+	color:#fff;
+	background:#dc3545;
+	display:inline-block;
+	padding:4px 10px;
+	border-radius:4px;
+	font-weight:700;
+	font-size:14px;
+}
+.murailles-compare-th-link {
+	display:inline-block;
+	margin-top:8px;
+	font-size:12px;
+	color:#1a2332;
+	background:#fff;
+	padding:4px 12px;
+	border-radius:4px;
+	text-decoration:none;
+	font-weight:600;
+}
+.murailles-compare-row-label {
+	font-weight:600;
+	background:#f8f9fa;
+}
+.murailles-compare-row-price { color:#dc3545; }
+#murailles-compare-rows td { text-align:center; }
+
+/* ─── 12. Share modal (single-property page) ──────────────────────── */
+.murailles-share-overlay {
+	position:fixed;
+	inset:0;
+	z-index:100000;
+	background:rgba(15,22,32,0.7);
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	padding:16px;
+}
+.murailles-share-modal {
+	background:#fff;
+	border-radius:14px;
+	max-width:440px;
+	width:100%;
+	box-shadow:0 24px 64px rgba(0,0,0,0.25);
+	overflow:hidden;
+	font-family:Arial,Helvetica,sans-serif;
+}
+.murailles-share-head {
+	padding:22px 28px 14px;
+	border-bottom:1px solid #f0f0f0;
+}
+.murailles-share-head h3 {
+	margin:0;
+	font-size:18px;
+	color:#1a2332;
+}
+.murailles-share-head p {
+	margin:6px 0 0;
+	font-size:13px;
+	color:#6c757d;
+}
+.murailles-share-grid {
+	padding:24px 28px;
+	display:grid;
+	grid-template-columns:repeat(4,1fr);
+	gap:14px;
+}
+.murailles-share-icon {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	gap:6px;
+	text-decoration:none;
+	color:#495057;
+	font-size:12px;
+	font-weight:600;
+}
+.murailles-share-icon > span {
+	width:48px;
+	height:48px;
+	border-radius:50%;
+	background:var(--c);
+	color:#fff;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	font-size:18px;
+	transition:transform .15s;
+}
+.murailles-share-icon:hover > span { transform:scale(1.1); }
+.murailles-share-link { padding:0 28px 20px; }
+.murailles-share-link label {
+	display:block;
+	font-size:12px;
+	color:#6c757d;
+	margin-bottom:6px;
+	font-weight:600;
+	text-transform:uppercase;
+	letter-spacing:0.5px;
+}
+.murailles-share-link-row {
+	display:flex;
+	gap:8px;
+	align-items:center;
+	background:#f8f9fa;
+	border:1.5px solid #e5e7eb;
+	border-radius:10px;
+	padding:8px 8px 8px 14px;
+}
+.murailles-share-link-row input {
+	flex:1;
+	border:none;
+	background:transparent;
+	font-size:13px;
+	color:#1a2332;
+	outline:none;
+}
+.murailles-share-link-row button {
+	padding:8px 16px;
+	border:none;
+	background:#dc3545;
+	color:#fff;
+	border-radius:6px;
+	font-weight:600;
+	font-size:13px;
+	cursor:pointer;
+}
+.murailles-share-link-row button.is-copied { background:#28a745; }
+.murailles-share-foot {
+	padding:14px 28px;
+	background:#fafbfc;
+	border-top:1px solid #f0f0f0;
+	text-align:right;
+}
+.murailles-share-foot button {
+	padding:8px 18px;
+	border:1px solid #ced4da;
+	background:#fff;
+	border-radius:6px;
+	font-weight:600;
+	font-size:13px;
+	color:#495057;
+	cursor:pointer;
+}
+
+/* ─── Categories widget (blog sidebar) ───────────────────────────────── */
+/* Reference design: CodeSommet blog-detail sidebar — white card, dashed
+   dividers, circular pill counter on the right. Brand-colored (red)
+   for Murailles. */
+.sidebar_widgets.single_widgets.widget_category {
+	background: #fff;
+	border-radius: 12px;
+	padding: 24px 22px;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar_widgets.single_widgets.widget_category .sidebar_title {
+	font-size: 22px;
+	font-weight: 800;
+	color: #1a2332;
+	margin: 0 0 18px;
+	padding: 0;
+}
+.sidebar_widgets.single_widgets.widget_category .sidebar_title::after {
+	display: none; /* hide the brand underline so it matches pic 2 */
+}
+
+.sidebar_widgets.single_widgets.widget_category ul li {
+	padding: 14px 0;
+	border-bottom: 1px dashed #d1d5db;
+}
+.sidebar_widgets.single_widgets.widget_category ul li:last-child {
+	border-bottom: none;
+}
+
+.sidebar_widgets.single_widgets.widget_category ul li a {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	color: #1a2332;
+	font-size: 15px;
+	font-weight: 700;
+	text-decoration: none;
+	transition: color .15s ease;
+}
+
+.sidebar_widgets.single_widgets.widget_category ul li a:hover {
+	color: #a70a29;
+}
+
+.sidebar_widgets.single_widgets.widget_category ul li a span {
+	float: none;
+	background: #a70a29;
+	color: #fff;
+	border-radius: 50%;
+	min-width: 36px;
+	height: 36px;
+	padding: 0 8px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+
+/* ─── WP default Categories widget — match the design above ─────────── */
+/* When users drop the stock "Categories" widget into a sidebar area, WP
+   renders <div class="widget widget_categories"> instead of our custom
+   markup. The murailles_format_category_count() filter wraps the count
+   in <span class="murailles-cat-count"> so we can style it as a badge. */
+.widget.widget_categories,
+.widget_categories {
+	background: #fff;
+	border-radius: 12px;
+	padding: 24px 22px;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+	margin-bottom: 24px;
+}
+
+.widget.widget_categories .widget-title,
+.widget.widget_categories h2.widget-title,
+.widget.widget_categories h3.widget-title,
+.widget.widget_categories h4 {
+	font-size: 22px;
+	font-weight: 800;
+	color: #1a2332;
+	margin: 0 0 18px;
+	padding: 0;
+	border: none;
+}
+.widget.widget_categories .widget-title::after { display: none; }
+
+.widget.widget_categories ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.widget.widget_categories ul li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 14px 0;
+	border-bottom: 1px dashed #d1d5db;
+	font-size: 15px;
+	font-weight: 700;
+	color: #1a2332;
+}
+
+.widget.widget_categories ul li:last-child {
+	border-bottom: none;
+}
+
+.widget.widget_categories ul li a {
+	flex: 1;
+	color: #1a2332;
+	text-decoration: none;
+	transition: color .15s ease;
+}
+
+.widget.widget_categories ul li a:hover {
+	color: #a70a29;
+}
+
+/* Circular badge — set by the wp_list_categories filter in functions.php */
+.murailles-cat-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 36px;
+	height: 36px;
+	padding: 0 8px;
+	background: #a70a29;
+	color: #fff;
+	border-radius: 50%;
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
+/* ─── 10. Language switcher (Polylang) ────────────────────────────── */
+.murailles-lang-switcher {
+	position: relative;
+}
+
+.murailles-lang-switcher > a {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.08);
+	color: inherit;
+	font-weight: 600;
+	font-size: 13px;
+	text-decoration: none;
+	transition: background .15s ease, color .15s ease;
+}
+
+.murailles-lang-switcher > a:hover,
+.murailles-lang-switcher.show > a {
+	background: #fff;
+	color: #a70a29;
+}
+
+.murailles-lang-flag {
+	display: inline-flex;
+	align-items: center;
+}
+
+.murailles-lang-flag img {
+	display: block;
+	width: 18px;
+	height: auto;
+	border-radius: 2px;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.murailles-lang-code {
+	letter-spacing: 0.5px;
+	font-size: 12px;
+}
+
+.murailles-lang-menu {
+	min-width: 160px;
+	padding: 6px !important;
+	border-radius: 10px !important;
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+	border: none !important;
+}
+
+.murailles-lang-menu .dropdown-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border-radius: 6px;
+	font-size: 14px;
+	color: #1a2332;
+	transition: background .12s ease, color .12s ease;
+}
+
+.murailles-lang-menu .dropdown-item:hover,
+.murailles-lang-menu .dropdown-item:focus {
+	background: #fff3f3;
+	color: #a70a29;
+}
+
+/* Dark-text variant for non-transparent headers */
+.header-light .murailles-lang-switcher > a {
+	background: #f3f4f6;
+	color: #1a2332;
+}
+
+.header-light .murailles-lang-switcher > a:hover,
+.header-light .murailles-lang-switcher.show > a {
+	background: #fff3f3;
+	color: #a70a29;
+}
+
+/* ─── Header layout — centered main nav, lang switcher pinned right ──── */
+.navigation-landscape .nav-menus-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+/* Main menu: take all the free space and center its items */
+.navigation-landscape .nav-menus-wrapper > .nav-menu:first-of-type,
+.navigation-landscape .nav-menus-wrapper > .menu-primary-container {
+	flex: 1 1 auto;
+	display: flex;
+	justify-content: center;
+	gap: 4px;
+	float: none;
+	min-width: 0;
+}
+
+.navigation-landscape .nav-menus-wrapper > .nav-menu:first-of-type > li,
+.navigation-landscape .nav-menus-wrapper > .menu-primary-container > .nav-menu > li {
+	float: none;
+}
+
+/* Right-side group (lang switcher + any future utility items) — no flex grow */
+.navigation-landscape .nav-menu.nav-menu-social.align-to-right {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* ============================================================
+ * Mobile menu — logo inside the open drawer + lang switcher
+ * in the top bar (replaces the old envelope icon).
+ * ============================================================ */
+
+/* Hide the drawer-logo on desktop; it's only meant for the slide-out panel. */
+.mobile-menu-logo {
+	display: none;
+}
+
+/* On mobile, show the logo at the top of the open menu drawer. */
+@media (max-width: 992px) {
+	.nav-menus-wrapper .mobile-menu-logo {
+		display: block;
+		padding: 16px 20px;
+		margin: 0 0 8px 0;
+		border-bottom: 1px solid #eee;
+	}
+	.nav-menus-wrapper .mobile-menu-logo img {
+		max-height: 42px;
+		width: auto;
+		display: block;
+	}
+	/* The desktop-only right-side lang switcher is redundant on mobile
+	   because we now expose it in the top bar. */
+	.nav-menus-wrapper .nav-menu.nav-menu-social.align-to-right {
+		display: none;
+	}
+
+	/* ── Mobile top bar: logo far-left, hamburger center, lang far-right ── */
+	.nav-header {
+		display: flex !important;
+		align-items: center !important;
+		justify-content: space-between !important;
+		width: 100%;
+		padding: 0 12px;
+		box-sizing: border-box;
+	}
+	/* Logo: left anchor — never grows/shrinks */
+	.nav-header .nav-brand {
+		flex: 0 0 auto;
+		order: 1;
+		margin: 0 !important;
+	}
+	.nav-header .nav-brand img.logo {
+		max-height: 38px;
+		width: auto;
+		display: block;
+	}
+	/* Hamburger: stays in natural document order (order 2 by default) */
+	.nav-header .nav-toggle {
+		flex: 0 0 auto;
+		order: 2;
+		margin: 0 auto; /* centre it in the remaining space */
+	}
+	/* Lang switcher: pinned to the far right */
+	.nav-header .mobile_nav {
+		flex: 0 0 auto;
+		order: 3;
+		margin-left: auto;
+	}
+	.nav-header .mobile_nav .mobile-lang-switcher {
+		display: inline-flex !important;
+		align-items: center;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+}
+
+/* ----------------------------------------------------------
+ * Lang switcher — reuses the CodeSommet `.btn-group.account-drop` +
+ * `.btn-order-by-filt` pattern so it inherits the demo's dropdown
+ * panel styling (white panel, rounded, soft shadow, top:70px right:0).
+ *
+ * We only need to:
+ *   1. Slim the trigger button — CodeSommet's `.btn-order-by-filt` defaults
+ *      to a round 30×30 avatar; we want a small pill of flag + code.
+ *   2. Re-enable our switcher despite the `.navigation-portrait
+ *      .nav-menu.nav-menu-social { display:none }` rule from
+ *      styles.css:3554 (it would otherwise hide it on mobile).
+ *   3. Style the dropdown-menu list items (flag + name rows).
+ * ---------------------------------------------------------- */
+
+/* Trigger button — flag + code, pill shape. Subtle background so it
+   stays readable on white headers AND over hero images (transparent header). */
+.murailles-lang-switcher .btn.btn-order-by-filt.murailles-lang-toggle {
+	display: inline-flex !important;
+	align-items: center;
+	gap: 6px;
+	height: auto;
+	width: auto;
+	padding: 6px 12px;
+	margin: 0;
+	border: 1px solid rgba(41, 53, 68, 0.12) !important;
+	border-radius: 50px !important;
+	background: #ffffff !important;
+	color: #293544;
+	font-family: 'Jost', sans-serif;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+	cursor: pointer;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+	-webkit-appearance: none;
+	appearance: none;
+	transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.murailles-lang-switcher .btn.btn-order-by-filt.murailles-lang-toggle:hover {
+	background: #a70a29 !important;
+	border-color: #a70a29 !important;
+	color: #ffffff !important;
+	box-shadow: 0 2px 6px rgba(167, 10, 41, 0.25) !important;
+}
+.murailles-lang-switcher .btn.btn-order-by-filt.murailles-lang-toggle:hover .fa-chevron-down {
+	opacity: 1;
+}
+/* Click / active / open state — keep the white pill with dark text so the
+   button reads as "pressed" without flipping to red. */
+.murailles-lang-switcher .btn.btn-order-by-filt.murailles-lang-toggle:focus,
+.murailles-lang-switcher .btn.btn-order-by-filt.murailles-lang-toggle:active,
+.murailles-lang-switcher .btn.btn-order-by-filt.murailles-lang-toggle.show,
+.murailles-lang-switcher.show .btn.btn-order-by-filt.murailles-lang-toggle,
+.murailles-lang-switcher .btn.btn-order-by-filt.murailles-lang-toggle[aria-expanded="true"] {
+	background: #ffffff !important;
+	border-color: rgba(41, 53, 68, 0.18) !important;
+	color: #293544 !important;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* On the transparent (hero) header the pill stays white-on-translucent
+   so it remains readable over photos. When the header becomes fixed
+   (scrolled), it inherits the default white-pill style above. */
+.header-transparent:not(.header-fixed) .murailles-lang-switcher .btn.btn-order-by-filt.murailles-lang-toggle {
+	background: rgba(255, 255, 255, 0.92) !important;
+	border-color: rgba(255, 255, 255, 0.92) !important;
+	color: #293544;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+	-webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Flag glyph inside the trigger. */
+.murailles-lang-switcher .murailles-lang-flag {
+	display: inline-flex;
+	align-items: center;
+	line-height: 0;
+}
+.murailles-lang-switcher .murailles-lang-flag img,
+.murailles-lang-switcher .murailles-lang-flag svg {
+	display: block;
+	width: 20px;
+	height: 14px;
+	border-radius: 2px;
+}
+
+/* Chevron — small + muted. */
+.murailles-lang-switcher .murailles-lang-toggle .fa-chevron-down {
+	font-size: 9px;
+	opacity: 0.6;
+	margin-left: 2px;
+}
+
+/* Dropdown menu rows (the CodeSommet `.account-drop .dropdown-menu ul li a`
+   block already styles padding/border-bottom — we just space flag + name). */
+.murailles-lang-switcher .murailles-lang-menu ul li a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.murailles-lang-switcher .murailles-lang-menu .murailles-lang-flag img,
+.murailles-lang-switcher .murailles-lang-menu .murailles-lang-flag svg {
+	width: 22px;
+	height: 15px;
+	border-radius: 2px;
+}
+
+@media (max-width: 992px) {
+	/* The blanket "hide all .nav-menu-social on mobile" rule from
+	   styles.css:3554 also hides our switcher because it sits inside
+	   a <ul class="nav-menu nav-menu-social mobile-lang-switcher">.
+	   We re-enable it here. */
+	.navigation-portrait .mobile_nav .mobile-lang-switcher {
+		display: inline-block !important;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		vertical-align: middle;
+	}
+	.navigation-portrait .mobile_nav .mobile-lang-switcher > li {
+		display: inline-block;
+		padding: 0;
+	}
+
+	/* Tighten the trigger a hair on mobile so it doesn't crowd the
+	   small header bar; hide the language code letters — flag + chevron
+	   is enough on tiny screens. */
+	.mobile_nav .murailles-lang-switcher .btn.btn-order-by-filt.murailles-lang-toggle {
+		padding: 4px 8px;
+		font-size: 13px;
+	}
+
+	/* Pin the dropdown so it can never overflow the viewport. The
+	   parent .btn-group is position:relative by default, so right:0
+	   anchors it to the trigger's right edge — which is itself the
+	   right edge of the viewport. */
+	.mobile_nav .murailles-lang-switcher .dropdown-menu {
+		top: 100% !important;
+		right: 0 !important;
+		left: auto !important;
+		transform: none !important;
+		margin-top: 8px;
+		min-width: 180px;
+		max-width: calc(100vw - 24px);
+	}
+}
+
+/* ─── Footer contact list — fixed-width icon column for clean alignment ─ */
+.murailles-footer-contact .murailles-contact-list {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 6px;
+}
+
+.murailles-footer-contact .murailles-contact-list > li {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 6px 0;
+	line-height: 1.55;
+	color: rgba(255, 255, 255, 0.72);
+}
+
+.murailles-footer-contact .murailles-contact-list > li > i {
+	flex: 0 0 18px;
+	width: 18px;
+	margin-top: 4px;
+	text-align: center;
+	color: #dc3545;
+	font-size: 15px;
+}
+
+.murailles-footer-contact .murailles-contact-list > li > span,
+.murailles-footer-contact .murailles-contact-list > li > a {
+	flex: 1 1 auto;
+	min-width: 0;
+	word-wrap: break-word;
+}
+
+.murailles-footer-contact .murailles-contact-list > li > a {
+	color: rgba(255, 255, 255, 0.72);
+	text-decoration: none;
+	transition: color .15s ease;
+}
+
+.murailles-footer-contact .murailles-contact-list > li > a:hover {
+	color: #fff;
+}
+
+/* ─── Footer-bottom CodeSommet credit ─────────────────────────────────── */
+.murailles-built-by {
+	font-size: 13px;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.murailles-built-by__link {
+	color: #dc3545;
+	text-decoration: none;
+	font-weight: 600;
+	transition: color .15s ease;
+}
+
+.murailles-built-by__link:hover,
+.murailles-built-by__link:focus {
+	color: #fff;
+	text-decoration: underline;
+}
+
+/* ─── Accessibility: skip-to-content link ─────────────────────────────── */
+.murailles-skip-link.screen-reader-text {
+	clip: rect(1px, 1px, 1px, 1px);
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	word-wrap: normal !important;
+}
+.murailles-skip-link:focus {
+	clip: auto !important;
+	height: auto;
+	width: auto;
+	background: #dc3545;
+	color: #fff;
+	padding: 12px 24px;
+	font-weight: 600;
+	left: 16px;
+	top: 16px;
+	z-index: 100000;
+	border-radius: 6px;
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+	text-decoration: none;
+}
+
+/* Improve focus visibility on the language switcher and main nav */
+.murailles-lang-toggle:focus-visible,
+.nav-menu a:focus-visible {
+	outline: 2px solid #dc3545;
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+/* ─── 19. FAQ accordion — reserve room for the absolute-positioned
+       arrow icon so long questions don't overlap it on mobile ──── */
+.accordion .btn.btn-link,
+.accordion .btn.btn-link.collapsed {
+	padding-right: 55px;
+	white-space: normal;
+	word-break: break-word;
+}
+
+@media (max-width: 576px) {
+	.btn.btn-link:before,
+	.btn.btn-link.collapsed:before {
+		width: 26px;
+		height: 26px;
+		font-size: 11px;
+		right: 8px;
+		top: 14px;
+	}
+	.accordion .btn.btn-link,
+	.accordion .btn.btn-link.collapsed {
+		padding-right: 42px;
+		font-size: 14px;
+		line-height: 1.45;
+	}
+	.faq_wrap .card-body .ac-para {
+		font-size: 14px;
+		line-height: 1.6;
+	}
+}
+
+/* ─── 20. Compare Property table — mobile-friendly layout.
+       Default Bootstrap .table-responsive scrolls horizontally; on small
+       screens we also tighten cell padding, shrink the criterion column,
+       and stack the property thumbnail/price block so cards stay readable. */
+@media (max-width: 768px) {
+	#murailles-compare-content .table {
+		font-size: 13px;
+	}
+	#murailles-compare-content .table th,
+	#murailles-compare-content .table td {
+		padding: 10px 8px;
+		min-width: 130px;
+	}
+	#murailles-compare-content .table th:first-child,
+	#murailles-compare-content .table td:first-child {
+		min-width: 100px;
+		width: 100px;
+		position: sticky;
+		left: 0;
+		z-index: 2;
+		background: #f8f9fa;
+		box-shadow: 2px 0 4px rgba(0,0,0,0.06);
+	}
+	#murailles-compare-content thead th:first-child {
+		background: #1a2332;
+		color: #fff;
+	}
+	.murailles-compare-th {
+		padding: 10px 6px;
+	}
+	.murailles-compare-th img {
+		max-width: 130px;
+		height: 90px;
+		margin-bottom: 8px;
+	}
+	.murailles-compare-th h4 {
+		font-size: 13px;
+	}
+	.murailles-compare-th-price {
+		font-size: 12px;
+		padding: 3px 8px;
+		white-space: normal;
+		line-height: 1.3;
+	}
+	.murailles-compare-th-link {
+		font-size: 11px;
+		padding: 3px 10px;
+		margin-top: 6px;
+	}
+	.murailles-compare-row-label {
+		font-size: 13px;
+		text-align: left;
+	}
+}
+
+@media (max-width: 480px) {
+	#murailles-compare-content .table th,
+	#murailles-compare-content .table td {
+		min-width: 115px;
+	}
+	#murailles-compare-content .table th:first-child,
+	#murailles-compare-content .table td:first-child {
+		min-width: 85px;
+		width: 85px;
+	}
+	.murailles-compare-th img {
+		max-width: 110px;
+		height: 75px;
+	}
+}
+
+/* ─── Hero search — mobile readability & compactness ──────────────────
+   On small screens the hero card was showing visually empty selects:
+   the placeholder option was &nbsp; and the native control rendered
+   the inline label with very low contrast on white. We tighten the
+   vertical rhythm, give labels weight & colour, and style the native
+   selects with a visible caret and dark text so users can scan and
+   tap each field without guessing what's there. */
+@media (max-width: 767px) {
+	.hero_banner .big-header-capt {
+		font-size: 22px;
+		line-height: 1.25;
+		margin-top: 1.25rem;
+	}
+	.hero_banner p {
+		font-size: 14px;
+		line-height: 1.4;
+		margin-bottom: 0.5rem;
+	}
+	.hero_banner .row.justify-content-center.mt-5 {
+		margin-top: 1.25rem !important;
+	}
+	.full_search_box.hero_search-radius.modern {
+		padding: 14px 14px 6px;
+		background: #ffffff;
+		border-radius: 10px;
+		box-shadow: 0 10px 30px rgba(8, 14, 28, 0.12);
+	}
+	.full_search_box.lightanic_search.modern .form-group {
+		background: #ffffff;
+		border: 1px solid #e1e6f1;
+		border-radius: 8px;
+		margin-bottom: 10px;
+		padding: 8px 12px 6px;
+	}
+	.full_search_box.modern label {
+		font-size: 12px;
+		font-weight: 600;
+		color: #4a5872;
+		text-transform: uppercase;
+		letter-spacing: 0.3px;
+		margin-bottom: 2px;
+	}
+	.full_search_box.nexio_search .form-group .input-with-icon {
+		border: none;
+		padding: 0;
+		background: transparent;
+	}
+	.full_search_box.nexio_search .form-group select.form-control {
+		height: 38px;
+		padding: 0 28px 0 0;
+		font-size: 15px;
+		font-weight: 500;
+		color: #1a2236;
+		background-color: transparent;
+		border: none;
+		box-shadow: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23a02a37' d='M6 8L0 0h12z'/></svg>");
+		background-repeat: no-repeat;
+		background-position: right 4px center;
+		background-size: 10px 7px;
+		width: 100%;
+	}
+	.full_search_box.nexio_search .form-group select.form-control:focus {
+		outline: none;
+	}
+	.full_search_box.lightanic_search.modern .form-group:focus-within {
+		border-color: #a02a37;
+		box-shadow: 0 0 0 3px rgba(160, 42, 55, 0.12);
+	}
+	.lightanic_search.hero_search-radius.modern .btn.search-btn,
+	.full_search_box.nexio_search .small-padd .btn.btn-danger {
+		height: 52px;
+		border-radius: 8px;
+		font-size: 16px;
+		font-weight: 600;
+	}
+	.full_search_box.nexio_search .small-padd {
+		padding: 4px 0 0 !important;
+	}
+	.full_search_box.nexio_search .small-padd .form-group {
+		background: transparent;
+		border: none;
+		padding: 0;
+		margin-bottom: 0;
+	}
+}
+
+/* === Affaires du Mois badge ======================================= */
+/* === Carousel card equal-height fix =============================== */
+.murailles-featured-slide .single_items,
+.murailles-adm-slide .single_items {
+	display: flex !important;
+	flex-direction: column;
+}
+.murailles-featured-slide .property-listing.property-2,
+.murailles-adm-slide .property-listing.property-2 {
+	display: flex !important;
+	flex-direction: column;
+	height: 100% !important;
+}
+/* Lock image area to a fixed height so all cards align */
+.murailles-featured-slide .listing-img-wrapper,
+.murailles-adm-slide .listing-img-wrapper,
+.murailles-featured-slide .list-img-slide,
+.murailles-adm-slide .list-img-slide {
+	height: 220px !important;
+	min-height: 220px !important;
+	max-height: 220px !important;
+	overflow: hidden;
+	flex-shrink: 0;
+}
+.murailles-featured-slide .listing-img-wrapper img,
+.murailles-adm-slide .listing-img-wrapper img {
+	width: 100%;
+	height: 220px !important;
+	object-fit: cover;
+}
+/* Push footer to bottom of card */
+.murailles-featured-slide .listing-detail-footer,
+.murailles-adm-slide .listing-detail-footer {
+	margin-top: auto;
+}
+
+
+/* ============================================================
+   Property card grid fallback � ensures cards are visible in
+   a responsive grid when Slick carousel fails to initialise
+   (JS error, slow connection, etc.). Slick overrides these
+   rules once it runs by adding display:block to .slick-slide.
+   ============================================================ */
+.item-slide:not(.slick-initialized) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+.item-slide:not(.slick-initialized) .single_items {
+    flex: 0 0 calc(33.333% - 16px);
+    max-width: calc(33.333% - 16px);
+}
+@media (max-width: 992px) {
+    .item-slide:not(.slick-initialized) .single_items {
+        flex: 0 0 calc(50% - 12px);
+        max-width: calc(50% - 12px);
+    }
+}
+@media (max-width: 600px) {
+    .item-slide:not(.slick-initialized) .single_items {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Ensure card images always fill the wrapper and never collapse to 0px height */
+.listing-img-wrapper .list-img-slide .click {
+    min-height: 200px;
+}
+.listing-img-wrapper .list-img-slide .click img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}

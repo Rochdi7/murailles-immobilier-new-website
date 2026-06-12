@@ -14,6 +14,109 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
+function murailles_ensure_localized_page( $slug, $titles, $template ) {
+	$default_title = is_array( $titles ) ? ( $titles['fr'] ?? reset( $titles ) ) : (string) $titles;
+	$english_title = is_array( $titles ) ? ( $titles['en'] ?? $default_title ) : (string) $titles;
+
+	if ( ! function_exists( 'pll_languages_list' ) || ! function_exists( 'pll_set_post_language' ) || ! function_exists( 'pll_save_post_translations' ) ) {
+		$existing = get_page_by_path( $slug );
+		if ( ! $existing ) {
+			$page_id = wp_insert_post( array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => $default_title,
+				'post_name'    => $slug,
+				'post_content' => '',
+			) );
+			$existing = ( $page_id && ! is_wp_error( $page_id ) ) ? get_post( $page_id ) : null;
+		}
+		if ( $existing ) {
+			update_post_meta( $existing->ID, '_wp_page_template', $template );
+		}
+		return $existing;
+	}
+
+	$available_langs = pll_languages_list( array( 'fields' => 'slug' ) );
+	$source_lang     = in_array( 'fr', $available_langs, true ) ? 'fr' : pll_default_language( 'slug' );
+	$english_lang    = in_array( 'en', $available_langs, true ) && 'en' !== $source_lang ? 'en' : '';
+
+	$source_page = function_exists( 'murailles_find_seed_page' )
+		? murailles_find_seed_page( $slug, $source_lang, $default_title )
+		: get_page_by_path( $slug );
+	$english_page = $english_lang && function_exists( 'murailles_find_seed_page' )
+		? murailles_find_seed_page( $slug, $english_lang, $english_title )
+		: null;
+
+	if ( ! $source_page && $english_page && function_exists( 'pll_get_post_translations' ) ) {
+		$translations = pll_get_post_translations( $english_page->ID );
+		if ( ! empty( $translations[ $source_lang ] ) ) {
+			$source_page = get_post( (int) $translations[ $source_lang ] );
+		}
+	}
+
+	if ( ! $source_page ) {
+		$source_id = wp_insert_post( array(
+			'post_type'    => 'page',
+			'post_status'  => 'publish',
+			'post_title'   => $default_title,
+			'post_name'    => $slug,
+			'post_content' => $english_page ? $english_page->post_content : '',
+			'post_excerpt' => $english_page ? $english_page->post_excerpt : '',
+		) );
+		if ( $source_id && ! is_wp_error( $source_id ) ) {
+			pll_set_post_language( $source_id, $source_lang );
+			$source_page = get_post( $source_id );
+			if ( $english_page && function_exists( 'murailles_copy_seed_page_data' ) ) {
+				murailles_copy_seed_page_data( $source_id, $english_page->ID );
+			}
+		}
+	}
+
+	if ( $source_page ) {
+		update_post_meta( $source_page->ID, '_wp_page_template', $template );
+	}
+
+	if ( $english_lang ) {
+		if ( ! $english_page && $source_page && function_exists( 'pll_get_post_translations' ) ) {
+			$translations = pll_get_post_translations( $source_page->ID );
+			if ( ! empty( $translations[ $english_lang ] ) ) {
+				$english_page = get_post( (int) $translations[ $english_lang ] );
+			}
+		}
+
+		if ( ! $english_page ) {
+			$english_id = wp_insert_post( array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => $english_title,
+				'post_name'    => $slug,
+				'post_content' => $source_page ? $source_page->post_content : '',
+				'post_excerpt' => $source_page ? $source_page->post_excerpt : '',
+			) );
+			if ( $english_id && ! is_wp_error( $english_id ) ) {
+				pll_set_post_language( $english_id, $english_lang );
+				$english_page = get_post( $english_id );
+				if ( $source_page && function_exists( 'murailles_copy_seed_page_data' ) ) {
+					murailles_copy_seed_page_data( $english_id, $source_page->ID );
+				}
+			}
+		}
+
+		if ( $english_page ) {
+			update_post_meta( $english_page->ID, '_wp_page_template', $template );
+		}
+
+		if ( $source_page && $english_page ) {
+			pll_save_post_translations( array(
+				$source_lang  => (int) $source_page->ID,
+				$english_lang => (int) $english_page->ID,
+			) );
+		}
+	}
+
+	return $source_page;
+}
+
 /**
  * Return a stripped-down array of property data for a set of IDs.
  * Used by both wishlist and compare-property to render cards client-side.
@@ -108,21 +211,14 @@ add_action('admin_init', function () {
 	if (get_option('murailles_favoris_page_created')) {
 		return;
 	}
-	$existing = get_page_by_path('favoris');
-	if (! $existing) {
-		$pid = wp_insert_post(array(
-			'post_type'    => 'page',
-			'post_status'  => 'publish',
-			'post_title'   => 'Mes favoris',
-			'post_name'    => 'favoris',
-			'post_content' => '',
-		));
-		if ($pid && ! is_wp_error($pid)) {
-			update_post_meta($pid, '_wp_page_template', 'page-templates/favoris.php');
-		}
-	} else {
-		update_post_meta($existing->ID, '_wp_page_template', 'page-templates/favoris.php');
-	}
+	murailles_ensure_localized_page(
+		'favoris',
+		array(
+			'fr' => 'Mes favoris',
+			'en' => 'My Favourites',
+		),
+		'page-templates/favoris.php'
+	);
 	update_option('murailles_favoris_page_created', 1);
 });
 
@@ -135,6 +231,29 @@ add_action('admin_init', function () {
 	if (get_option('murailles_info_pages_v2_created')) {
 		return;
 	}
+	$localized_pages = array(
+		'histoire-marrakech'  => array(
+			'titles'   => array( 'fr' => 'Histoire de Marrakech', 'en' => 'History of Marrakech' ),
+			'template' => 'page-templates/histoire-marrakech.php',
+		),
+		'assistance-conseils' => array(
+			'titles'   => array( 'fr' => 'Assistance & Conseils', 'en' => 'Assistance & Advice' ),
+			'template' => 'page-templates/assistance-conseils.php',
+		),
+		'tourisme-marrakech'  => array(
+			'titles'   => array( 'fr' => 'Tourisme a Marrakech', 'en' => 'Tourism in Marrakech' ),
+			'template' => 'page-templates/tourisme-marrakech.php',
+		),
+		'nos-services'        => array(
+			'titles'   => array( 'fr' => 'Nos Services', 'en' => 'Our Services' ),
+			'template' => 'page-templates/nos-services.php',
+		),
+	);
+	foreach ( $localized_pages as $slug => $info ) {
+		murailles_ensure_localized_page( $slug, $info['titles'], $info['template'] );
+	}
+	update_option('murailles_info_pages_v2_created', 1);
+	return;
 	$pages = array(
 		'histoire-marrakech'  => array('title' => 'Histoire de Marrakech',  'template' => 'page-templates/histoire-marrakech.php'),
 		'assistance-conseils' => array('title' => 'Assistance & Conseils',  'template' => 'page-templates/assistance-conseils.php'),
@@ -170,6 +289,21 @@ add_action('admin_init', function () {
 	if (get_option('murailles_legal_pages_v1_created')) {
 		return;
 	}
+	$localized_pages = array(
+		'privacy' => array(
+			'titles'   => array( 'fr' => 'Politique de confidentialite', 'en' => 'Privacy Policy' ),
+			'template' => 'page-templates/privacy.php',
+		),
+		'conditions-generales' => array(
+			'titles'   => array( 'fr' => 'Conditions generales', 'en' => 'Terms and Conditions' ),
+			'template' => 'page-templates/terms.php',
+		),
+	);
+	foreach ( $localized_pages as $slug => $info ) {
+		murailles_ensure_localized_page( $slug, $info['titles'], $info['template'] );
+	}
+	update_option('murailles_legal_pages_v1_created', 1);
+	return;
 	$pages = array(
 		'privacy'              => array('title' => 'Politique de confidentialité', 'template' => 'page-templates/privacy.php'),
 		'conditions-generales' => array('title' => 'Conditions générales',          'template' => 'page-templates/terms.php'),
@@ -203,6 +337,16 @@ add_action('admin_init', function () {
 	if (get_option('murailles_error_page_created')) {
 		return;
 	}
+	murailles_ensure_localized_page(
+		'erreur',
+		array(
+			'fr' => 'Erreur',
+			'en' => 'Error',
+		),
+		'page-templates/error.php'
+	);
+	update_option('murailles_error_page_created', 1);
+	return;
 	$existing = get_page_by_path('erreur');
 	if (! $existing) {
 		$pid = wp_insert_post(array(

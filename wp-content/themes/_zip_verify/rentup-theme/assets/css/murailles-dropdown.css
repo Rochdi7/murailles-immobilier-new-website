@@ -1,0 +1,1334 @@
+/**
+ * Murailles Immobilier — Unified Dropdown / Select / Datepicker Style
+ *
+ * Mirrors the "Trier par" pill dropdown from archive-property.php so every
+ * <select> and date picker across the site shares one consistent look:
+ *   - white pill trigger with red chevron
+ *   - rounded white popover panel with subtle shadow
+ *   - light-red highlight on active option (#fff3f3 bg, #a70a29 text)
+ *   - hover state: same light-red bg
+ *
+ * The matching JS (murailles-dropdown.js) wraps every <select> in a div with
+ * class .murailles-select; the original <select> is hidden but still submits.
+ */
+
+/* ─── Custom-select wrapper (replaces native <select> visually) ─────────── */
+.murailles-select {
+	position: relative;
+	display: block;
+	width: 100%;
+	font-size: 14px;
+	font-family: inherit;
+}
+
+/* Visually hide the native <select> while keeping it focusable/submittable.
+   !important is required because legacy rules like `.frm_submit_block .form-control`
+   (specificity 0,2,0) override our 0,1,1 selector and re-impose height:56px. */
+.murailles-select > select,
+.murailles-select > select.form-control,
+.murailles-select > select.form-select {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	min-height: 0 !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+	background: transparent !important;
+	pointer-events: none !important;
+	opacity: 0 !important;
+}
+
+.murailles-select__trigger {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	width: 100%;
+	min-height: 46px;
+	padding: 10px 14px;
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	color: #1a2332;
+	font-size: 14px;
+	line-height: 1.4;
+	cursor: pointer;
+	transition: border-color .15s ease, box-shadow .15s ease;
+	text-align: left;
+}
+
+.murailles-select__trigger:hover {
+	border-color: #d1d5db;
+}
+
+.murailles-select.is-open .murailles-select__trigger,
+.murailles-select__trigger:focus {
+	border-color: #a70a29;
+	box-shadow: 0 0 0 3px rgba(167, 10, 41, 0.10);
+	outline: none;
+}
+
+.murailles-select__label {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.murailles-select__label--placeholder {
+	color: #9ca3af;
+}
+
+.murailles-select__chevron {
+	flex-shrink: 0;
+	width: 12px;
+	height: 12px;
+	color: #a70a29;
+	transition: transform .2s ease;
+}
+
+.murailles-select.is-open .murailles-select__chevron {
+	transform: rotate(180deg);
+}
+
+/* Popover is portaled to <body> with position:fixed so it escapes every
+   parent stacking context. Coordinates are computed in JS from the trigger's
+   getBoundingClientRect() on open + scroll + resize. */
+.murailles-select__menu {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 2147483000; /* maximum-safe z-index — beats anything on the page */
+	max-height: 280px;
+	overflow-y: auto;
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10), 0 2px 6px rgba(0, 0, 0, 0.06);
+	padding: 6px;
+	display: none;
+}
+
+.murailles-select__menu.is-open {
+	display: block;
+	animation: muraillesDropdownIn .14s ease-out;
+}
+
+@keyframes muraillesDropdownIn {
+	from { opacity: 0; transform: translateY(-4px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+.murailles-select__option {
+	display: block;
+	padding: 10px 12px;
+	border-radius: 6px;
+	color: #1a2332;
+	font-size: 14px;
+	cursor: pointer;
+	transition: background .12s ease, color .12s ease;
+	user-select: none;
+}
+
+.murailles-select__option:hover,
+.murailles-select__option.is-focused {
+	background: #fff3f3;
+	color: #a70a29;
+}
+
+.murailles-select__option.is-selected {
+	background: #fff3f3;
+	color: #a70a29;
+	font-weight: 600;
+}
+
+.murailles-select__option.is-placeholder {
+	color: #9ca3af;
+}
+
+/* Scrollbar */
+.murailles-select__menu::-webkit-scrollbar { width: 8px; }
+.murailles-select__menu::-webkit-scrollbar-track { background: transparent; }
+.murailles-select__menu::-webkit-scrollbar-thumb {
+	background: #e5e7eb;
+	border-radius: 4px;
+}
+.murailles-select__menu::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+
+/* ─── Bootstrap .dropdown-menu (already used by "Trier par") ─────────── */
+/* Make the existing custom dropdowns match the new design tokens */
+.dropdown-menu {
+	border: none !important;
+	border-radius: 10px !important;
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+	padding: 6px !important;
+}
+
+.dropdown-menu .dropdown-item {
+	border-radius: 6px;
+	padding: 10px 12px;
+	font-size: 14px;
+	color: #1a2332;
+	transition: background .12s ease, color .12s ease;
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+	background: #fff3f3;
+	color: #a70a29;
+}
+
+.dropdown-menu .dropdown-item.active,
+.dropdown-menu .dropdown-item:active {
+	background: #fff3f3 !important;
+	color: #a70a29 !important;
+	font-weight: 600;
+}
+
+/* Width override for "Trier par" so options like "Prix décroissant" fit */
+.shorting-right .dropdown-menu.show {
+	width: 200px !important;
+	min-width: 200px !important;
+	border-color: transparent !important;
+}
+
+/* ─── Date pickers (daterangepicker) ─────────────────────────────────── */
+.daterangepicker {
+	border: none !important;
+	border-radius: 10px !important;
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+	padding: 8px !important;
+	font-family: inherit !important;
+}
+
+.daterangepicker .calendar-table {
+	border: none !important;
+	background: transparent !important;
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+	background: #a70a29 !important;
+	color: #fff !important;
+	border-radius: 6px !important;
+}
+
+.daterangepicker td.in-range {
+	background: #fff3f3 !important;
+	color: #a70a29 !important;
+}
+
+.daterangepicker td.available:hover,
+.daterangepicker th.available:hover {
+	background: #fff3f3 !important;
+	color: #a70a29 !important;
+	border-radius: 6px !important;
+}
+
+.daterangepicker td.start-date,
+.daterangepicker td.end-date {
+	background: #a70a29 !important;
+	color: #fff !important;
+	border-radius: 6px !important;
+}
+
+.daterangepicker .ranges li.active {
+	background: #a70a29 !important;
+	color: #fff !important;
+}
+
+.daterangepicker .ranges li:hover {
+	background: #fff3f3 !important;
+	color: #a70a29 !important;
+}
+
+.daterangepicker select.monthselect,
+.daterangepicker select.yearselect {
+	border: 1px solid #e5e7eb !important;
+	border-radius: 6px !important;
+	padding: 4px 8px !important;
+	background: #fff !important;
+}
+
+.daterangepicker .applyBtn,
+.daterangepicker .applyBtn:hover {
+	background: #a70a29 !important;
+	border-color: #a70a29 !important;
+}
+
+/* ─── Plain date / time inputs (HTML5 native) ──────────────────────────── */
+input[type="date"].form-control,
+input[type="time"].form-control,
+input[type="datetime-local"].form-control,
+input[type="month"].form-control {
+	min-height: 46px;
+	padding: 10px 14px;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	background: #fff;
+	font-size: 14px;
+	color: #1a2332;
+}
+
+input[type="date"].form-control:focus,
+input[type="time"].form-control:focus,
+input[type="datetime-local"].form-control:focus,
+input[type="month"].form-control:focus {
+	border-color: #a70a29;
+	box-shadow: 0 0 0 3px rgba(167, 10, 41, 0.10);
+	outline: none;
+}
+
+/* ─── Make form-group selects align with new look (height parity) ─────── */
+.form-group .murailles-select { margin-bottom: 0; }
+.simple-input .murailles-select__trigger {
+	min-height: 50px;
+	padding: 12px 14px;
+}
+
+/* ─── Hero search bar polish ─────────────────────────────────────────── */
+/* Lift the hero search bar, balance the three triggers, ensure the popover
+   has enough width for long labels like "De 500 000 € à 1 000 000 €". */
+.full_search_box.hero_search-radius.modern {
+	background: #fff !important;
+	border-radius: 14px !important;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+	padding: 18px 22px !important;
+}
+
+.full_search_box .search_hero_wrapping > .row {
+	align-items: flex-end;
+	row-gap: 12px;
+}
+
+.full_search_box label {
+	display: block;
+	margin: 0 0 6px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #6b7280;
+	letter-spacing: 0.2px;
+	text-transform: none;
+}
+
+.full_search_box .input-with-icon .murailles-select__trigger {
+	min-height: 52px;
+	padding: 12px 16px;
+	border: 1.5px solid #e5e7eb;
+	border-radius: 10px;
+	font-size: 15px;
+}
+
+.full_search_box .input-with-icon .murailles-select.is-open .murailles-select__trigger,
+.full_search_box .input-with-icon .murailles-select__trigger:hover {
+	border-color: #a70a29;
+}
+
+/* Hero-search-specific popover polish — the menu is portaled to <body>, so
+   we target it via the data attribute the JS sets when the source select
+   lives inside .full_search_box. */
+.murailles-select__menu[data-murailles-from="hero"] {
+	min-width: 280px;
+	padding: 8px;
+	border-radius: 12px;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.murailles-select__menu[data-murailles-from="hero"] .murailles-select__option {
+	padding: 11px 14px;
+	font-size: 14px;
+}
+
+/* Search button — same height as the triggers, square-ish pill */
+.full_search_box .btn.btn-danger.full-width {
+	min-height: 52px;
+	width: 100%;
+	border-radius: 10px;
+	background: #a70a29;
+	border-color: #a70a29;
+	font-size: 18px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background .15s ease, transform .15s ease;
+}
+
+.full_search_box .btn.btn-danger.full-width:hover {
+	background: #8e0822;
+	transform: translateY(-1px);
+}
+
+/* (Width override removed: JS now sets min-width based on the trigger's
+   actual width via getBoundingClientRect, so the popover always matches
+   its trigger and can grow up to the viewport edge for long labels.) */
+
+/* ─── File uploader (custom drop-zone) ───────────────────────────────── */
+.murailles-uploader {
+	position: relative;
+}
+
+.murailles-uploader__input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.murailles-uploader__drop {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 32px 24px;
+	border: 2px dashed #d1d5db;
+	border-radius: 12px;
+	background: #fafbfc;
+	color: #6b7280;
+	cursor: pointer;
+	text-align: center;
+	transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+
+.murailles-uploader__drop:hover,
+.murailles-uploader.is-dragover .murailles-uploader__drop {
+	border-color: #a70a29;
+	background: #fff5f6;
+	color: #a70a29;
+}
+
+.murailles-uploader__icon {
+	width: 40px;
+	height: 40px;
+	color: #a70a29;
+	margin-bottom: 4px;
+}
+
+.murailles-uploader__title {
+	font-size: 15px;
+	font-weight: 600;
+	color: #1a2332;
+}
+
+.murailles-uploader:hover .murailles-uploader__title,
+.murailles-uploader.is-dragover .murailles-uploader__title {
+	color: #a70a29;
+}
+
+.murailles-uploader__hint {
+	font-size: 13px;
+	color: #9ca3af;
+}
+
+/* Preview grid */
+.murailles-uploader__preview {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	gap: 12px;
+	margin-top: 14px;
+}
+
+.murailles-uploader__preview:empty {
+	display: none;
+}
+
+.murailles-uploader__thumb {
+	position: relative;
+	aspect-ratio: 4 / 3;
+	border-radius: 10px;
+	overflow: hidden;
+	background: #f3f4f6;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.murailles-uploader__thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.murailles-uploader__thumb-remove {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	border: none;
+	background: rgba(255, 255, 255, 0.95);
+	color: #a70a29;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+	transition: transform .15s ease, background .15s ease;
+	font-size: 14px;
+	line-height: 1;
+}
+
+.murailles-uploader__thumb-remove:hover {
+	background: #a70a29;
+	color: #fff;
+	transform: scale(1.08);
+}
+
+.murailles-uploader__thumb-name {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 8px 10px 6px;
+	background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+	color: #fff;
+	font-size: 11px;
+	font-weight: 500;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* ─── Error page (404 / 403 / 500 / 503 / maintenance) ───────────────── */
+.murailles-error {
+	padding: 80px 0 100px;
+	background:
+		radial-gradient(1200px 600px at 50% -100px, rgba(167, 10, 41, 0.06), transparent 60%),
+		linear-gradient(180deg, #fff 0%, #f9fafc 100%);
+}
+
+.murailles-error__card {
+	background: #fff;
+	border-radius: 18px;
+	padding: 56px 40px 48px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.murailles-error__code {
+	font-size: clamp( 92px, 16vw, 168px );
+	font-weight: 800;
+	line-height: 1;
+	letter-spacing: -2px;
+	color: #a70a29;
+	background: linear-gradient(135deg, #a70a29 0%, #dc3545 60%, #ff5a73 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	margin-bottom: 8px;
+	user-select: none;
+}
+
+.murailles-error__title {
+	font-size: clamp( 24px, 3vw, 32px );
+	font-weight: 700;
+	color: #1a2332;
+	margin: 0 0 14px;
+}
+
+.murailles-error__message {
+	font-size: 16px;
+	line-height: 1.6;
+	color: #6b7280;
+	max-width: 560px;
+	margin: 0 auto 28px;
+}
+
+/* Search bar */
+.murailles-error__search {
+	display: flex;
+	align-items: stretch;
+	max-width: 520px;
+	margin: 0 auto 28px;
+	background: #fff;
+	border: 1.5px solid #e5e7eb;
+	border-radius: 999px;
+	padding: 4px;
+	transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.murailles-error__search:focus-within {
+	border-color: #a70a29;
+	box-shadow: 0 0 0 4px rgba(167, 10, 41, 0.10);
+}
+
+.murailles-error__search input {
+	flex: 1;
+	min-width: 0;
+	padding: 10px 18px;
+	border: none;
+	background: transparent;
+	font-size: 15px;
+	color: #1a2332;
+	outline: none;
+}
+
+.murailles-error__search input::placeholder { color: #9ca3af; }
+
+.murailles-error__search button {
+	flex-shrink: 0;
+	width: 44px;
+	height: 44px;
+	border: none;
+	border-radius: 50%;
+	background: #a70a29;
+	color: #fff;
+	font-size: 16px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background .15s ease, transform .15s ease;
+}
+
+.murailles-error__search button:hover { background: #8e0822; transform: scale(1.05); }
+
+/* Actions */
+.murailles-error__actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
+	margin-bottom: 32px;
+}
+
+.murailles-error__actions .btn {
+	min-height: 46px;
+	padding: 10px 22px;
+	border-radius: 10px;
+	font-weight: 600;
+	font-size: 14px;
+	display: inline-flex;
+	align-items: center;
+	transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.murailles-error__actions .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10); }
+.murailles-error__actions .btn-danger { background: #a70a29; border-color: #a70a29; }
+.murailles-error__actions .btn-danger:hover { background: #8e0822; border-color: #8e0822; }
+
+/* Popular categories chips */
+.murailles-error__popular {
+	padding-top: 24px;
+	border-top: 1px solid #f1f3f7;
+	font-size: 14px;
+	color: #6b7280;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+.murailles-error__popular-label {
+	font-weight: 600;
+	color: #1a2332;
+	margin-right: 4px;
+}
+
+.murailles-error__chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 14px;
+	border-radius: 999px;
+	background: #fff5f6;
+	color: #a70a29;
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: none;
+	transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+
+.murailles-error__chip:hover {
+	background: #a70a29;
+	color: #fff;
+	transform: translateY(-1px);
+}
+
+/* Accessibility helper */
+.murailles-error .visually-hidden {
+	position: absolute;
+	width: 1px; height: 1px;
+	padding: 0; margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* ─── Blog Detail Page ─────────────────────────────────────────────── */
+.murailles-blog-hero {
+	position: relative;
+	min-height: 380px;
+	display: flex;
+	align-items: center;
+	background-color: #1a2332;
+	background-size: cover;
+	background-position: center;
+	color: #fff;
+	padding: 80px 0 60px;
+}
+
+.murailles-blog-hero:not(.has-image) {
+	background-image: linear-gradient(135deg, #1a2332 0%, #2a3447 40%, #a70a29 140%);
+}
+
+.murailles-blog-hero__overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(15, 23, 42, 0.55) 0%, rgba(15, 23, 42, 0.85) 100%);
+	pointer-events: none;
+}
+
+.murailles-blog-hero .container { position: relative; z-index: 1; }
+
+.murailles-blog-hero__breadcrumb {
+	font-size: 13px;
+	color: rgba(255, 255, 255, 0.75);
+	margin-bottom: 18px;
+}
+
+.murailles-blog-hero__breadcrumb a {
+	color: rgba(255, 255, 255, 0.85);
+	text-decoration: none;
+	transition: color .15s ease;
+}
+
+.murailles-blog-hero__breadcrumb a:hover { color: #fff; }
+.murailles-blog-hero__breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+.murailles-blog-hero__breadcrumb .current { color: #fff; }
+
+.murailles-blog-hero__cats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.murailles-blog-hero__cats a {
+	display: inline-flex;
+	padding: 6px 14px;
+	border-radius: 999px;
+	background: #a70a29;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	text-decoration: none;
+	transition: background .15s ease, transform .15s ease;
+}
+
+.murailles-blog-hero__cats a:hover { background: #8e0822; transform: translateY(-1px); }
+
+.murailles-blog-hero__title {
+	font-size: clamp( 28px, 4vw, 44px );
+	font-weight: 800;
+	line-height: 1.2;
+	margin: 0 0 24px;
+	color: #fff;
+	letter-spacing: -0.5px;
+}
+
+.murailles-blog-hero__meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	font-size: 14px;
+	color: rgba(255, 255, 255, 0.85);
+}
+
+.murailles-blog-hero__meta .meta-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.murailles-blog-hero__meta .meta-avatar {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	border: 2px solid rgba(255, 255, 255, 0.4);
+	object-fit: cover;
+}
+
+.murailles-blog-hero__meta a {
+	color: #fff;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.murailles-blog-hero__meta .meta-dot {
+	width: 4px;
+	height: 4px;
+	background: rgba(255, 255, 255, 0.5);
+	border-radius: 50%;
+}
+
+.murailles-blog-hero__meta i { color: rgba(255, 255, 255, 0.65); }
+
+/* ===== Detail section ===== */
+.murailles-blog-detail {
+	padding: 60px 0 80px;
+	background: #f7f8fa;
+}
+
+.murailles-blog-card {
+	background: #fff;
+	border-radius: 14px;
+	padding: 40px 44px;
+	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.murailles-blog-card__content {
+	font-size: 16px;
+	line-height: 1.75;
+	color: #2a3447;
+}
+
+.murailles-blog-card__content > * { margin-bottom: 1.2em; }
+.murailles-blog-card__content > *:last-child { margin-bottom: 0; }
+
+.murailles-blog-card__content h1,
+.murailles-blog-card__content h2,
+.murailles-blog-card__content h3,
+.murailles-blog-card__content h4 {
+	color: #1a2332;
+	font-weight: 700;
+	line-height: 1.3;
+	margin: 1.6em 0 0.6em;
+}
+
+.murailles-blog-card__content h2 { font-size: 28px; }
+.murailles-blog-card__content h3 { font-size: 22px; }
+.murailles-blog-card__content h4 { font-size: 18px; }
+
+.murailles-blog-card__content p { color: #4a5568; }
+
+.murailles-blog-card__content a {
+	color: #a70a29;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	text-decoration-thickness: 1.5px;
+}
+
+.murailles-blog-card__content a:hover { color: #8e0822; }
+
+.murailles-blog-card__content img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 10px;
+	margin: 1.4em 0;
+}
+
+.murailles-blog-card__content blockquote {
+	border-left: 4px solid #a70a29;
+	padding: 4px 0 4px 20px;
+	margin: 1.4em 0;
+	color: #1a2332;
+	font-style: italic;
+	font-size: 18px;
+	line-height: 1.6;
+	background: #fff5f6;
+	border-radius: 0 10px 10px 0;
+	padding: 16px 24px;
+}
+
+.murailles-blog-card__content ul,
+.murailles-blog-card__content ol {
+	padding-left: 1.4em;
+}
+
+.murailles-blog-card__content ul li,
+.murailles-blog-card__content ol li {
+	margin-bottom: 0.5em;
+	color: #4a5568;
+}
+
+.murailles-blog-card__content code {
+	background: #f3f4f6;
+	color: #a70a29;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 0.9em;
+}
+
+.murailles-blog-card__footer {
+	margin-top: 36px;
+	padding-top: 24px;
+	border-top: 1px solid #eef0f5;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.murailles-blog-card__tags {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	font-size: 14px;
+}
+
+.murailles-blog-card__tags i { color: #a70a29; margin-right: 4px; }
+
+.murailles-tag {
+	display: inline-flex;
+	padding: 5px 12px;
+	background: #f3f4f6;
+	color: #4a5568;
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+	transition: background .15s ease, color .15s ease;
+}
+
+.murailles-tag:hover { background: #fff5f6; color: #a70a29; }
+
+.murailles-blog-card__share {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+}
+
+.murailles-blog-card__share .share-label {
+	font-weight: 600;
+	color: #1a2332;
+	margin-right: 4px;
+}
+
+.share-btn {
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: #f3f4f6;
+	color: #4a5568;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+	transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+
+.share-btn:hover { color: #fff; transform: translateY(-2px); }
+.share-btn.share-fb:hover { background: #1877f2; }
+.share-btn.share-tw:hover { background: #000; }
+.share-btn.share-wa:hover { background: #25d366; }
+.share-btn.share-li:hover { background: #0a66c2; }
+.share-btn.share-copy:hover { background: #a70a29; }
+.share-btn.share-copy.is-copied { background: #2ecc71; color: #fff; }
+
+/* ===== Author box ===== */
+.murailles-author-box {
+	display: flex;
+	gap: 24px;
+	background: #fff;
+	border-radius: 14px;
+	padding: 32px;
+	margin-top: 30px;
+	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.murailles-author-box__avatar {
+	width: 96px;
+	height: 96px;
+	border-radius: 50%;
+	object-fit: cover;
+	flex-shrink: 0;
+	border: 3px solid #fff5f6;
+}
+
+.murailles-author-box__role {
+	display: inline-block;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	color: #a70a29;
+	margin-bottom: 4px;
+}
+
+.murailles-author-box__name {
+	font-size: 18px;
+	font-weight: 700;
+	color: #1a2332;
+	margin: 0 0 8px;
+}
+
+.murailles-author-box__name a { color: inherit; text-decoration: none; }
+.murailles-author-box__name a:hover { color: #a70a29; }
+
+.murailles-author-box__bio {
+	font-size: 14px;
+	color: #6b7280;
+	line-height: 1.6;
+	margin: 0 0 10px;
+}
+
+.murailles-author-box__all {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #a70a29;
+	text-decoration: none;
+}
+
+.murailles-author-box__all:hover { color: #8e0822; }
+.murailles-author-box__all i { font-size: 11px; transition: transform .15s ease; }
+.murailles-author-box__all:hover i { transform: translateX(3px); }
+
+/* ===== Related posts ===== */
+.murailles-related {
+	margin-top: 40px;
+}
+
+.murailles-related__header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	margin-bottom: 22px;
+	gap: 16px;
+}
+
+.murailles-related__header h3 {
+	font-size: 22px;
+	font-weight: 700;
+	color: #1a2332;
+	margin: 0;
+}
+
+.murailles-related__header a {
+	font-size: 13px;
+	font-weight: 600;
+	color: #a70a29;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.murailles-related__header a:hover { color: #8e0822; }
+.murailles-related__header i { font-size: 11px; }
+
+.murailles-related__grid {
+	display: grid;
+	grid-template-columns: repeat( auto-fit, minmax(220px, 1fr) );
+	gap: 18px;
+}
+
+.murailles-related__card {
+	background: #fff;
+	border-radius: 12px;
+	overflow: hidden;
+	text-decoration: none;
+	color: inherit;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+	transition: transform .2s ease, box-shadow .2s ease;
+	display: flex;
+	flex-direction: column;
+}
+
+.murailles-related__card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.murailles-related__thumb {
+	height: 140px;
+	background-size: cover;
+	background-position: center;
+}
+
+.murailles-related__body { padding: 16px 18px; }
+
+.murailles-related__date {
+	font-size: 12px;
+	color: #9ca3af;
+	font-weight: 500;
+}
+
+.murailles-related__title {
+	font-size: 15px;
+	font-weight: 700;
+	color: #1a2332;
+	line-height: 1.35;
+	margin: 4px 0 0;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.murailles-related__card:hover .murailles-related__title { color: #a70a29; }
+
+/* ===== Comments ===== */
+.murailles-comments-wrap {
+	background: #fff;
+	border-radius: 14px;
+	padding: 32px;
+	margin-top: 30px;
+	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.murailles-comments-wrap .comments-title,
+.murailles-comments-wrap .comment-reply-title {
+	font-size: 22px;
+	font-weight: 700;
+	color: #1a2332;
+	margin: 0 0 18px;
+}
+
+.murailles-comments-wrap .comment-list {
+	list-style: none;
+	margin: 0 0 30px;
+	padding: 0;
+}
+
+.murailles-comments-wrap .comment-list li {
+	padding: 18px 0;
+	border-bottom: 1px solid #eef0f5;
+}
+
+.murailles-comments-wrap .comment-list li:last-child { border-bottom: none; }
+
+.murailles-comments-wrap .comment-author {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 8px;
+}
+
+.murailles-comments-wrap .comment-author img {
+	border-radius: 50%;
+	width: 42px;
+	height: 42px;
+}
+
+.murailles-comments-wrap .comment-author .fn {
+	font-weight: 600;
+	color: #1a2332;
+	font-style: normal;
+}
+
+.murailles-comments-wrap .comment-meta {
+	font-size: 12px;
+	color: #9ca3af;
+}
+
+.murailles-comments-wrap .comment-meta a { color: inherit; text-decoration: none; }
+
+.murailles-comments-wrap .comment-form label {
+	display: block;
+	font-size: 13px;
+	font-weight: 600;
+	color: #1a2332;
+	margin-bottom: 6px;
+}
+
+.murailles-comments-wrap .comment-form input[type=text],
+.murailles-comments-wrap .comment-form input[type=email],
+.murailles-comments-wrap .comment-form input[type=url],
+.murailles-comments-wrap .comment-form textarea {
+	width: 100%;
+	min-height: 44px;
+	padding: 10px 14px;
+	border: 1.5px solid #e5e7eb;
+	border-radius: 8px;
+	background: #fff;
+	font-size: 14px;
+	color: #1a2332;
+	font-family: inherit;
+	transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.murailles-comments-wrap .comment-form textarea {
+	min-height: 140px;
+	resize: vertical;
+}
+
+.murailles-comments-wrap .comment-form input:focus,
+.murailles-comments-wrap .comment-form textarea:focus {
+	outline: none;
+	border-color: #a70a29;
+	box-shadow: 0 0 0 4px rgba(167, 10, 41, 0.10);
+}
+
+.murailles-comments-wrap .comment-form .form-submit { margin-top: 8px; }
+
+.murailles-comments-wrap .comment-form .submit {
+	background: #a70a29;
+	border: none;
+	color: #fff;
+	padding: 12px 28px;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background .15s ease, transform .15s ease;
+}
+
+.murailles-comments-wrap .comment-form .submit:hover {
+	background: #8e0822;
+	transform: translateY(-1px);
+}
+
+/* ===== Sidebar widgets ===== */
+.murailles-blog-sidebar .widget,
+.murailles-blog-sidebar .sidebar_widgets {
+	background: #fff;
+	border-radius: 14px;
+	padding: 24px 22px;
+	margin-bottom: 22px;
+	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+	list-style: none;
+}
+
+.murailles-blog-sidebar .widget-title,
+.murailles-blog-sidebar .sidebar_title {
+	font-size: 17px;
+	font-weight: 700;
+	color: #1a2332;
+	margin: 0 0 16px;
+	padding-bottom: 12px;
+	border-bottom: 2px solid #fff5f6;
+	position: relative;
+}
+
+.murailles-blog-sidebar .widget-title::after,
+.murailles-blog-sidebar .sidebar_title::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	bottom: -2px;
+	width: 40px;
+	height: 2px;
+	background: #a70a29;
+}
+
+.murailles-blog-sidebar .widget input[type=search],
+.murailles-blog-sidebar .widget input[type=text].search-field {
+	width: 100%;
+	min-height: 44px;
+	padding: 10px 14px;
+	border: 1.5px solid #e5e7eb;
+	border-radius: 8px;
+	background: #fff;
+	font-size: 14px;
+	color: #1a2332;
+}
+
+.murailles-blog-sidebar .widget input:focus {
+	outline: none;
+	border-color: #a70a29;
+	box-shadow: 0 0 0 4px rgba(167, 10, 41, 0.10);
+}
+
+.murailles-blog-sidebar .widget .search-submit,
+.murailles-blog-sidebar .widget button[type=submit] {
+	background: #a70a29;
+	border: none;
+	color: #fff;
+	padding: 10px 18px;
+	border-radius: 8px;
+	font-weight: 600;
+	cursor: pointer;
+	margin-top: 8px;
+	transition: background .15s ease;
+}
+
+.murailles-blog-sidebar .widget .search-submit:hover { background: #8e0822; }
+
+.murailles-blog-sidebar .widget ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.murailles-blog-sidebar .widget li {
+	padding: 9px 0;
+	border-bottom: 1px dashed #eef0f5;
+	font-size: 14px;
+	color: #4a5568;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.murailles-blog-sidebar .widget li:last-child { border-bottom: none; }
+
+.murailles-blog-sidebar .widget li a {
+	color: #2a3447;
+	text-decoration: none;
+	font-weight: 500;
+	transition: color .15s ease, padding-left .15s ease;
+	flex: 1;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.murailles-blog-sidebar .widget li a::before {
+	content: '\f105'; /* fa-angle-right */
+	font-family: 'Font Awesome 6 Free';
+	font-weight: 900;
+	font-size: 11px;
+	color: #a70a29;
+	transition: transform .15s ease;
+}
+
+.murailles-blog-sidebar .widget li a:hover {
+	color: #a70a29;
+}
+
+.murailles-blog-sidebar .widget li a:hover::before {
+	transform: translateX(3px);
+}
+
+.murailles-blog-sidebar .widget li .count {
+	display: inline-flex;
+	min-width: 26px;
+	height: 22px;
+	padding: 0 8px;
+	background: #fff5f6;
+	color: #a70a29;
+	border-radius: 11px;
+	font-size: 11px;
+	font-weight: 700;
+	align-items: center;
+	justify-content: center;
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────── */
+@media (max-width: 575.98px) {
+	.murailles-select__trigger { min-height: 44px; padding: 9px 12px; }
+	.murailles-select__menu { max-height: 240px; }
+	.full_search_box.hero_search-radius.modern { padding: 14px 14px; }
+	.murailles-uploader__drop { padding: 24px 16px; }
+	.murailles-uploader__preview { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+	.murailles-error { padding: 48px 0 64px; }
+	.murailles-error__card { padding: 36px 22px 32px; border-radius: 14px; }
+	.murailles-error__actions .btn { width: 100%; justify-content: center; }
+	.murailles-blog-hero { padding: 56px 0 40px; min-height: 280px; }
+	.murailles-blog-detail { padding: 36px 0 56px; }
+	.murailles-blog-card { padding: 24px 20px; border-radius: 12px; }
+	.murailles-blog-card__footer { flex-direction: column; align-items: flex-start; }
+	.murailles-author-box { flex-direction: column; align-items: center; text-align: center; padding: 24px 20px; }
+	.murailles-comments-wrap { padding: 24px 20px; }
+}

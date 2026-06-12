@@ -1,0 +1,60 @@
+.murailles-template-editor-note {
+	margin-top: 12px;
+}
+
+.murailles-page-sections-wrap .murailles-page-sections-group {
+	margin-top: 20px;
+	padding-top: 12px;
+	border-top: 1px solid #dcdcde;
+}
+
+.murailles-page-sections-wrap .murailles-page-sections-group:first-child {
+	margin-top: 0;
+	padding-top: 0;
+	border-top: 0;
+}
+
+.murailles-page-sections-wrap h3 {
+	margin: 0 0 12px;
+}
+
+.murailles-media-field {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-width: 520px;
+}
+
+.murailles-media-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 120px;
+	padding: 12px;
+	border: 1px dashed #c3c4c7;
+	border-radius: 6px;
+	background: #f6f7f7;
+}
+
+.murailles-media-preview img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+	border-radius: 4px;
+}
+
+.murailles-media-preview.is-empty {
+	color: #646970;
+	font-size: 13px;
+	text-align: center;
+}
+
+.murailles-media-actions {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.murailles-media-clear.is-hidden {
+	display: none;
+}

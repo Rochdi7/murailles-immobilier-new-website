@@ -10,16 +10,20 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+$murailles_front_hero_bg = murailles_page_section_image_url( 'hero_bg_image_id', murailles_img( 'villa-luxe-marrakech-hero.webp' ), get_the_ID(), true );
+$murailles_front_title = murailles_page_section_meta( 'hero_title', murailles_t( 'Trouvez votre prochain bien', false ) );
+$murailles_front_subtitle = murailles_page_section_meta( 'hero_subtitle', murailles_t( 'Découvrez les nouveaux biens immobiliers à la une dans votre ville.', false ) );
+
 $murailles_header_style = 'transparent';
 get_header();
 ?>
 
 <!-- ============================ Hero Banner  Start================================== -->
-			<div class="image-cover hero_banner" style="background:url(<?php echo esc_url( murailles_img( 'villa-luxe-marrakech-hero.webp' ) ); ?>) no-repeat;" data-overlay="4">
+			<div class="image-cover hero_banner" style="background:url(<?php echo esc_url( $murailles_front_hero_bg ); ?>) no-repeat;" data-overlay="4">
 				<div class="container">
 					
-					<h1 class="big-header-capt mb-0"><?php murailles_t( 'Trouvez votre prochain bien' ); ?></h1>
-					<p class="text-center"><?php murailles_t( 'Découvrez les nouveaux biens immobiliers à la une dans votre ville.' ); ?></p>
+					<h1 class="big-header-capt mb-0"><?php echo esc_html( $murailles_front_title ); ?></h1>
+					<p class="text-center"><?php echo esc_html( $murailles_front_subtitle ); ?></p>
 					<!-- Type -->
 					<div class="row justify-content-center mt-5">
 						<div class="col-xl-10 col-lg-11 col-md-12">
@@ -1197,6 +1201,8 @@ get_header();
 			</section>
 			<div class="clearfix"></div>
 			<!-- ============================ article End ================================== -->
+
+<?php murailles_render_page_builder_content(); ?>
 
 <?php get_template_part( 'template-parts/call-to-action' ); ?>
 

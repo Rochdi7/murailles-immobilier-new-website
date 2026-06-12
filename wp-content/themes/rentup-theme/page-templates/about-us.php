@@ -10,11 +10,27 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+$murailles_about_hero_bg = murailles_page_section_image_url(
+	'hero_bg_image_id',
+	murailles_img( 'about-agence-murailles-immobilier.webp' ),
+	get_the_ID(),
+	true
+);
+$murailles_about_hero_title = murailles_page_section_meta( 'hero_title', murailles_t( 'À propos — Qui sommes-nous ?', false ) );
+$murailles_about_story_title = murailles_page_section_meta( 'story_title', murailles_t( "L'histoire de notre agence", false ) );
+$murailles_about_story_subtitle = murailles_page_section_meta( 'story_subtitle', murailles_t( 'Découvrez notre parcours et notre méthode de travail', false ) );
+$murailles_about_story_text_1 = murailles_page_section_meta( 'story_text_1', murailles_t( "Depuis sa création, l'Agence Murailles Immobilier s'investit pleinement dans le suivi et l'accompagnement de ses clients. Nous mettons notre connaissance fine du marché marocain au service de chaque projet : achat, vente, location longue durée ou saisonnière.", false ) );
+$murailles_about_story_text_2 = murailles_page_section_meta( 'story_text_2', murailles_t( "Notre équipe sillonne quotidiennement Marrakech et les autres villes du Royaume pour vous proposer une sélection rigoureuse de biens : riads d'exception, villas, appartements modernes, terrains à bâtir et locaux commerciaux.", false ) );
+$murailles_about_story_button_label = murailles_page_section_meta( 'story_button_label', murailles_t( 'En savoir plus', false ) );
+$murailles_about_story_button_url = murailles_page_section_meta( 'story_button_url', home_url( '/contact/' ) );
+$murailles_about_team_heading = murailles_page_section_meta( 'team_heading', murailles_t( 'Notre équipe', false ) );
+$murailles_about_team_subheading = murailles_page_section_meta( 'team_subheading', murailles_t( 'Une équipe professionnelle et dévouée à vos côtés', false ) );
+
 get_header();
 ?>
 
 <!-- ============================ Page Title Start================================== -->
-			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( murailles_img( 'about-agence-murailles-immobilier.webp' ) ); ?>);" data-overlay="5">
+			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( $murailles_about_hero_bg ); ?>);" data-overlay="5">
 				<div class="container">
 					<div class="row">
 						<div class="col-lg-12 col-md-12">
@@ -24,7 +40,7 @@ get_header();
 									<li class="breadcrumb-item"><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php murailles_t( 'Accueil' ); ?></a></li>
 									<li class="breadcrumb-item active" aria-current="page"><?php murailles_t( 'À propos' ); ?></li>
 								</ol>
-								<h2 class="breadcrumb-title"><?php murailles_t( 'À propos — Qui sommes-nous ?' ); ?></h2>
+								<h2 class="breadcrumb-title"><?php echo esc_html( $murailles_about_hero_title ); ?></h2>
 							</div>
 							
 						</div>
@@ -44,16 +60,16 @@ get_header();
 						<div class="col-lg-6 col-md-6">
 							<div class="story-wrap explore-content">
 
-								<h2 class="mb-3 fw-bold"><?php murailles_t( "L'histoire de notre agence" ); ?></h2>
-								<span class="text-muted fs-5"><?php murailles_t( 'Découvrez notre parcours et notre méthode de travail' ); ?></span>
-								<p class="mt-4"><?php murailles_t( "Depuis sa création, l'Agence Murailles Immobilier s'investit pleinement dans le suivi et l'accompagnement de ses clients. Nous mettons notre connaissance fine du marché marocain au service de chaque projet : achat, vente, location longue durée ou saisonnière." ); ?></p>
-								<p class="mb-3"><?php murailles_t( "Notre équipe sillonne quotidiennement Marrakech et les autres villes du Royaume pour vous proposer une sélection rigoureuse de biens : riads d'exception, villas, appartements modernes, terrains à bâtir et locaux commerciaux." ); ?></p>
-								<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn btn-danger"><?php murailles_t( 'En savoir plus' ); ?></a>
+								<h2 class="mb-3 fw-bold"><?php echo esc_html( $murailles_about_story_title ); ?></h2>
+								<span class="text-muted fs-5"><?php echo esc_html( $murailles_about_story_subtitle ); ?></span>
+								<p class="mt-4"><?php echo esc_html( $murailles_about_story_text_1 ); ?></p>
+								<p class="mb-3"><?php echo esc_html( $murailles_about_story_text_2 ); ?></p>
+								<a href="<?php echo esc_url( $murailles_about_story_button_url ); ?>" class="btn btn-danger"><?php echo esc_html( $murailles_about_story_button_label ); ?></a>
 							</div>
 						</div>
 						
 						<div class="col-lg-6 col-md-6">
-							<img src="<?php echo esc_url( murailles_img( 'b-1.jpg' ) ); ?>" class="img-fluid rounded" alt="" />
+							<?php echo murailles_page_section_image( 'story_image_id', murailles_img( 'b-1.jpg' ), array( 'class' => 'img-fluid rounded', 'alt' => $murailles_about_story_title ), get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</div>
 						
 					</div>
@@ -127,8 +143,8 @@ get_header();
 					<div class="row">
 						<div class="col-lg-12 col-md-12">
 							<div class="sec-heading center">
-								<h2><?php murailles_t( 'Notre équipe' ); ?></h2>
-								<p><?php murailles_t( 'Une équipe professionnelle et dévouée à vos côtés' ); ?></p>
+								<h2><?php echo esc_html( $murailles_about_team_heading ); ?></h2>
+								<p><?php echo esc_html( $murailles_about_team_subheading ); ?></p>
 							</div>
 						</div>
 					</div>
@@ -519,6 +535,8 @@ get_header();
 			</section>
 			<div class="clearfix"></div>
 			<!-- ============================ article End ================================== -->
+
+<?php murailles_render_page_builder_content(); ?>
 
 <?php get_template_part( 'template-parts/call-to-action' ); ?>
 

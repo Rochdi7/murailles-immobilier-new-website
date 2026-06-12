@@ -10,19 +10,41 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+$murailles_contact_hero_bg = murailles_page_section_image_url(
+	'hero_bg_image_id',
+	murailles_img( 'contact-agence-immobiliere-marrakech.webp' ),
+	get_the_ID(),
+	true
+);
+$murailles_contact_hero_eyebrow = murailles_page_section_meta( 'hero_eyebrow', murailles_t( 'Contactez-nous', false ) );
+$murailles_contact_hero_title = murailles_page_section_meta( 'hero_title', murailles_t( 'Une équipe à votre écoute', false ) );
+$murailles_contact_hero_subtitle = murailles_page_section_meta( 'hero_subtitle', murailles_t( "Besoin d'aide pour votre projet immobilier ? Nous sommes joignables 7 jours sur 7.", false ) );
+$murailles_contact_phone_label = murailles_page_section_meta( 'phone_label', murailles_t( 'Téléphone', false ) );
+$murailles_contact_phone_value = murailles_page_section_meta( 'phone_value', '+212 (0) 6 61 42 51 50' );
+$murailles_contact_phone_note = murailles_page_section_meta( 'phone_note', murailles_t( 'Joignable 7j/7', false ) );
+$murailles_contact_email_label = murailles_page_section_meta( 'email_label', murailles_t( 'E-mail', false ) );
+$murailles_contact_email_value = murailles_page_section_meta( 'email_value', 'contact@murailles-immobilier.com' );
+$murailles_contact_email_note = murailles_page_section_meta( 'email_note', murailles_t( 'Réponse sous 24h', false ) );
+$murailles_contact_address_label = murailles_page_section_meta( 'address_label', murailles_t( 'Adresse', false ) );
+$murailles_contact_address_line_1 = murailles_page_section_meta( 'address_line_1', murailles_t( '13 Rue Mouslim, Résidence Boukar', false ) );
+$murailles_contact_address_line_2 = murailles_page_section_meta( 'address_line_2', murailles_t( '2ème étage Bureau N°10, Marrakesh 40000', false ) );
+$murailles_contact_map_url = murailles_page_section_meta( 'map_embed_url', 'https://maps.google.com/maps?q=31.633176,-8.004951&z=16&hl=fr&output=embed' );
+$murailles_contact_phone_href = 'tel:' . preg_replace( '/[^0-9+]/', '', $murailles_contact_phone_value );
+$murailles_contact_email_href = 'mailto:' . sanitize_email( $murailles_contact_email_value );
+
 get_header();
 ?>
 
 <!-- ============================ Page Title Start================================== -->
-			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( murailles_img( 'contact-agence-immobiliere-marrakech.webp' ) ); ?>);" data-overlay="5">
+			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( $murailles_contact_hero_bg ); ?>);" data-overlay="5">
 				<div class="ht-80"></div>
 				<div class="container">
 					<div class="row">
 						<div class="col-lg-12 col-md-12 position-relative z-1">
 							<div class="_page_tetio">
-								<div class="pledtio_wrap"><span><?php murailles_t( 'Contactez-nous' ); ?></span></div>
-								<h2 class="text-light mb-0"><?php murailles_t( 'Une équipe à votre écoute' ); ?></h2>
-								<p><?php murailles_t( "Besoin d'aide pour votre projet immobilier ? Nous sommes joignables 7 jours sur 7." ); ?></p>
+								<div class="pledtio_wrap"><span><?php echo esc_html( $murailles_contact_hero_eyebrow ); ?></span></div>
+								<h2 class="text-light mb-0"><?php echo esc_html( $murailles_contact_hero_title ); ?></h2>
+								<p><?php echo esc_html( $murailles_contact_hero_subtitle ); ?></p>
 							</div>
 						</div>
 					</div>
@@ -39,27 +61,27 @@ get_header();
 						<div class="col-lg-4 col-md-4 col-sm-12">
 							<div class="contact-box">
 								<i class="ti-mobile text-danger"></i>
-								<h4><?php murailles_t( 'Téléphone' ); ?></h4>
-								<p><a href="tel:+212661425150">+212 (0) 6 61 42 51 50</a></p>
-								<span><?php murailles_t( 'Joignable 7j/7' ); ?></span>
+								<h4><?php echo esc_html( $murailles_contact_phone_label ); ?></h4>
+								<p><a href="<?php echo esc_url( $murailles_contact_phone_href ); ?>"><?php echo esc_html( $murailles_contact_phone_value ); ?></a></p>
+								<span><?php echo esc_html( $murailles_contact_phone_note ); ?></span>
 							</div>
 						</div>
 
 						<div class="col-lg-4 col-md-4 col-sm-12">
 							<div class="contact-box">
 								<i class="ti-email text-danger"></i>
-								<h4><?php murailles_t( 'E-mail' ); ?></h4>
-								<p><a href="mailto:contact@murailles-immobilier.com">contact@murailles-immobilier.com</a></p>
-								<span><?php murailles_t( 'Réponse sous 24h' ); ?></span>
+								<h4><?php echo esc_html( $murailles_contact_email_label ); ?></h4>
+								<p><a href="<?php echo esc_url( $murailles_contact_email_href ); ?>"><?php echo esc_html( $murailles_contact_email_value ); ?></a></p>
+								<span><?php echo esc_html( $murailles_contact_email_note ); ?></span>
 							</div>
 						</div>
 
 						<div class="col-lg-4 col-md-4 col-sm-12">
 							<div class="contact-box">
 								<i class="ti-location-pin text-danger"></i>
-								<h4><?php murailles_t( 'Adresse' ); ?></h4>
-								<p><?php murailles_t( '13 Rue Mouslim, Résidence Boukar' ); ?></p>
-								<span><?php murailles_t( '2ème étage Bureau N°10, Marrakesh 40000' ); ?></span>
+								<h4><?php echo esc_html( $murailles_contact_address_label ); ?></h4>
+								<p><?php echo esc_html( $murailles_contact_address_line_1 ); ?></p>
+								<span><?php echo esc_html( $murailles_contact_address_line_2 ); ?></span>
 							</div>
 						</div>
 						
@@ -117,7 +139,7 @@ get_header();
 						</div>
 						
 						<div class="col-lg-4 col-md-5">
-							<iframe src="https://maps.google.com/maps?q=31.633176,-8.004951&z=16&hl=fr&output=embed" width="100%" height="470" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+							<iframe src="<?php echo esc_url( $murailles_contact_map_url ); ?>" width="100%" height="470" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
 						</div>
 						
 					</div>
@@ -295,6 +317,8 @@ get_header();
 				</div>
 			</section>
 			<!-- ============================ article End ================================== -->
+
+<?php murailles_render_page_builder_content(); ?>
 
 <?php get_template_part( 'template-parts/call-to-action' ); ?>
 

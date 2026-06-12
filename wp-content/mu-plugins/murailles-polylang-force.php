@@ -24,6 +24,57 @@ add_filter( 'option_polylang', function ( $opts ) {
 }, PHP_INT_MAX );
 
 /**
+ * Force the bare site root to the default language URL.
+ *
+ * Polylang can still honor a stale `pll_language` cookie on `/`, which makes
+ * the root URL open in English even when French is the default language. For
+ * this site the contract is explicit: `/` must always resolve to the default
+ * language homepage, and translated homes live under `/fr/` and `/en/`.
+ */
+add_action( 'template_redirect', function () {
+	if ( is_admin() || wp_doing_ajax() ) {
+		return;
+	}
+
+	$request_path = isset( $_SERVER['REQUEST_URI'] )
+		? (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH )
+		: '';
+
+	$home_path = (string) wp_parse_url( get_option( 'home' ), PHP_URL_PATH );
+	$home_path = rtrim( $home_path, '/' );
+
+	$normalized_request = rtrim( $request_path, '/' );
+	if ( '' === $normalized_request ) {
+		$normalized_request = '/';
+	}
+	if ( '' === $home_path ) {
+		$home_path = '/';
+	}
+
+	if ( $normalized_request !== $home_path ) {
+		return;
+	}
+
+	$default_lang = function_exists( 'pll_default_language' ) ? pll_default_language( 'slug' ) : 'fr';
+	if ( ! $default_lang ) {
+		$default_lang = 'fr';
+	}
+
+	$target = rtrim( get_option( 'home' ), '/' ) . '/' . $default_lang . '/';
+	if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
+		$target .= '?' . ltrim( (string) wp_unslash( $_SERVER['QUERY_STRING'] ), '?' );
+	}
+
+	if ( ! headers_sent() ) {
+		setcookie( 'pll_language', $default_lang, time() + YEAR_IN_SECONDS, COOKIEPATH ?: '/', COOKIE_DOMAIN );
+		$_COOKIE['pll_language'] = $default_lang;
+	}
+
+	wp_safe_redirect( $target, 302, 'murailles-root-language' );
+	exit;
+}, 0 );
+
+/**
  * Helpers: return a language-prefixed URL.
  *
  * Use `murailles_url('/contact/')` instead of `home_url('/contact/')` for any

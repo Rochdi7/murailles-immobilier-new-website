@@ -6,17 +6,22 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+$murailles_tourisme_hero_bg = murailles_page_section_image_url( 'hero_bg_image_id', murailles_img( 'tourisme-marrakech.webp' ), get_the_ID(), true );
+$murailles_tourisme_hero_eyebrow = murailles_page_section_meta( 'hero_eyebrow', murailles_t( 'Découvrir', false ) );
+$murailles_tourisme_hero_title = murailles_page_section_meta( 'hero_title', murailles_t( 'Tourisme à Marrakech', false ) );
+$murailles_tourisme_hero_subtitle = murailles_page_section_meta( 'hero_subtitle', murailles_t( 'La ville ocre vous ouvre ses portes : palais millénaires, jardins enchantés, gastronomie raffinée et désert mystique.', false ) );
 get_header();
 ?>
 
 <!-- ============================ Page Title ================================== -->
-<div class="page-title tourisme-hero" style="background:linear-gradient(135deg,rgba(220,53,69,0.85),rgba(26,35,50,0.85)),url(<?php echo esc_url( murailles_img( 'tourisme-marrakech.webp' ) ); ?>) center/cover no-repeat;padding:100px 0;color:#fff;">
+<div class="page-title tourisme-hero" style="background:linear-gradient(135deg,rgba(220,53,69,0.85),rgba(26,35,50,0.85)),url(<?php echo esc_url( $murailles_tourisme_hero_bg ); ?>) center/cover no-repeat;padding:100px 0;color:#fff;">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12 text-center">
-				<span style="display:inline-block;padding:6px 16px;background:rgba(255,255,255,0.15);border-radius:20px;font-size:13px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;backdrop-filter:blur(4px);margin-bottom:14px;"><?php murailles_t( 'Découvrir' ); ?></span>
-				<h1 style="color:#fff;font-size:42px;font-weight:800;margin:0 0 12px;text-shadow:0 2px 10px rgba(0,0,0,0.2);"><?php murailles_t( 'Tourisme à Marrakech' ); ?></h1>
-				<p style="color:rgba(255,255,255,0.92);font-size:17px;max-width:680px;margin:0 auto;line-height:1.6;"><?php murailles_t( 'La ville ocre vous ouvre ses portes : palais millénaires, jardins enchantés, gastronomie raffinée et désert mystique.' ); ?></p>
+				<span style="display:inline-block;padding:6px 16px;background:rgba(255,255,255,0.15);border-radius:20px;font-size:13px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;backdrop-filter:blur(4px);margin-bottom:14px;"><?php echo esc_html( $murailles_tourisme_hero_eyebrow ); ?></span>
+				<h1 style="color:#fff;font-size:42px;font-weight:800;margin:0 0 12px;text-shadow:0 2px 10px rgba(0,0,0,0.2);"><?php echo esc_html( $murailles_tourisme_hero_title ); ?></h1>
+				<p style="color:rgba(255,255,255,0.92);font-size:17px;max-width:680px;margin:0 auto;line-height:1.6;"><?php echo esc_html( $murailles_tourisme_hero_subtitle ); ?></p>
 			</div>
 		</div>
 	</div>

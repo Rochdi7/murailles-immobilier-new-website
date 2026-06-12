@@ -6,17 +6,25 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+$murailles_services_hero_bg = murailles_page_section_image_url( 'hero_bg_image_id', murailles_img( 'nos-services-immobilier-marrakech.webp' ), get_the_ID(), true );
+$murailles_services_hero_eyebrow = murailles_page_section_meta( 'hero_eyebrow', 'Murailles Immobilier' );
+$murailles_services_hero_title = murailles_page_section_meta( 'hero_title', 'Nos Services' );
+$murailles_services_hero_subtitle = murailles_page_section_meta( 'hero_subtitle', 'Un savoir-faire complet sur tous les types de biens et tous les secteurs de Marrakech.' );
+$murailles_services_intro_eyebrow = murailles_page_section_meta( 'intro_eyebrow', 'Ce que nous proposons' );
+$murailles_services_intro_title = murailles_page_section_meta( 'intro_title', "L'Agence Murailles Immobilier vous propose" );
+$murailles_services_intro_text = murailles_page_section_meta( 'intro_text', "Chaque type de bien et chaque secteur de Marrakech répondent à une logique de marché distincte&nbsp;: c'est l'ensemble de ces savoir-faire que nous mettons à votre disposition." );
 get_header();
 ?>
 
 <!-- ============================ Page Title ================================== -->
-<div class="page-title nos-services-hero" style="background:linear-gradient(135deg,rgba(220,53,69,0.85),rgba(26,35,50,0.85)),url(<?php echo esc_url( murailles_img( 'nos-services-immobilier-marrakech.webp' ) ); ?>) center/cover no-repeat;padding:100px 0;color:#fff;">
+<div class="page-title nos-services-hero" style="background:linear-gradient(135deg,rgba(220,53,69,0.85),rgba(26,35,50,0.85)),url(<?php echo esc_url( $murailles_services_hero_bg ); ?>) center/cover no-repeat;padding:100px 0;color:#fff;">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12 text-center">
-				<span style="display:inline-block;padding:6px 16px;background:rgba(255,255,255,0.15);border-radius:20px;font-size:13px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;backdrop-filter:blur(4px);margin-bottom:14px;">Murailles Immobilier</span>
-				<h1 style="color:#fff;font-size:42px;font-weight:800;margin:0 0 12px;text-shadow:0 2px 10px rgba(0,0,0,0.2);">Nos Services</h1>
-				<p style="color:rgba(255,255,255,0.92);font-size:17px;max-width:680px;margin:0 auto;line-height:1.6;">Un savoir-faire complet sur tous les types de biens et tous les secteurs de Marrakech.</p>
+				<span style="display:inline-block;padding:6px 16px;background:rgba(255,255,255,0.15);border-radius:20px;font-size:13px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;backdrop-filter:blur(4px);margin-bottom:14px;"><?php echo esc_html( $murailles_services_hero_eyebrow ); ?></span>
+				<h1 style="color:#fff;font-size:42px;font-weight:800;margin:0 0 12px;text-shadow:0 2px 10px rgba(0,0,0,0.2);"><?php echo esc_html( $murailles_services_hero_title ); ?></h1>
+				<p style="color:rgba(255,255,255,0.92);font-size:17px;max-width:680px;margin:0 auto;line-height:1.6;"><?php echo wp_kses_post( $murailles_services_hero_subtitle ); ?></p>
 			</div>
 		</div>
 	</div>
@@ -27,9 +35,9 @@ get_header();
 	<div class="container">
 		<div class="row justify-content-center">
 			<div class="col-lg-9 text-center">
-				<span style="display:inline-block;color:#dc3545;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;font-size:13px;margin-bottom:8px;">Ce que nous proposons</span>
-				<h2 style="margin:0 0 16px;">L'Agence Murailles Immobilier vous propose</h2>
-				<p class="text-muted" style="font-size:16px;line-height:1.7;">Chaque type de bien et chaque secteur de Marrakech répondent à une logique de marché distincte&nbsp;: c'est l'ensemble de ces savoir-faire que nous mettons à votre disposition.</p>
+				<span style="display:inline-block;color:#dc3545;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;font-size:13px;margin-bottom:8px;"><?php echo esc_html( $murailles_services_intro_eyebrow ); ?></span>
+				<h2 style="margin:0 0 16px;"><?php echo esc_html( $murailles_services_intro_title ); ?></h2>
+				<p class="text-muted" style="font-size:16px;line-height:1.7;"><?php echo wp_kses_post( $murailles_services_intro_text ); ?></p>
 			</div>
 		</div>
 	</div>
