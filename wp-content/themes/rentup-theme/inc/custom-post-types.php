@@ -822,7 +822,8 @@ function murailles_populate_taxonomies() {
 
 	update_option( 'murailles_taxonomies_populated_v3', true );
 }
-add_action( 'init', 'murailles_populate_taxonomies', 20 );
+// Taxonomy seeding is NOT wired to any automatic hook.
+// Triggered manually via the admin notice button (see murailles_admin_setup_notice in functions.php).
 
 /* ╔═══════════════════════════════════════════════════╗
    ║  10. FLUSH DES RÈGLES DE RÉÉCRITURE              ║
@@ -830,7 +831,7 @@ add_action( 'init', 'murailles_populate_taxonomies', 20 );
 function murailles_flush_rewrites() {
 	murailles_register_property_cpt();
 	murailles_register_taxonomies();
-	flush_rewrite_rules();
+	flush_rewrite_rules( false );
 }
 add_action( 'after_switch_theme', 'murailles_flush_rewrites' );
 
@@ -846,10 +847,10 @@ function murailles_maybe_flush_rewrites() {
 	if ( get_option( 'murailles_rewrite_version' ) === MURAILLES_REWRITE_VERSION ) {
 		return;
 	}
-	flush_rewrite_rules();
+	flush_rewrite_rules( false );
 	update_option( 'murailles_rewrite_version', MURAILLES_REWRITE_VERSION );
 }
-add_action( 'init', 'murailles_maybe_flush_rewrites', 99 );
+add_action( 'after_switch_theme', 'murailles_maybe_flush_rewrites', 99 );
 
 /* ╔═══════════════════════════════════════════════════╗
    ║  11. ADMIN UX — soumissions externes              ║

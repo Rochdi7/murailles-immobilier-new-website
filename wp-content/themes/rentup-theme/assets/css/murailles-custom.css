@@ -1049,6 +1049,46 @@ a > i[class*="fa-"]:only-child {
 	.nav-menus-wrapper .nav-menu.nav-menu-social.align-to-right {
 		display: none;
 	}
+
+	/* ── Mobile top bar: logo far-left, hamburger center, lang far-right ── */
+	.nav-header {
+		display: flex !important;
+		align-items: center !important;
+		justify-content: space-between !important;
+		width: 100%;
+		padding: 0 12px;
+		box-sizing: border-box;
+	}
+	/* Logo: left anchor — never grows/shrinks */
+	.nav-header .nav-brand {
+		flex: 0 0 auto;
+		order: 1;
+		margin: 0 !important;
+	}
+	.nav-header .nav-brand img.logo {
+		max-height: 38px;
+		width: auto;
+		display: block;
+	}
+	/* Hamburger: stays in natural document order (order 2 by default) */
+	.nav-header .nav-toggle {
+		flex: 0 0 auto;
+		order: 2;
+		margin: 0 auto; /* centre it in the remaining space */
+	}
+	/* Lang switcher: pinned to the far right */
+	.nav-header .mobile_nav {
+		flex: 0 0 auto;
+		order: 3;
+		margin-left: auto;
+	}
+	.nav-header .mobile_nav .mobile-lang-switcher {
+		display: inline-flex !important;
+		align-items: center;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
 }
 
 /* ----------------------------------------------------------
@@ -1521,3 +1561,42 @@ a > i[class*="fa-"]:only-child {
 	margin-top: auto;
 }
 
+
+/* ============================================================
+   Property card grid fallback � ensures cards are visible in
+   a responsive grid when Slick carousel fails to initialise
+   (JS error, slow connection, etc.). Slick overrides these
+   rules once it runs by adding display:block to .slick-slide.
+   ============================================================ */
+.item-slide:not(.slick-initialized) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+.item-slide:not(.slick-initialized) .single_items {
+    flex: 0 0 calc(33.333% - 16px);
+    max-width: calc(33.333% - 16px);
+}
+@media (max-width: 992px) {
+    .item-slide:not(.slick-initialized) .single_items {
+        flex: 0 0 calc(50% - 12px);
+        max-width: calc(50% - 12px);
+    }
+}
+@media (max-width: 600px) {
+    .item-slide:not(.slick-initialized) .single_items {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Ensure card images always fill the wrapper and never collapse to 0px height */
+.listing-img-wrapper .list-img-slide .click {
+    min-height: 200px;
+}
+.listing-img-wrapper .list-img-slide .click img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}

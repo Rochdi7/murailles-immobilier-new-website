@@ -25,6 +25,39 @@ if (is_front_page() && ! isset($murailles_header_style)) {
 	<meta charset="<?php bloginfo('charset'); ?>" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php wp_head(); ?>
+	<?php /* Preloader safety net — pure CSS + inline JS, no jQuery dependency.
+	         Hides the spinner after 2 s if window.load / custom.js never fires.
+	         Runs before any external script so it works even when every JS 404s. */ ?>
+	<style>
+		@keyframes murailles-preloader-timeout {
+			0%   { opacity: 1; pointer-events: auto;  }
+			99%  { opacity: 1; pointer-events: auto;  }
+			100% { opacity: 0; pointer-events: none;  }
+		}
+		.preloader-timeout-armed {
+			animation: murailles-preloader-timeout 2s forwards;
+			animation-delay: 2s;
+		}
+	</style>
+	<script>
+		/* Immediately make body visible so a blank white screen never persists. */
+		document.documentElement.style.visibility = 'visible';
+		/* Arm the CSS 2 s fallback as soon as the element exists in the DOM. */
+		document.addEventListener('DOMContentLoaded', function() {
+			var el = document.querySelector('.preloader');
+			if (el) { el.classList.add('preloader-timeout-armed'); }
+		});
+		/* Belt-and-braces: window.onload plain JS fallback (no jQuery needed). */
+		window.addEventListener('load', function() {
+			var el = document.querySelector('.preloader');
+			if (el) {
+				el.style.transition = 'opacity 0.3s ease';
+				el.style.opacity    = '0';
+				el.style.pointerEvents = 'none';
+				setTimeout(function() { if (el && el.parentNode) { el.parentNode.removeChild(el); } }, 350);
+			}
+		});
+	</script>
 </head>
 
 <body <?php body_class(); ?>>

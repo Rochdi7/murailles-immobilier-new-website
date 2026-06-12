@@ -24,6 +24,13 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
+if ( ! function_exists( 'murailles_opt' ) ) {
+	function murailles_opt( $key, $default = '' ) {
+		$opts = (array) get_option( 'murailles_options', array() );
+		return isset( $opts[ $key ] ) && $opts[ $key ] !== '' ? $opts[ $key ] : $default;
+	}
+}
+
 /**
  * DNS prefetch + preconnect to external origins we know are used on every page.
  */

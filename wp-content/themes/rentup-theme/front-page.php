@@ -252,7 +252,7 @@ get_header();
 			$_adm_ids = array_filter( array_map( 'intval', (array) get_option( 'murailles_affaires_du_mois', array() ) ) );
 			if ( ! empty( $_adm_ids ) ) :
 			?>
-			<section class="pt-0">
+			<section class="pt-5">
 				<div class="container">
 
 					<div class="row justify-content-center">

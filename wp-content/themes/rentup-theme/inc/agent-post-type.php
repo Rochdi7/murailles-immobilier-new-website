@@ -322,6 +322,6 @@ function murailles_get_all_agents()
 function murailles_agent_flush_rewrites()
 {
 	murailles_register_agent_cpt();
-	flush_rewrite_rules();
+	flush_rewrite_rules( false );
 }
 add_action('after_switch_theme', 'murailles_agent_flush_rewrites');

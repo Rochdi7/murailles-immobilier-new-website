@@ -1,15 +1,24 @@
 $(function() {
     "use strict";
 
-	//Loader	
-	$(function preloaderLoad() {
-        if($('.preloader').length){
-            $('.preloader').delay(50).fadeOut(60);
-        }
-        $(".preloader_disabler").on('click', function() {
-            $("#preloader").hide();
-        });
-    });
+	// Preloader — hide on window load (all assets done), not just DOM ready.
+	// The CSS-only 2 s fallback in header.php covers JS errors / slow networks.
+	function muraillesHidePreloader() {
+		$('.preloader').stop(true, true).fadeOut(300, function() {
+			$(this).remove();
+		});
+	}
+	$(window).on('load', muraillesHidePreloader);
+	// Safety net: also dismiss on DOM ready in case window.load already fired
+	// (e.g. cached page where resources arrive before the script runs).
+	$(document).ready(function() {
+		if (document.readyState === 'complete') {
+			muraillesHidePreloader();
+		}
+	});
+	$(".preloader_disabler").on('click', function() {
+		muraillesHidePreloader();
+	});
 	
 	// Tooltip
 	var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -253,8 +262,16 @@ $(function() {
 	});
 	
 	
+	// ─── Slick availability flag ────────────────────────────────────────────
+	// All carousel inits are gated on this flag so a missing slick bundle
+	// (CDN failure, caching edge case) cannot throw uncaught ReferenceErrors.
+	var hasSlick = typeof $.fn.slick === 'function';
+
+	try { // top-level safety net: one broken slider cannot crash the rest
+
 	// smart_textimonials_style
-	$('.modern-testimonial').slick({
+	if ( hasSlick && $('.modern-testimonial').not('.slick-initialized').length ) {
+	$('.modern-testimonial').not('.slick-initialized').slick({
 	  slidesToShow:1,
 	  arrows: false,
 	  dots: true,
@@ -278,9 +295,11 @@ $(function() {
 		}
 	  ]
 	});
-	
+	}
+
 	// smart_textimonials_style
-	$('.list_views').slick({
+	if ( hasSlick && $('.list_views').not('.slick-initialized').length ) {
+	$('.list_views').not('.slick-initialized').slick({
 	  slidesToShow:1,
 	  arrows: false,
 	  dots: true,
@@ -304,9 +323,29 @@ $(function() {
 		}
 	  ]
 	});
-	
-	// Property Slide
-	$('.item-slide').slick({
+	}
+
+	// Property Slide — outer card carousel.
+	// Inner .click image sliders are initialised AFTER Slick has built its DOM
+	// (in the 'init' callback below) to avoid nesting conflicts.
+	if ( hasSlick && $('.item-slide').not('.slick-initialized').length ) {
+	$('.item-slide').not('.slick-initialized').on('init', function() {
+		$(this).find('.click').each(function() {
+			if ( ! $(this).hasClass('slick-initialized') ) {
+				try {
+					$(this).slick({
+						slidesToShow: 1,
+						slidesToScroll: 1,
+						arrows: false,
+						autoplay: true,
+						fade: true,
+						dots: true,
+						autoplaySpeed: 4000,
+					});
+				} catch(e) { /* inner slider failed silently */ }
+			}
+		});
+	}).slick({
 	  slidesToShow:4,
 	  arrows: true,
 	  dots: false,
@@ -340,10 +379,12 @@ $(function() {
 		}
 	  ]
 	});
-	
-	
+	}
+
+
 	// location Slide
-	$('.item-slide-2').slick({
+	if ( hasSlick && $('.item-slide-2').not('.slick-initialized').length ) {
+	$('.item-slide-2').not('.slick-initialized').slick({
 	  slidesToShow:3,
 	  arrows: true,
 	  dots: false,
@@ -373,9 +414,11 @@ $(function() {
 		}
 	  ]
 	});
-	
+	}
+
 	// Property Slide
-	$('.testi-slide').slick({
+	if ( hasSlick && $('.testi-slide').not('.slick-initialized').length ) {
+	$('.testi-slide').not('.slick-initialized').slick({
 	  slidesToShow:3,
 	  arrows: false,
 	  autoplay:true,
@@ -403,14 +446,16 @@ $(function() {
 		}
 	  ]
 	});
+	}
 
 	// Select2 initializations disabled — every <select.form-control> is now
 	// enhanced by the murailles-dropdown.js component for design consistency.
-	
-	
-	
+
+
+
 	// Home Slider
-	$('.home-slider').slick({
+	if ( hasSlick && $('.home-slider').not('.slick-initialized').length ) {
+	$('.home-slider').not('.slick-initialized').slick({
 	  centerMode:false,
 	  slidesToShow:1,
 	  responsive: [
@@ -430,22 +475,36 @@ $(function() {
 		}
 	  ]
 	});
-	
-	$('.click').slick({
-	  slidesToShow:1,
-	  slidesToScroll: 1,
-	  arrows: false,
-	  autoplay:true,
-	  fade: true,
-	  dots:true,
-	  autoplaySpeed:4000,
-	});
-	
-	// Advance Single Slider
-	$(function() { 
-	// Card's slider
-	  var $carousel = $('.slider-for');
+	}
 
+	// .click image sliders inside .item-slide are initialised in the
+	// .item-slide 'init' callback above to prevent nesting conflicts.
+	// For .click sliders that exist OUTSIDE of .item-slide (e.g. standalone
+	// property archive cards), init them here with the same guard.
+	if ( hasSlick ) {
+	$('.click').not('.item-slide .click').not('.slick-initialized').each(function() {
+		if ( ! $(this).hasClass('slick-initialized') ) {
+			try {
+				$(this).slick({
+					slidesToShow: 1,
+					slidesToScroll: 1,
+					arrows: false,
+					autoplay: true,
+					fade: true,
+					dots: true,
+					autoplaySpeed: 4000,
+				});
+			} catch(e) { /* standalone .click slider failed silently */ }
+		}
+	});
+	}
+
+	// Advance Single Slider — single property gallery (slider-for + slider-nav asNavFor pair).
+	// Note: no nested $(function(){}) wrapper — we are already inside DOM ready.
+	// Card's slider
+	  var $carousel = $('.slider-for').not('.slick-initialized');
+
+	  if ( hasSlick && $carousel.length ) {
 	  $carousel
 		.slick({
 		  slidesToShow: 1,
@@ -489,19 +548,20 @@ $(function() {
 				self.wrap.removeClass('mfp-image-loaded');
 				setTimeout(function() { $.magnificPopup.proto.prev.call(self); }, 120);
 			  };
-			  var current = $carousel.slick('slickCurrentSlide');
-			  $carousel.magnificPopup('goTo', current);
+			  var current = $('.slider-for').slick('slickCurrentSlide');
+			  $('.slider-for').magnificPopup('goTo', current);
 			},
 			imageLoadComplete: function() {
 			  var self = this;
 			  setTimeout(function() { self.wrap.addClass('mfp-image-loaded'); }, 16);
 			},
 			beforeClose: function() {
-			  $carousel.slick('slickGoTo', parseInt(this.index));
+			  $('.slider-for').slick('slickGoTo', parseInt(this.index));
 			}
 		  }
 		});
-	  $('.slider-nav').slick({
+	  if ( $('.slider-nav').not('.slick-initialized').length ) {
+	  $('.slider-nav').not('.slick-initialized').slick({
 		slidesToShow:6,
 		slidesToScroll:1,
 		asNavFor: '.slider-for',
@@ -509,12 +569,12 @@ $(function() {
 		centerMode: false,
 		focusOnSelect: true
 	  });
-	  
-	  
-	});
-	
+	  }
+	  } // end if hasSlick && $carousel.length
+
 	// Featured Slick Slider
-	$('.featured_slick_gallery-slide').slick({
+	if ( hasSlick && $('.featured_slick_gallery-slide').not('.slick-initialized').length ) {
+	$('.featured_slick_gallery-slide').not('.slick-initialized').slick({
 		centerMode: true,
 		infinite:true,
 		centerPadding: '80px',
@@ -540,9 +600,11 @@ $(function() {
 		}
 		]
 	});
-	
+	}
+
 	// Featured Slick Slider
-	$('.featured_slick_gallery-slide-single').slick({
+	if ( hasSlick && $('.featured_slick_gallery-slide-single').not('.slick-initialized').length ) {
+	$('.featured_slick_gallery-slide-single').not('.slick-initialized').slick({
 		centerMode: true,
 		centerPadding: '0px',
 		slidesToShow:1,
@@ -567,6 +629,15 @@ $(function() {
 		}
 		]
 	});
+	}
+
+	} catch(slickInitError) {
+		// One broken slider init threw — remaining carousels may still work.
+		// Log to console for diagnostics but do not re-throw.
+		if ( window.console && console.error ) {
+			console.error( '[Murailles] Slider init error:', slickInitError );
+		}
+	}
 	
 	// MagnificPopup
 	$('body').magnificPopup({

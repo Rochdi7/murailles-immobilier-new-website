@@ -14,6 +14,17 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+// Defensive fallback: murailles_opt() is defined in inc/theme-options.php which is
+// loaded first in functions.php. If for any reason that file was not included
+// (e.g. a hosting file-permission issue), define a no-op stub so this file
+// never causes a PHP fatal error.
+if ( ! function_exists( 'murailles_opt' ) ) {
+	function murailles_opt( $key, $default = '' ) {
+		$opts = (array) get_option( 'murailles_options', array() );
+		return isset( $opts[ $key ] ) && $opts[ $key ] !== '' ? $opts[ $key ] : $default;
+	}
+}
+
 /**
  * Build the page title for the current request.
  *

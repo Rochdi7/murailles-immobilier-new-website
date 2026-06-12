@@ -139,9 +139,10 @@ function murailles_enqueue_scripts()
 	$theme_uri = get_template_directory_uri();
 	$ver       = wp_get_theme()->get('Version');
 
-	// jQuery is bundled with WordPress, but we use the theme's version for compatibility
-	wp_deregister_script('jquery');
-	wp_enqueue_script('jquery', $theme_uri . '/assets/js/jquery.min.js', array(), '3.6.0', true);
+	// Use WordPress's bundled jQuery so Elementor, Royal Elementor Addons, and
+	// all admin scripts get the handle they expect in <head>. The theme's own
+	// jQuery file (3.6.0) is kept in /assets/js/ but is no longer served to
+	// avoid the in_footer conflict that breaks Elementor widget initialisation.
 
 	// Popper.js (required by Bootstrap)
 	wp_enqueue_script('murailles-popper', $theme_uri . '/assets/js/popper.min.js', array('jquery'), $ver, true);
@@ -424,6 +425,17 @@ function murailles_excerpt_more($more)
 add_filter('excerpt_more', 'murailles_excerpt_more');
 
 /**
+ * Helper: Return the canonical URL for the property archive (/bien/).
+ * Used everywhere a link to "all properties" is needed.
+ * Falls back to home_url('/bien/') when no post-type archive URL is resolvable
+ * (e.g. during a fresh install before CPTs are fully flushed).
+ */
+function murailles_bien_url() {
+	$url = get_post_type_archive_link( 'property' );
+	return $url ? $url : home_url( '/bien/' );
+}
+
+/**
  * Helper: Get theme image URL
  * Simplifies referencing images in the assets/images folder.
  *
@@ -489,10 +501,10 @@ function murailles_img($filename)
  * Auto-create all WordPress pages with correct templates on theme activation.
  * This maps every page template to a WordPress page so all navigation links work.
  */
-function murailles_create_pages()
+function murailles_create_pages( $force = false )
 {
-	// Only run once
-	if (get_option('murailles_pages_created')) {
+	// Only run once unless forced
+	if ( ! $force && get_option('murailles_pages_created') ) {
 		return;
 	}
 
@@ -591,25 +603,152 @@ function murailles_create_pages()
 	// Set permalink structure to /%postname%/ so slugs work
 	global $wp_rewrite;
 	$wp_rewrite->set_permalink_structure('/%postname%/');
-	$wp_rewrite->flush_rules();
+	$wp_rewrite->flush_rules( false );
 
 	update_option('murailles_pages_created', true);
 }
-add_action('after_switch_theme', 'murailles_create_pages');
+// Page creation is intentionally NOT wired to after_switch_theme.
+// An admin notice with a manual button triggers it instead (see murailles_admin_setup_notice).
 
 /**
- * Admin notice + manual trigger if pages weren't created yet
+ * Admin notice shown after theme activation for one-time manual setup.
+ * Three independent nonce-protected buttons — none runs automatically:
+ *   1. "Créer le contenu du thème"  — 44 pages      (murailles_create_pages)
+ *   2. "Créer les termes de taxonomie" — ~90 terms  (murailles_populate_taxonomies)
+ *   3. "Publier les articles de démo" — 3 posts     (murailles_seed_demo_blog_posts)
+ *
+ * This pattern prevents bulk SQL during activation on One.com Managed WordPress.
  */
 function murailles_admin_setup_notice()
 {
-	if (get_option('murailles_pages_created')) {
+	$pages_done = (bool) get_option( 'murailles_pages_created' );
+	$terms_done = (bool) get_option( 'murailles_taxonomies_populated_v3' );
+	$posts_done = (bool) get_option( 'murailles_demo_blog_seeded' );
+
+	// Build the redirect-back URL (current admin page, so notice reappears after action).
+	$back_url = esc_url( remove_query_arg( array( 'murailles_done', 'murailles_action' ) ) );
+
+	// Show transient success messages set by admin-post handlers.
+	$done_msg = get_transient( 'murailles_setup_done_' . get_current_user_id() );
+	if ( $done_msg ) {
+		delete_transient( 'murailles_setup_done_' . get_current_user_id() );
+		echo '<div class="notice notice-success is-dismissible"><p>' . wp_kses_post( $done_msg ) . '</p></div>';
+		// Refresh local state after action.
+		$pages_done = (bool) get_option( 'murailles_pages_created' );
+		$terms_done = (bool) get_option( 'murailles_taxonomies_populated_v3' );
+		$posts_done = (bool) get_option( 'murailles_demo_blog_seeded' );
+	}
+
+	// All done — hide the notice.
+	if ( $pages_done && $terms_done && $posts_done ) {
 		return;
 	}
-	// Run it now if visiting admin for first time after activation
-	murailles_create_pages();
-	echo '<div class="notice notice-success is-dismissible"><p><strong>Agence Murailles Theme:</strong> All pages have been created automatically with their templates assigned. Visit your site!</p></div>';
+
+	// Each form posts to admin-post.php with action= and a _wpnonce field.
+	// admin-post.php is always a valid endpoint on every WP install (no blank page).
+	echo '<div class="notice notice-warning">';
+	echo '<p><strong>Agence Murailles Theme — Configuration initiale</strong></p>';
+	echo '<p style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">';
+
+	if ( ! $pages_done ) {
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="murailles_create_pages">';
+		echo '<input type="hidden" name="_wpnonce" value="' . esc_attr( wp_create_nonce( 'murailles_create_pages' ) ) . '">';
+		echo '<input type="hidden" name="_wp_http_referer" value="' . esc_attr( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) . '">';
+		echo '<button type="submit" class="button button-primary">Créer le contenu du thème (44 pages)</button>';
+		echo '</form>';
+	}
+
+	if ( ! $terms_done ) {
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="murailles_populate_terms">';
+		echo '<input type="hidden" name="_wpnonce" value="' . esc_attr( wp_create_nonce( 'murailles_populate_terms' ) ) . '">';
+		echo '<input type="hidden" name="_wp_http_referer" value="' . esc_attr( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) . '">';
+		echo '<button type="submit" class="button">Créer les termes de taxonomie (~90 termes)</button>';
+		echo '</form>';
+	}
+
+	if ( ! $posts_done ) {
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="murailles_seed_posts">';
+		echo '<input type="hidden" name="_wpnonce" value="' . esc_attr( wp_create_nonce( 'murailles_seed_posts' ) ) . '">';
+		echo '<input type="hidden" name="_wp_http_referer" value="' . esc_attr( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) . '">';
+		echo '<button type="submit" class="button">Publier les articles de démo (3 posts)</button>';
+		echo '</form>';
+	}
+
+	// Re-import — always visible so missing pages can be restored any time.
+	echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="margin-left:auto;" onsubmit="return confirm(\'Ré-importer toutes les 44 pages ? Les pages existantes ne seront pas supprimées.\')">';
+	echo '<input type="hidden" name="action" value="murailles_reimport_pages">';
+	echo '<input type="hidden" name="_wpnonce" value="' . esc_attr( wp_create_nonce( 'murailles_reimport_pages' ) ) . '">';
+	echo '<input type="hidden" name="_wp_http_referer" value="' . esc_attr( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) . '">';
+	echo '<button type="submit" class="button" style="color:#856404;border-color:#ffc107;">↺ Ré-importer toutes les pages</button>';
+	echo '</form>';
+
+	echo '</p>';
+	if ( $pages_done ) {
+		echo '<p style="margin:4px 0 8px;color:#666;font-size:12px;">✓ Pages déjà créées — utilisez ↺ pour récupérer des pages manquantes.</p>';
+	}
+	echo '</div>';
 }
-add_action('admin_notices', 'murailles_admin_setup_notice');
+add_action( 'admin_notices', 'murailles_admin_setup_notice' );
+
+/**
+ * admin-post.php handlers — each runs, sets a transient for the success notice,
+ * then redirects back to wherever the admin was (no blank page, no double-submit).
+ */
+function murailles_handle_create_pages() {
+	if ( ! current_user_can( 'manage_options' ) || ! check_admin_referer( 'murailles_create_pages' ) ) {
+		wp_die( 'Accès refusé.' );
+	}
+	murailles_create_pages();
+	set_transient( 'murailles_setup_done_' . get_current_user_id(),
+		'<strong>Agence Murailles:</strong> Pages créées. <a href="' . esc_url( admin_url( 'edit.php?post_type=page' ) ) . '">Voir les pages &rarr;</a>',
+		60 );
+	wp_safe_redirect( wp_get_referer() ?: admin_url() );
+	exit;
+}
+add_action( 'admin_post_murailles_create_pages', 'murailles_handle_create_pages' );
+
+function murailles_handle_populate_terms() {
+	if ( ! current_user_can( 'manage_options' ) || ! check_admin_referer( 'murailles_populate_terms' ) ) {
+		wp_die( 'Accès refusé.' );
+	}
+	murailles_populate_taxonomies();
+	set_transient( 'murailles_setup_done_' . get_current_user_id(),
+		'<strong>Agence Murailles:</strong> Termes de taxonomie créés (catégories, localisations, quartiers).',
+		60 );
+	wp_safe_redirect( wp_get_referer() ?: admin_url() );
+	exit;
+}
+add_action( 'admin_post_murailles_populate_terms', 'murailles_handle_populate_terms' );
+
+function murailles_handle_seed_posts() {
+	if ( ! current_user_can( 'manage_options' ) || ! check_admin_referer( 'murailles_seed_posts' ) ) {
+		wp_die( 'Accès refusé.' );
+	}
+	murailles_seed_demo_blog_posts();
+	set_transient( 'murailles_setup_done_' . get_current_user_id(),
+		'<strong>Agence Murailles:</strong> Articles de démo publiés.',
+		60 );
+	wp_safe_redirect( wp_get_referer() ?: admin_url() );
+	exit;
+}
+add_action( 'admin_post_murailles_seed_posts', 'murailles_handle_seed_posts' );
+
+function murailles_handle_reimport_pages() {
+	if ( ! current_user_can( 'manage_options' ) || ! check_admin_referer( 'murailles_reimport_pages' ) ) {
+		wp_die( 'Accès refusé.' );
+	}
+	delete_option( 'murailles_pages_created' );
+	murailles_create_pages( true );
+	set_transient( 'murailles_setup_done_' . get_current_user_id(),
+		'<strong>Agence Murailles:</strong> Toutes les pages ont été ré-importées. <a href="' . esc_url( admin_url( 'edit.php?post_type=page' ) ) . '">Voir les pages &rarr;</a>',
+		60 );
+	wp_safe_redirect( wp_get_referer() ?: admin_url() );
+	exit;
+}
+add_action( 'admin_post_murailles_reimport_pages', 'murailles_handle_reimport_pages' );
 
 /**
  * Seed 3 demo blog posts so the dynamic blog grid + detail pages have content.
@@ -680,8 +819,8 @@ function murailles_seed_demo_blog_posts()
 
 	update_option('murailles_demo_blog_seeded', true);
 }
-add_action('after_switch_theme', 'murailles_seed_demo_blog_posts');
-add_action('admin_init', 'murailles_seed_demo_blog_posts');
+// Demo blog seeder is NOT wired to after_switch_theme or admin_init.
+// Triggered manually via the admin notice button (see murailles_admin_setup_notice).
 
 /**
  * Central contact info — single source of truth for the agency's coordinates.

@@ -10,6 +10,13 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+if ( ! function_exists( 'murailles_opt' ) ) {
+	function murailles_opt( $key, $default = '' ) {
+		$opts = (array) get_option( 'murailles_options', array() );
+		return isset( $opts[ $key ] ) && $opts[ $key ] !== '' ? $opts[ $key ] : $default;
+	}
+}
+
 /**
  * Pick the best image for the current URL:
  *   1. Custom _seo_og_image meta (set via WP admin or Royal MCP key: _seo_og_image).
