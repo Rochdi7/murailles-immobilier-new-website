@@ -16,6 +16,7 @@ wp-config.local.php
 # Uploads belong on the production server / a CDN, not in source control.
 # Restore from backups or re-upload on deployment.
 wp-content/plugins/
+wp-content/plugins/novamira/
 wp-content/uploads/
 
 # --- Caches, logs, debug -------------------------------------------------
@@ -34,6 +35,7 @@ error_log
 # --- Backup / temp files -------------------------------------------------
 *.sql
 *.sql.gz
+*.zip
 *.bak
 *.tmp
 *.swp
@@ -46,6 +48,7 @@ backup-*.tar.gz
 .vscode/
 .cursor/
 .claude/
+.env
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -71,3 +74,4 @@ c:/tmp/
 wp-includes/css/dist/
 wp-includes/blocks/
 wp-admin/css/dist/
+backups/
