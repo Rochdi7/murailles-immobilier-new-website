@@ -1,0 +1,224 @@
+/* ═══════════════════════════════════════════════
+   Murailles Immobilier Admin – Tabbed Property Meta Box
+   Modern ThemeForest-style UI
+   ═══════════════════════════════════════════════ */
+
+.murailles-tabs-wrap {
+	margin: -6px -12px -12px;
+}
+
+/* ── Tab Navigation ── */
+.murailles-tabs-nav {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	background: #f0f0f1;
+	border-bottom: 1px solid #c3c4c7;
+}
+.murailles-tabs-nav li {
+	margin: 0;
+}
+.murailles-tabs-nav li a {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 12px 18px;
+	text-decoration: none;
+	color: #50575e;
+	font-size: 13px;
+	font-weight: 500;
+	border-bottom: 3px solid transparent;
+	transition: all .15s ease;
+}
+.murailles-tabs-nav li a:hover {
+	background: #fff;
+	color: #1d2327;
+}
+.murailles-tabs-nav li a.active {
+	background: #fff;
+	color: #2271b1;
+	border-bottom-color: #2271b1;
+}
+.murailles-tabs-nav li a .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+}
+
+/* ── Tab Panels ── */
+.murailles-tab-panel {
+	display: none;
+	padding: 20px;
+}
+.murailles-tab-panel.active {
+	display: block;
+}
+
+/* ── Field Rows ── */
+.murailles-field-row {
+	display: flex;
+	align-items: flex-start;
+	padding: 10px 0;
+	border-bottom: 1px solid #f0f0f1;
+}
+.murailles-field-row:last-child {
+	border-bottom: none;
+}
+.murailles-field-label {
+	flex: 0 0 200px;
+	padding-top: 6px;
+	font-weight: 600;
+	color: #1d2327;
+	font-size: 13px;
+}
+.murailles-field-label small {
+	display: block;
+	font-weight: 400;
+	color: #787c82;
+	font-size: 11.5px;
+	margin-top: 2px;
+}
+.murailles-field-input {
+	flex: 1;
+}
+.murailles-field-input input[type="text"],
+.murailles-field-input input[type="number"],
+.murailles-field-input input[type="url"],
+.murailles-field-input input[type="date"],
+.murailles-field-input textarea,
+.murailles-field-input select {
+	width: 100%;
+	max-width: 500px;
+}
+.murailles-field-input textarea {
+	min-height: 80px;
+}
+
+/* ── Section Headers inside tabs ── */
+.murailles-section-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: #1d2327;
+	padding: 15px 0 8px;
+	margin: 10px 0 5px;
+	border-bottom: 2px solid #2271b1;
+}
+
+/* ── Amenities Checkboxes Grid ── */
+.murailles-amenities-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 8px;
+}
+.murailles-amenity-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 10px;
+	background: #f6f7f7;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background .1s;
+}
+.murailles-amenity-item:hover {
+	background: #e8f0fe;
+}
+.murailles-amenity-item input[type="checkbox"] {
+	margin: 0;
+}
+.murailles-amenity-item label {
+	cursor: pointer;
+	font-size: 13px;
+	margin: 0;
+}
+
+/* ── Gallery Grid ── */
+.murailles-gallery-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 12px;
+}
+.murailles-gallery-item {
+	position: relative;
+	width: 120px;
+	height: 90px;
+	border-radius: 6px;
+	overflow: hidden;
+	border: 2px solid #ddd;
+}
+.murailles-gallery-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.murailles-gallery-item .remove-image {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	background: rgba(220,50,50,.9);
+	color: #fff;
+	border: none;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	font-size: 14px;
+	line-height: 18px;
+	text-align: center;
+	cursor: pointer;
+}
+
+/* ── Custom Fields Table ── */
+.murailles-custom-fields-table {
+	width: 100%;
+	max-width: 600px;
+}
+.murailles-custom-fields-table th {
+	text-align: left;
+	padding: 6px 8px;
+	font-size: 12px;
+	background: #f0f0f1;
+}
+.murailles-custom-fields-table td {
+	padding: 6px 8px;
+}
+.murailles-custom-fields-table input {
+	width: 100%;
+}
+
+/* ── Required Field Asterisk ── */
+.murailles-required {
+	color: #d63638;
+	font-weight: 700;
+	font-size: 15px;
+}
+.murailles-field-row input:invalid,
+.murailles-field-row select:invalid {
+	border-color: #d63638;
+	box-shadow: 0 0 0 1px #d63638;
+}
+
+/* ── Map embed help text ── */
+.murailles-field-input .description code {
+	background: #f0f0f1;
+	padding: 1px 5px;
+	border-radius: 3px;
+	font-size: 12px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 782px) {
+	.murailles-tabs-nav {
+		flex-direction: column;
+	}
+	.murailles-field-row {
+		flex-direction: column;
+	}
+	.murailles-field-label {
+		flex: none;
+		padding-bottom: 4px;
+	}
+}

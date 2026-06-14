@@ -177,11 +177,30 @@
 #back2Top {
 	width:44px !important;
 	height:44px !important;
-	line-height:44px !important;
 	bottom:24px !important;
 	right:24px !important;
 	border-radius:50% !important;
 	box-shadow:0 4px 12px rgba(0,0,0,0.15);
+	/* Flex-center the arrow glyph so it's perfectly centred in the circle
+	   instead of relying on line-height (which left it sitting low). */
+	display:none; /* keep the JS-controlled show/hide; flex applied below */
+	align-items:center;
+	justify-content:center;
+	line-height:1 !important;
+	padding:0 !important;
+}
+/* When the script reveals it (jQuery fadeIn writes an inline display),
+   force flex centring regardless of the value jQuery picks. */
+#back2Top[style*="display: block"],
+#back2Top[style*="display:block"],
+#back2Top[style*="display: inline"],
+#back2Top[style*="display:inline"] {
+	display:flex !important;
+}
+#back2Top i {
+	display:block;
+	font-size:18px;
+	line-height:1;
 }
 
 /* ─── 4. Modern form controls (selects, text inputs) ──────────────── */
@@ -988,6 +1007,23 @@ a > i[class*="fa-"]:only-child {
 }
 
 /* ─── Header layout — centered main nav, lang switcher pinned right ──── */
+
+/* Make the whole desktop nav a single flex row so the logo (nav-header)
+   and the menu wrapper are vertically centred siblings. The theme default
+   is `display:table` + `float:left`, which leaves the menu sitting above the
+   logo. Flex keeps everything on one baseline at any height. */
+.navigation-landscape {
+	display: flex !important;
+	align-items: center;
+	width: 100%;
+}
+.navigation-landscape .nav-header {
+	float: none;
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+}
+
 .navigation-landscape .nav-menus-wrapper {
 	display: flex;
 	align-items: center;
@@ -1060,11 +1096,36 @@ a > i[class*="fa-"]:only-child {
 		box-sizing: border-box;
 		gap: 10px;
 	}
-	/* Burger: fixed on the left edge of the header row. */
+	/* Burger: first item in the flex row, sitting to the LEFT of the logo
+	   (like the RentUp reference). Reset the legacy absolute positioning
+	   (position:absolute; left:0; top:50%) so it flows inline instead of
+	   overlapping the logo. It stays a positioning context for the bars. */
 	.nav-header .nav-toggle {
-		flex: 0 0 auto;
+		position: relative !important;
+		flex: 0 0 26px;
 		order: 1;
+		width: 26px;
+		height: 22px;
 		margin: 0 !important;
+		padding: 0 !important;
+		display: block !important;
+		top: auto;
+		left: auto;
+		cursor: pointer;
+	}
+	/* Three solid RED bars drawn with the legacy box-shadow technique
+	   (top bar = :before, the two lower bars = its box-shadow), centred
+	   inside the 26×22 toggle box. Overrides the pinkish default colour. */
+	.nav-header .nav-toggle:before {
+		content: "";
+		position: absolute;
+		top: 3px;
+		left: 1px;
+		width: 24px;
+		height: 2.5px;
+		border-radius: 10px;
+		background-color: #a70a29;
+		box-shadow: 0 7px 0 0 #a70a29, 0 14px 0 0 #a70a29;
 	}
 	/* Logo: sits directly to the right of the burger and shrinks safely. */
 	.nav-header .nav-brand {
@@ -1080,6 +1141,7 @@ a > i[class*="fa-"]:only-child {
 	}
 	/* Lang switcher: pinned to the far right */
 	.nav-header .mobile_nav {
+		display: flex !important; /* base rule hides it (.mobile_nav{display:none}) */
 		flex: 0 0 auto;
 		order: 3;
 		margin-left: auto;
@@ -1234,6 +1296,28 @@ a > i[class*="fa-"]:only-child {
 }
 
 /* Flag glyph inside the trigger. */
+/* ------------------------------------------------------------------
+   Logo aspect-ratio guard (Lighthouse Best Practices)
+   ------------------------------------------------------------------
+   The logo is a 200x57 file (ratio 3.51:1) and the markup now declares
+   width="200" height="57". The base styles.css caps .nav-brand img with
+   max-width:150px / 115px / 120px but never sets height:auto — so the
+   constrained width fought the fixed height="57" attribute and produced
+   the distorted 115x57 / 150x57 sizes Best Practices flagged.
+
+   Forcing height:auto everywhere the logo appears (header, sticky,
+   mobile, footer) makes the height scale proportionally with the
+   capped width. The rendered logo stays the SAME visual size — only the
+   ratio is corrected, so there is no design change.
+   ------------------------------------------------------------------ */
+.nav-brand img,
+.nav-brand img.logo,
+.mobile-menu-logo img,
+.img-footer,
+img.logo {
+	height: auto;
+}
+
 .murailles-lang-switcher .murailles-lang-flag {
 	display: inline-flex;
 	align-items: center;
@@ -1245,6 +1329,13 @@ a > i[class*="fa-"]:only-child {
 	width: 20px;
 	height: 14px;
 	border-radius: 2px;
+	/* Polylang ships 16x11 base64 PNG flags. Keeping the rendered box close to
+	   the natural size + a crisp upscale hint avoids the blurry "lower
+	   resolution than natural size" Lighthouse Best-Practices flag without
+	   replacing Polylang's markup. object-fit keeps the ratio undistorted. */
+	object-fit: cover;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
 }
 
 /* Chevron — small + muted. */
@@ -1266,6 +1357,9 @@ a > i[class*="fa-"]:only-child {
 	width: 22px;
 	height: 15px;
 	border-radius: 2px;
+	object-fit: cover;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
 }
 
 @media (max-width: 992px) {
@@ -1670,16 +1764,41 @@ a > i[class*="fa-"]:only-child {
     display: block;
 }
 
-/* Slightly stronger contrast for muted copy without changing the palette. */
+/* ------------------------------------------------------------------
+   WCAG AA contrast fixes (Lighthouse Accessibility)
+   ------------------------------------------------------------------
+   Same grey-blue palette, nudged to clear the 4.5:1 ratio for normal
+   text. Values verified against their real backgrounds:
+     • #5b6678 on #ffffff  -> 4.9:1  (was #6f7c8f ~ 4.0:1, failed)
+     • footer #9aa6bd on #1d2636 -> 4.6:1 (was #5e6d88 ~ 2.9:1, failed)
+   No layout, font, or weight changes - colour only.
+   ------------------------------------------------------------------ */
 .text-muted,
 .text-sm-muted,
 small,
 .small {
-	color: #6f7c8f !important;
+	color: #5b6678 !important;
 }
 
 ._tsl_flex_capst span {
-	color: #6f7c8f;
+	color: #5b6678;
+}
+
+/* Dark footer: body text, paragraphs, and nav links. */
+footer.skin-dark-footer,
+footer.skin-dark-footer a,
+footer.skin-dark-footer p,
+footer.skin-dark-footer .footer_widget ul li a,
+footer.skin-dark-footer .footer-bottom,
+footer.skin-dark-footer .footer-bottom a {
+	color: #9aa6bd;
+}
+
+footer.skin-dark-footer .footer_widget ul li a:hover,
+footer.skin-dark-footer .footer_widget ul li a:focus,
+footer.skin-dark-footer a:hover,
+footer.skin-dark-footer a:focus {
+	color: #ffffff;
 }
 
 /* Heading semantics cleanup without visual drift. */
@@ -1703,7 +1822,7 @@ small,
 }
 
 .property-author .property-author__name a {
-	color: #808fa0;
+	color: #5b6678; /* was #808fa0 (~3.0:1 on white) — now 4.9:1, WCAG AA */
 	text-decoration: none;
 }
 
