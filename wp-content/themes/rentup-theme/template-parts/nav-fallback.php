@@ -16,8 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$base = murailles_bien_url();
-
 /**
  * The _property_action meta is stored as the literal language-specific string
  * (FR posts hold "A Vendre" / "A Louer", EN posts hold "For Sale" / "For Rent").
@@ -31,11 +29,11 @@ $ACT_RENT = ( $mu_lang === 'en' ) ? 'For Rent' : 'A Louer';
  * Build a filtered archive URL from an action + category slug.
  * Either arg can be empty to omit that filter.
  */
-$flt = function ( $action, $ptype = '' ) use ( $base ) {
-	$args = array();
-	if ( $action ) { $args['action_t'] = $action; }
-	if ( $ptype )  { $args['ptype']    = $ptype; }
-	return esc_url( $args ? add_query_arg( $args, $base ) : $base );
+$flt = function ( $action, $ptype = '' ) {
+	return esc_url( murailles_property_filter_url( array(
+		'action' => $action,
+		'ptype'  => $ptype,
+	) ) );
 };
 ?>
 <ul class="nav-menu">
@@ -83,7 +81,7 @@ $flt = function ( $action, $ptype = '' ) use ( $base ) {
 	</li>
 
 	<!-- 4. Informations -->
-	<li><a href="#"><?php murailles_t( 'Informations' ); ?><span class="submenu-indicator"></span></a>
+	<li><a href="<?php echo esc_url( home_url( '/assistance-conseils/' ) ); ?>"><?php murailles_t( 'Informations' ); ?><span class="submenu-indicator"></span></a>
 		<ul class="nav-dropdown nav-submenu">
 			<li><a href="<?php echo esc_url( home_url( '/assistance-conseils/' ) ); ?>"><?php murailles_t( 'Assistance & conseils' ); ?></a></li>
 			<li><a href="<?php echo esc_url( home_url( '/histoire-marrakech/' ) ); ?>"><?php murailles_t( 'Histoire de Marrakech' ); ?></a></li>

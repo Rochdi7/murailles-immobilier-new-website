@@ -345,8 +345,6 @@ function murailles_enqueue_styles()
 	// .slick-slide display:block) every slide stays display:none after JS init,
 	// which is why the single-property mobile gallery was blank. styles.css has
 	// only a few helper overrides but lacks the core layout rules.
-	wp_enqueue_style('murailles-slick', $theme_uri . '/assets/css/slick.css', array('murailles-styles'), $ver);
-
 	// Font Awesome 6 from CDN — bundled CSS lacks FA6 class names (fa-magnifying-glass,
 	// fa-scale-balanced, etc.). Loaded AFTER the theme CSS so its rules win.
 	wp_enqueue_style('murailles-fa6', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css', array('murailles-styles'), '6.5.2');
@@ -681,6 +679,110 @@ if ( ! function_exists( 'murailles_bien_url' ) ) {
 	}
 }
 
+if ( ! function_exists( 'murailles_property_action_slug' ) ) {
+	function murailles_property_action_slug( $action ) {
+		$slug = sanitize_title( (string) $action );
+		if ( '' === $slug ) {
+			return '';
+		}
+
+		$map = array(
+			'a-vendre' => 'a-vendre',
+			'a-louer'  => 'a-louer',
+			'for-sale' => 'for-sale',
+			'for-rent' => 'for-rent',
+		);
+
+		return isset( $map[ $slug ] ) ? $map[ $slug ] : $slug;
+	}
+}
+
+if ( ! function_exists( 'murailles_property_action_value' ) ) {
+	function murailles_property_action_value( $action ) {
+		$slug = murailles_property_action_slug( $action );
+		$lang = function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr';
+
+		switch ( $slug ) {
+			case 'a-vendre':
+				return 'en' === $lang ? 'For Sale' : 'A Vendre';
+			case 'a-louer':
+				return 'en' === $lang ? 'For Rent' : 'A Louer';
+			case 'for-sale':
+				return 'For Sale';
+			case 'for-rent':
+				return 'For Rent';
+		}
+
+		return sanitize_text_field( (string) $action );
+	}
+}
+
+if ( ! function_exists( 'murailles_property_filter_url' ) ) {
+	function murailles_property_filter_url( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'action'   => '',
+				'ptype'    => '',
+				'location' => '',
+			)
+		);
+
+		$base        = murailles_bien_url();
+		$pretty_urls = ! empty( get_option( 'permalink_structure' ) );
+
+		if ( ! $pretty_urls ) {
+			$query = array();
+			if ( '' !== $args['action'] ) {
+				$query['action_t'] = murailles_property_action_value( $args['action'] );
+			}
+			if ( '' !== $args['ptype'] ) {
+				$query['ptype'] = sanitize_title( (string) $args['ptype'] );
+			}
+			if ( '' !== $args['location'] ) {
+				$query['location'] = sanitize_title( (string) $args['location'] );
+			}
+			return $query ? add_query_arg( $query, $base ) : $base;
+		}
+
+		$base = trailingslashit( $base );
+
+		if ( '' !== $args['location'] ) {
+			return $base . 'ville/' . rawurlencode( sanitize_title( (string) $args['location'] ) ) . '/';
+		}
+
+		if ( '' !== $args['action'] ) {
+			$url = $base . murailles_property_action_slug( $args['action'] ) . '/';
+			if ( '' !== $args['ptype'] ) {
+				$url .= sanitize_title( (string) $args['ptype'] ) . '/';
+			}
+			return $url;
+		}
+
+		if ( '' !== $args['ptype'] ) {
+			return add_query_arg( array( 'ptype' => sanitize_title( (string) $args['ptype'] ) ), $base );
+		}
+
+		return $base;
+	}
+}
+
+add_filter( 'query_vars', function ( $vars ) {
+	$vars[] = 'action_t';
+	$vars[] = 'ptype';
+	$vars[] = 'location';
+	return array_values( array_unique( $vars ) );
+} );
+
+add_action( 'init', function () {
+	add_rewrite_rule( '^bien/(a-vendre|a-louer|for-sale|for-rent)/?$', 'index.php?post_type=property&action_t=$matches[1]', 'top' );
+	add_rewrite_rule( '^bien/(a-vendre|a-louer|for-sale|for-rent)/([^/]+)/?$', 'index.php?post_type=property&action_t=$matches[1]&ptype=$matches[2]', 'top' );
+	add_rewrite_rule( '^bien/ville/([^/]+)/?$', 'index.php?post_type=property&location=$matches[1]', 'top' );
+	add_rewrite_rule( '^bien/ville/([^/]+)/page/([0-9]+)/?$', 'index.php?post_type=property&location=$matches[1]&paged=$matches[2]', 'top' );
+	add_rewrite_rule( '^bien/(a-vendre|a-louer|for-sale|for-rent)/page/([0-9]+)/?$', 'index.php?post_type=property&action_t=$matches[1]&paged=$matches[2]', 'top' );
+	add_rewrite_rule( '^bien/(a-vendre|a-louer|for-sale|for-rent)/([^/]+)/page/([0-9]+)/?$', 'index.php?post_type=property&action_t=$matches[1]&ptype=$matches[2]&paged=$matches[3]', 'top' );
+}, 20 );
+
 /**
  * Render the current page's saved editor content inside otherwise static
  * templates so WPBakery, shortcodes, and core blocks still output normally.
@@ -779,7 +881,15 @@ function murailles_img($filename)
 function murailles_find_seed_page( $slug, $lang = '', $title = '' ) {
 	global $wpdb;
 
-	$candidates = $wpdb->get_results(
+	// Pass 1 — exact slug or exact title. This is the normal, correct match.
+	// Pass 2 — fall back to "-N" suffixed slugs (e.g. about-us-2) left behind by the old
+	// insert-then-set-language bug, where WordPress force-suffixed the second-language page.
+	// The suffix fallback is title-guarded so it never swallows legitimately distinct slugs
+	// such as home-2/home-3 ("Home 2", "Home 3"), which carry their own titles.
+	$has_pll        = function_exists( 'pll_get_post_language' );
+	$suffix_pattern = '^' . preg_quote( $slug, '' ) . '-[0-9]+$';
+
+	$exact = $wpdb->get_results(
 		$wpdb->prepare(
 			"SELECT ID FROM {$wpdb->posts}
 			WHERE post_type = 'page'
@@ -791,26 +901,74 @@ function murailles_find_seed_page( $slug, $lang = '', $title = '' ) {
 		)
 	);
 
-	if ( empty( $candidates ) ) {
-		return null;
-	}
+	$suffixed = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT ID FROM {$wpdb->posts}
+			WHERE post_type = 'page'
+				AND post_status IN ('publish', 'draft', 'private')
+				AND post_name REGEXP %s
+				AND post_title = %s
+			ORDER BY ID ASC",
+			$suffix_pattern,
+			$title
+		)
+	);
 
-	foreach ( $candidates as $candidate ) {
-		$post = get_post( (int) $candidate->ID );
-		if ( ! $post ) {
+	foreach ( array( $exact, $suffixed ) as $candidates ) {
+		if ( empty( $candidates ) ) {
 			continue;
 		}
 
-		if ( '' === $lang || ! function_exists( 'pll_get_post_language' ) ) {
-			return $post;
-		}
+		foreach ( $candidates as $candidate ) {
+			$post = get_post( (int) $candidate->ID );
+			if ( ! $post ) {
+				continue;
+			}
 
-		if ( pll_get_post_language( $post->ID, 'slug' ) === $lang ) {
-			return $post;
+			if ( '' === $lang || ! $has_pll ) {
+				return $post;
+			}
+
+			if ( pll_get_post_language( $post->ID, 'slug' ) === $lang ) {
+				return $post;
+			}
 		}
 	}
 
 	return null;
+}
+
+/**
+ * Force a page's slug back to the intended value after its Polylang language is set.
+ *
+ * wp_insert_post() runs before pll_set_post_language(), so at insert time WordPress
+ * does not yet know the new page belongs to a different language. If the slug is already
+ * used by the other-language page, WordPress appends a "-2"/"-3" suffix. Once the language
+ * is assigned, Polylang scopes slug uniqueness per language, so we can safely restore the
+ * bare slug here without creating a duplicate. No-op if the slug is already correct.
+ *
+ * @param int    $post_id Page ID whose language has just been set.
+ * @param string $slug    The intended (bare) slug.
+ */
+function murailles_force_seed_slug( $post_id, $slug ) {
+	$post_id = (int) $post_id;
+	$slug    = sanitize_title( $slug );
+
+	if ( ! $post_id || '' === $slug ) {
+		return;
+	}
+
+	$current = get_post_field( 'post_name', $post_id );
+	if ( $current === $slug ) {
+		return;
+	}
+
+	wp_update_post(
+		array(
+			'ID'        => $post_id,
+			'post_name' => $slug,
+		)
+	);
 }
 
 function murailles_copy_seed_page_data( $target_id, $source_id ) {
@@ -1101,6 +1259,7 @@ function murailles_create_pages( $force = false, $repair_existing = false )
 
 			if ( $default_id && ! is_wp_error( $default_id ) ) {
 				pll_set_post_language( $default_id, $source_lang );
+				murailles_force_seed_slug( $default_id, $slug );
 				$default_page = get_post( $default_id );
 				$default_created = (bool) $default_page;
 				if ( $english_page ) {
@@ -1127,6 +1286,7 @@ function murailles_create_pages( $force = false, $repair_existing = false )
 
 			if ( $english_id && ! is_wp_error( $english_id ) ) {
 				pll_set_post_language( $english_id, $english_lang );
+				murailles_force_seed_slug( $english_id, $slug );
 				$english_page = get_post( $english_id );
 				$english_created = (bool) $english_page;
 				if ( $default_page ) {
@@ -1311,6 +1471,28 @@ function murailles_is_production_like_environment() {
 
 	return true;
 }
+
+/**
+ * Keep front-end pages indexable on production even if the local/staging
+ * "discourage search engines" flag was accidentally copied to production.
+ *
+ * Admin screens still read the real database option so the warning remains
+ * visible until the setting is corrected in Settings > Reading.
+ *
+ * @return string|false
+ */
+function murailles_force_frontend_blog_public_on_production() {
+	if ( is_admin() || wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return false;
+	}
+
+	if ( ! murailles_is_production_like_environment() ) {
+		return false;
+	}
+
+	return '1';
+}
+add_filter( 'pre_option_blog_public', 'murailles_force_frontend_blog_public_on_production' );
 
 /**
  * Show a strong admin warning if Novamira MCP is active on production.

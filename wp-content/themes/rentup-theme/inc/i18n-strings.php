@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Pre-registered English translations for static UI strings.
  *
@@ -127,8 +127,8 @@ function murailles_i18n_dictionary() {
 
 		// === Front page: hero ==============================================
 		'Trouvez votre prochain bien'  => 'Find your next property',
-		'Découvrez les nouveaux biens immobiliers à la une dans votre ville.'
-			=> 'Discover the new featured properties in your city.',
+		'Découvrez les nouveaux biens immobiliers à la une dans votre ville. Trouvez votre prochain bien immobilier à Marrakech avec Murailles Immobilier.'
+			=> 'Discover the new featured properties in your city. Find your next property in Marrakech with Murailles Immobilier.',
 		'Ville / Quartier'             => 'City / Neighbourhood',
 		'Type de bien'                 => 'Property type',
 		'Fourchette de prix'           => 'Price range',

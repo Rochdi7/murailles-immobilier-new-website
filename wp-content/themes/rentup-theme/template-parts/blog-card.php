@@ -55,8 +55,8 @@ if ( ! $author_avatar ) {
 
 		<div class="modern_property_footer">
 			<div class="property-author">
-				<div class="path-img"><a href="<?php echo esc_url( $author_url ); ?>" tabindex="-1"><img src="<?php echo esc_url( $author_avatar ); ?>" class="img-fluid" alt="<?php echo esc_attr( $author_name ); ?>"></a></div>
-				<h5><a href="<?php echo esc_url( $author_url ); ?>" tabindex="-1"><?php echo esc_html( $author_name ); ?></a></h5>
+				<div class="path-img"><a href="<?php echo esc_url( $author_url ); ?>" aria-label="<?php echo esc_attr( $author_name ); ?>"><img src="<?php echo esc_url( $author_avatar ); ?>" class="img-fluid" alt="<?php echo esc_attr( $author_name ); ?>"></a></div>
+				<h5><a href="<?php echo esc_url( $author_url ); ?>"><?php echo esc_html( $author_name ); ?></a></h5>
 			</div>
 			<span class="article-pulish-date"><i class="ti-comment-alt me-2"></i><?php echo esc_html( $comment_cnt ); ?></span>
 		</div>

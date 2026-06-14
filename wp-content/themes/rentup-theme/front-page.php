@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Front Page Template
  *
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 $murailles_front_page_id           = get_the_ID();
 $murailles_front_hero_bg           = murailles_page_section_image_url( 'hero_bg_image_id', murailles_img( 'villa-luxe-marrakech-hero.webp' ), $murailles_front_page_id, true );
 $murailles_front_title             = murailles_page_section_meta( 'hero_title', murailles_t( 'Trouvez votre prochain bien', false ), $murailles_front_page_id );
-$murailles_front_subtitle          = murailles_page_section_meta( 'hero_subtitle', murailles_t( 'Découvrez les nouveaux biens immobiliers à la une dans votre ville.', false ), $murailles_front_page_id );
+$murailles_front_subtitle          = murailles_page_section_meta( 'hero_subtitle', murailles_t( 'Découvrez les nouveaux biens immobiliers à la une dans votre ville. Trouvez votre prochain bien immobilier à Marrakech avec Murailles Immobilier.', false ), $murailles_front_page_id );
 $murailles_front_adm_heading       = murailles_page_section_meta( 'adm_heading', murailles_t( 'Affaires du Mois', false ), $murailles_front_page_id );
 $murailles_front_adm_subtitle      = murailles_page_section_meta( 'adm_subtitle', murailles_t( 'Notre sélection du moment : les meilleures opportunités immobilières à ne pas manquer ce mois-ci.', false ), $murailles_front_page_id );
 $murailles_front_featured_heading  = murailles_page_section_meta( 'featured_heading', murailles_t( 'Biens immobiliers à la une', false ), $murailles_front_page_id );
@@ -56,7 +56,10 @@ $murailles_front_repeat_defaults   = murailles_page_editor_repeatable_defaults( 
 $murailles_front_service_cards     = murailles_get_repeatable_meta( '_murailles_service_cards', isset( $murailles_front_repeat_defaults['_murailles_service_cards'] ) ? $murailles_front_repeat_defaults['_murailles_service_cards'] : array(), $murailles_front_page_id );
 $murailles_front_commitment_cards  = murailles_get_repeatable_meta( '_murailles_commitment_cards', isset( $murailles_front_repeat_defaults['_murailles_commitment_cards'] ) ? $murailles_front_repeat_defaults['_murailles_commitment_cards'] : array(), $murailles_front_page_id );
 $murailles_front_city_tiles        = murailles_get_repeatable_meta( '_murailles_city_tiles', isset( $murailles_front_repeat_defaults['_murailles_city_tiles'] ) ? $murailles_front_repeat_defaults['_murailles_city_tiles'] : array(), $murailles_front_page_id );
-$murailles_front_home_testimonials = murailles_get_repeatable_meta( '_murailles_home_testimonials', isset( $murailles_front_repeat_defaults['_murailles_home_testimonials'] ) ? $murailles_front_repeat_defaults['_murailles_home_testimonials'] : array(), $murailles_front_page_id );
+$murailles_front_home_testimonials_default = murailles_get_repeatable_meta( '_murailles_home_testimonials', isset( $murailles_front_repeat_defaults['_murailles_home_testimonials'] ) ? $murailles_front_repeat_defaults['_murailles_home_testimonials'] : array(), $murailles_front_page_id );
+$murailles_front_home_testimonials = function_exists( 'murailles_get_theme_option_testimonials' )
+	? murailles_get_theme_option_testimonials( '', $murailles_front_home_testimonials_default )
+	: $murailles_front_home_testimonials_default;
 $murailles_front_commitment        = ! empty( $murailles_front_commitment_cards[0] ) ? $murailles_front_commitment_cards[0] : array();
 $murailles_front_city_classes      = array(
 	'col-lg-4 col-md-4 col-sm-6',
@@ -457,7 +460,7 @@ get_header();
 
 			<!-- ============================ Biens Start ================================== -->
 			<?php if ( murailles_page_section_is_visible( 'biens-en-vedette', $murailles_front_page_id ) ) : ?>
-			<section class="pt-0">
+			<section class="pt-5 mt-4">
 				<div class="container">
 					
 					<div class="row justify-content-center">
@@ -930,7 +933,7 @@ get_header();
 			<!-- ============================ Qui sommes nous End ================================== -->
 
 			<!-- ============================ Property By Location ================================== -->
-			<?php if ( murailles_page_section_is_visible( 'villes-phares', $murailles_front_page_id ) ) : ?>
+			<?php if ( false && murailles_page_section_is_visible( 'villes-phares', $murailles_front_page_id ) ) : ?>
 			<section>
 				<div class="container">
 				
@@ -967,7 +970,7 @@ get_header();
 						<?php endforeach; ?>
 						<?php if ( false ) : ?>
 						<div class="col-lg-4 col-md-4 col-sm-6">
-							<a href="<?php echo esc_url( add_query_arg( 'location', 'casablanca', murailles_bien_url() ) ); ?>" class="img-wrap">
+							<a href="<?php echo esc_url( murailles_property_filter_url( array( 'location' => 'casablanca' ) ) ); ?>" class="img-wrap">
 									<div class="location_wrap_content visible">
 										<div class="location_wrap_content_first">
 											<h4><?php murailles_t( 'Casablanca, Maroc' ); ?></h4>
@@ -980,7 +983,7 @@ get_header();
 						</div>
 
 						<div class="col-lg-4 col-md-4 col-sm-6">
-							<a href="<?php echo esc_url( add_query_arg( 'location', 'marrakech', murailles_bien_url() ) ); ?>" class="img-wrap">
+							<a href="<?php echo esc_url( murailles_property_filter_url( array( 'location' => 'marrakech' ) ) ); ?>" class="img-wrap">
 									<div class="location_wrap_content visible">
 										<div class="location_wrap_content_first">
 											<h4><?php murailles_t( 'Marrakech, Maroc' ); ?></h4>
@@ -993,7 +996,7 @@ get_header();
 						</div>
 
 						<div class="col-lg-4 col-md-4 col-sm-6">
-							<a href="<?php echo esc_url( add_query_arg( 'location', 'rabat', murailles_bien_url() ) ); ?>" class="img-wrap">
+							<a href="<?php echo esc_url( murailles_property_filter_url( array( 'location' => 'rabat' ) ) ); ?>" class="img-wrap">
 									<div class="location_wrap_content visible">
 										<div class="location_wrap_content_first">
 											<h4><?php murailles_t( 'Rabat, Maroc' ); ?></h4>
@@ -1006,7 +1009,7 @@ get_header();
 						</div>
 
 						<div class="col-lg-6 col-md-6 col-sm-6">
-							<a href="<?php echo esc_url( add_query_arg( 'location', 'tanger', murailles_bien_url() ) ); ?>" class="img-wrap">
+							<a href="<?php echo esc_url( murailles_property_filter_url( array( 'location' => 'tanger' ) ) ); ?>" class="img-wrap">
 									<div class="location_wrap_content visible">
 										<div class="location_wrap_content_first">
 											<h4><?php murailles_t( 'Tanger, Maroc' ); ?></h4>
@@ -1019,7 +1022,7 @@ get_header();
 						</div>
 
 						<div class="col-lg-6 col-md-6 col-sm-6">
-							<a href="<?php echo esc_url( add_query_arg( 'location', 'fes', murailles_bien_url() ) ); ?>" class="img-wrap">
+							<a href="<?php echo esc_url( murailles_property_filter_url( array( 'location' => 'fes' ) ) ); ?>" class="img-wrap">
 									<div class="location_wrap_content visible">
 										<div class="location_wrap_content_first">
 											<h4><?php murailles_t( 'Fès, Maroc' ); ?></h4>
@@ -1306,7 +1309,7 @@ get_header();
 
 								<div class="modern_property_footer">
 									<div class="property-author">
-										<div class="path-img"><a href="<?php echo esc_url( $mu_aurl ); ?>" tabindex="-1"><img src="<?php echo esc_url( $mu_aav ); ?>" class="img-fluid" alt=""></a></div>
+										<div class="path-img"><a href="<?php echo esc_url( $mu_aurl ); ?>" tabindex="-1" aria-label="<?php echo esc_attr( $mu_aname ); ?>"><img src="<?php echo esc_url( $mu_aav ); ?>" class="img-fluid" alt="<?php echo esc_attr( $mu_aname ); ?>"></a></div>
 										<h5><a href="<?php echo esc_url( $mu_aurl ); ?>" tabindex="-1"><?php echo esc_html( $mu_aname ); ?></a></h5>
 									</div>
 									<span class="article-pulish-date"><i class="ti-comment-alt me-2"></i><?php echo (int) $mu_comm; ?></span>

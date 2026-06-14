@@ -23,7 +23,7 @@ if (! defined('ABSPATH')) {
 
 				<div class="col-lg-5 col-md-5">
 					<div class="footer_widget">
-						<img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" class="img-footer small mb-4" alt="" />
+						<img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" class="img-footer small mb-4" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" width="200" height="57" decoding="async" />
 						<h4 class="extream mb-3"><?php murailles_t("Besoin d'aide pour"); ?><br><?php murailles_t('votre projet ?'); ?></h4>
 						<p><?php murailles_t('Recevez chaque mois nos nouvelles annonces, conseils et actualités du marché immobilier marocain directement dans votre boîte mail.'); ?></p>
 						<form class="foot-news-last mt-4 murailles-form" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
@@ -140,7 +140,7 @@ if (! defined('ABSPATH')) {
 </footer>
 <!-- ============================ Footer End ================================== -->
 
-<a id="back2Top" class="top-scroll" title="<?php echo esc_attr(murailles_t('Retour en haut', false)); ?>" href="#"><i class="ti-arrow-up"></i></a>
+<a id="back2Top" class="top-scroll" title="<?php echo esc_attr(murailles_t('Retour en haut', false)); ?>" href="#main-wrapper" aria-label="<?php echo esc_attr(murailles_t('Retour en haut', false)); ?>"><i class="ti-arrow-up"></i></a>
 
 </main>
 </div>

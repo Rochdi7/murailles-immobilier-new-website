@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Page editor bridge for template-driven pages.
  *
@@ -589,7 +589,7 @@ function murailles_page_editor_default_values( $template_key, $post_id = 0 ) {
 			return array(
 				'hero_bg_image_id'        => murailles_img( 'villa-luxe-marrakech-hero.webp' ),
 				'hero_title'              => murailles_t( 'Trouvez votre prochain bien', false ),
-				'hero_subtitle'           => murailles_t( 'Découvrez les nouveaux biens immobiliers à la une dans votre ville.', false ),
+				'hero_subtitle'           => murailles_t( 'Découvrez les nouveaux biens immobiliers à la une dans votre ville. Trouvez votre prochain bien immobilier à Marrakech avec Murailles Immobilier.', false ),
 				'adm_heading'             => murailles_t( 'Affaires du Mois', false ),
 				'adm_subtitle'            => murailles_t( 'Notre sélection du moment : les meilleures opportunités immobilières à ne pas manquer ce mois-ci.', false ),
 				'featured_heading'        => murailles_t( 'Biens immobiliers à la une', false ),
@@ -957,7 +957,7 @@ function murailles_page_editor_repeatable_defaults( $template_key ) {
 					array(
 						'title'        => murailles_t( 'Casablanca, Maroc', false ),
 						'button_label' => murailles_t( 'Voir les biens', false ),
-						'link_url'     => add_query_arg( 'location', 'casablanca', murailles_bien_url() ),
+						'link_url'     => murailles_property_filter_url( array( 'location' => 'casablanca' ) ),
 						'image_id'     => 0,
 						'image_url'    => murailles_img( 'city-3.png' ),
 						'alt_text'     => murailles_t( 'Casablanca, Maroc', false ),
@@ -965,7 +965,7 @@ function murailles_page_editor_repeatable_defaults( $template_key ) {
 					array(
 						'title'        => murailles_t( 'Marrakech, Maroc', false ),
 						'button_label' => murailles_t( 'Voir les biens', false ),
-						'link_url'     => add_query_arg( 'location', 'marrakech', murailles_bien_url() ),
+						'link_url'     => murailles_property_filter_url( array( 'location' => 'marrakech' ) ),
 						'image_id'     => 0,
 						'image_url'    => murailles_img( 'city-7.png' ),
 						'alt_text'     => murailles_t( 'Marrakech, Maroc', false ),
@@ -973,7 +973,7 @@ function murailles_page_editor_repeatable_defaults( $template_key ) {
 					array(
 						'title'        => murailles_t( 'Rabat, Maroc', false ),
 						'button_label' => murailles_t( 'Voir les biens', false ),
-						'link_url'     => add_query_arg( 'location', 'rabat', murailles_bien_url() ),
+						'link_url'     => murailles_property_filter_url( array( 'location' => 'rabat' ) ),
 						'image_id'     => 0,
 						'image_url'    => murailles_img( 'city-3.png' ),
 						'alt_text'     => murailles_t( 'Rabat, Maroc', false ),
@@ -981,7 +981,7 @@ function murailles_page_editor_repeatable_defaults( $template_key ) {
 					array(
 						'title'        => murailles_t( 'Tanger, Maroc', false ),
 						'button_label' => murailles_t( 'Voir les biens', false ),
-						'link_url'     => add_query_arg( 'location', 'tanger', murailles_bien_url() ),
+						'link_url'     => murailles_property_filter_url( array( 'location' => 'tanger' ) ),
 						'image_id'     => 0,
 						'image_url'    => murailles_img( 'city-4.png' ),
 						'alt_text'     => murailles_t( 'Tanger, Maroc', false ),
@@ -989,7 +989,7 @@ function murailles_page_editor_repeatable_defaults( $template_key ) {
 					array(
 						'title'        => murailles_t( 'Fès, Maroc', false ),
 						'button_label' => murailles_t( 'Voir les biens', false ),
-						'link_url'     => add_query_arg( 'location', 'fes', murailles_bien_url() ),
+						'link_url'     => murailles_property_filter_url( array( 'location' => 'fes' ) ),
 						'image_id'     => 0,
 						'image_url'    => murailles_img( 'city-5.png' ),
 						'alt_text'     => murailles_t( 'Fès, Maroc', false ),

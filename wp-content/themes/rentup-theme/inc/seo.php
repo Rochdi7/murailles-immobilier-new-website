@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * SEO core: title tags, meta description, robots directives, canonicals.
  *
@@ -89,7 +89,7 @@ add_filter( 'pre_get_document_title', function ( $title ) {
 	}
 
 	if ( is_front_page() ) {
-		$tagline = murailles_t( 'Agence immobilière à Marrakech — riads, villas, appartements', false );
+		$tagline = murailles_t( 'Agence immobilière à Marrakech', false );
 		return sprintf( '%s — %s', $site, $tagline );
 	}
 
@@ -259,6 +259,52 @@ add_filter( 'murailles_seo_description_output', function ( $desc ) {
 
 	return 'Agence immobilière à Marrakech spécialisée dans la vente, location et gestion de riads, villas et appartements au Maroc.';
 }, 20 );
+
+/**
+ * If a third-party SEO plugin stays silent on the front page, inject the
+ * theme fallback meta description without creating duplicates.
+ */
+function murailles_capture_front_page_head_for_meta_description() {
+	if ( is_admin() || ! is_front_page() ) {
+		return;
+	}
+
+	if ( ! defined( 'WPSEO_VERSION' ) && ! defined( 'RANK_MATH_VERSION' ) &&
+		! class_exists( 'AIOSEO\\Plugin\\AIOSEO' ) && ! defined( 'SEOPRESS_VERSION' ) ) {
+		return;
+	}
+
+	$GLOBALS['murailles_head_desc_capture'] = true;
+	ob_start();
+}
+add_action( 'wp_head', 'murailles_capture_front_page_head_for_meta_description', 0 );
+
+function murailles_output_front_page_head_with_meta_description_fallback() {
+	if ( is_admin() || ! is_front_page() || empty( $GLOBALS['murailles_head_desc_capture'] ) || ! ob_get_level() ) {
+		return;
+	}
+
+	unset( $GLOBALS['murailles_head_desc_capture'] );
+	$head = (string) ob_get_clean();
+	$has_description = false !== stripos( $head, '<meta name="description"' )
+		|| false !== stripos( $head, "<meta name='description'" );
+
+	if ( ! $has_description ) {
+		$desc = apply_filters( 'murailles_seo_description_output', murailles_seo_description() );
+		$desc = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( (string) $desc ) ) );
+
+		if ( '' !== $desc ) {
+			if ( function_exists( 'mb_strlen' ) && mb_strlen( $desc ) > 160 ) {
+				$desc = mb_substr( $desc, 0, 157 ) . '...';
+			}
+
+			$head = sprintf( '<meta name="description" content="%s" />' . "\n", esc_attr( $desc ) ) . $head;
+		}
+	}
+
+	echo $head; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+add_action( 'wp_head', 'murailles_output_front_page_head_with_meta_description_fallback', PHP_INT_MAX );
 
 /* ============================================================
  * Register all SEO meta keys for pages, posts, and properties.

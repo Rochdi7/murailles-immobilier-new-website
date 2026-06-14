@@ -35,11 +35,14 @@ $murailles_about_blog_heading = murailles_page_section_meta( 'blog_heading', mur
 $murailles_about_blog_subtitle = murailles_page_section_meta( 'blog_subtitle', murailles_t( 'Conseils, tendances du marché et guides pour acheter, vendre ou louer votre bien immobilier au Maroc.', false ) );
 
 $murailles_about_repeaters = murailles_page_editor_repeatable_defaults( 'page-templates/about-us.php' );
-$murailles_about_testimonials = murailles_get_repeatable_meta(
+$murailles_about_testimonials_default = murailles_get_repeatable_meta(
 	'_murailles_about_testimonials',
 	isset( $murailles_about_repeaters['_murailles_about_testimonials'] ) ? $murailles_about_repeaters['_murailles_about_testimonials'] : array(),
 	$murailles_about_page_id
 );
+$murailles_about_testimonials = function_exists( 'murailles_get_theme_option_testimonials' )
+	? murailles_get_theme_option_testimonials( '', $murailles_about_testimonials_default )
+	: $murailles_about_testimonials_default;
 
 get_header();
 ?>

@@ -210,7 +210,7 @@
 			'background:' + opts.color,
 			'color:#fff',
 			'border:none',
-			'display:flex',
+			'display:none',
 			'align-items:center',
 			'justify-content:center',
 			'font-size:22px',
@@ -270,7 +270,7 @@
 			countEl.style.background = list.length ? '#1a2332' : '#6c757d';
 			countEl.style.opacity    = list.length ? '1' : '0.7';
 		}
-		btn.style.display = 'flex'; // always visible now
+		btn.style.display = list.length ? 'flex' : 'none';
 	}
 
 	function refreshFloatingFavoris() {
@@ -282,7 +282,7 @@
 			countEl.style.background = list.length ? '#1a2332' : '#6c757d';
 			countEl.style.opacity    = list.length ? '1' : '0.7';
 		}
-		btn.style.display = 'flex'; // always visible now
+		btn.style.display = list.length ? 'flex' : 'none';
 	}
 
 	/* ---------- floating modal previews ---------- */

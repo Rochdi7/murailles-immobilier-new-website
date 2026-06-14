@@ -32,6 +32,15 @@ if ( ! function_exists( 'murailles_opt' ) ) {
 }
 
 /**
+ * Remove the X-Powered-By header when PHP exposes it.
+ */
+add_action( 'send_headers', function () {
+	if ( function_exists( 'header_remove' ) ) {
+		@header_remove( 'X-Powered-By' );
+	}
+} );
+
+/**
  * DNS prefetch + preconnect to external origins we know are used on every page.
  */
 add_action('wp_head', function () {
@@ -297,7 +306,7 @@ add_filter('language_attributes', function ($output) {
  */
 add_action('wp_body_open', function () {
 	$label = function_exists('murailles_t') ? murailles_t('Aller au contenu principal', false) : 'Skip to content';
-	echo '<a class="murailles-skip-link screen-reader-text" href="#main-wrapper">' . esc_html($label) . '</a>';
+	echo '<a class="murailles-skip-link screen-reader-text" href="#site-content">' . esc_html($label) . '</a>';
 });
 
 /**
@@ -346,8 +355,8 @@ add_action('template_redirect', function () {
 		// Add width/height to logo + testimonial avatars when missing.
 		// These are the most common CLS culprits on this theme.
 		$known_dims = array(
-			'logo.webp'      => array(165, 40),
-			'logo.png'       => array(165, 40),
+			'logo.webp'      => array(200, 57),
+			'logo.png'       => array(200, 57),
 			'user-1.jpg'     => array(60,  60),
 			'user-2.jpg'     => array(60,  60),
 			'user-3.jpg'     => array(60,  60),

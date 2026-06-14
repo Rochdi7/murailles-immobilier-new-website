@@ -1050,31 +1050,33 @@ a > i[class*="fa-"]:only-child {
 		display: none;
 	}
 
-	/* ── Mobile top bar: logo far-left, hamburger center, lang far-right ── */
+	/* ── Mobile top bar: burger left, logo center-left, lang far-right ── */
 	.nav-header {
 		display: flex !important;
 		align-items: center !important;
-		justify-content: space-between !important;
+		justify-content: flex-start !important;
 		width: 100%;
 		padding: 0 12px;
 		box-sizing: border-box;
+		gap: 10px;
 	}
-	/* Logo: left anchor — never grows/shrinks */
-	.nav-header .nav-brand {
+	/* Burger: fixed on the left edge of the header row. */
+	.nav-header .nav-toggle {
 		flex: 0 0 auto;
 		order: 1;
 		margin: 0 !important;
+	}
+	/* Logo: sits directly to the right of the burger and shrinks safely. */
+	.nav-header .nav-brand {
+		flex: 0 1 auto;
+		order: 2;
+		margin: 0 !important;
+		min-width: 0;
 	}
 	.nav-header .nav-brand img.logo {
 		max-height: 38px;
 		width: auto;
 		display: block;
-	}
-	/* Hamburger: stays in natural document order (order 2 by default) */
-	.nav-header .nav-toggle {
-		flex: 0 0 auto;
-		order: 2;
-		margin: 0 auto; /* centre it in the remaining space */
 	}
 	/* Lang switcher: pinned to the far right */
 	.nav-header .mobile_nav {
@@ -1104,6 +1106,11 @@ a > i[class*="fa-"]:only-child {
 	}
 	#navigation .nav-toggle {
 		display: block !important;
+	}
+	#navigation .nav-toggle:focus-visible,
+	#navigation .nav-menus-wrapper-close-button:focus-visible {
+		outline: 2px solid #144273;
+		outline-offset: 2px;
 	}
 	#navigation.navigation-landscape .nav-menus-wrapper,
 	#navigation.navigation-portrait .nav-menus-wrapper {
@@ -1661,4 +1668,16 @@ a > i[class*="fa-"]:only-child {
     height: 220px;
     object-fit: cover;
     display: block;
+}
+
+/* Slightly stronger contrast for muted copy without changing the palette. */
+.text-muted,
+.text-sm-muted,
+small,
+.small {
+	color: #6f7c8f !important;
+}
+
+._tsl_flex_capst span {
+	color: #6f7c8f;
 }

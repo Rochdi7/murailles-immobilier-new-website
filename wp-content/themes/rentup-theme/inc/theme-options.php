@@ -23,6 +23,117 @@ function murailles_opt( $key, $default = '' ) {
 	return isset( $cache[ $key ] ) && $cache[ $key ] !== '' ? $cache[ $key ] : $default;
 }
 
+function murailles_theme_testimonial_default_rows( $lang = 'fr' ) {
+	$rows = array(
+		'fr' => array(
+			array( 'name' => 'Susan D. Murphy',     'role' => 'Proprietaire',            'photo_url' => 'https://i.pravatar.cc/96?img=47', 'rating' => 4.7, 'text' => "L'equipe d'Agence Murailles m'a accompagnee du premier rendez-vous a la signature. Service reactif, conseils avises et belle selection de biens a Marrakech." ),
+			array( 'name' => 'Maxine E. Gagliardi', 'role' => 'Acheteuse, Marrakech',    'photo_url' => 'https://i.pravatar.cc/96?img=32', 'rating' => 4.5, 'text' => "L'equipe d'Agence Murailles m'a accompagnee du premier rendez-vous a la signature. Service reactif, conseils avises et belle selection de biens a Marrakech." ),
+			array( 'name' => 'Roy M. Cardona',      'role' => 'Investisseur',            'photo_url' => 'https://i.pravatar.cc/96?img=12', 'rating' => 4.9, 'text' => "L'equipe d'Agence Murailles m'a accompagnee du premier rendez-vous a la signature. Service reactif, conseils avises et belle selection de biens a Marrakech." ),
+			array( 'name' => 'Dorothy K. Shipton',  'role' => 'Locataire, Casablanca',   'photo_url' => 'https://i.pravatar.cc/96?img=45', 'rating' => 4.7, 'text' => "L'equipe d'Agence Murailles m'a accompagnee du premier rendez-vous a la signature. Service reactif, conseils avises et belle selection de biens a Marrakech." ),
+			array( 'name' => 'Robert P. McKissack', 'role' => 'Proprietaire',            'photo_url' => 'https://i.pravatar.cc/96?img=68', 'rating' => 4.7, 'text' => "L'equipe d'Agence Murailles m'a accompagnee du premier rendez-vous a la signature. Service reactif, conseils avises et belle selection de biens a Marrakech." ),
+		),
+		'en' => array(
+			array( 'name' => 'Susan D. Murphy',     'role' => 'Owner',                   'photo_url' => 'https://i.pravatar.cc/96?img=47', 'rating' => 4.7, 'text' => 'The Agence Murailles team supported me from the first meeting to the final signature. Responsive service, sound advice and a strong selection of properties in Marrakech.' ),
+			array( 'name' => 'Maxine E. Gagliardi', 'role' => 'Buyer, Marrakech',       'photo_url' => 'https://i.pravatar.cc/96?img=32', 'rating' => 4.5, 'text' => 'The Agence Murailles team supported me from the first meeting to the final signature. Responsive service, sound advice and a strong selection of properties in Marrakech.' ),
+			array( 'name' => 'Roy M. Cardona',      'role' => 'Investor',                'photo_url' => 'https://i.pravatar.cc/96?img=12', 'rating' => 4.9, 'text' => 'The Agence Murailles team supported me from the first meeting to the final signature. Responsive service, sound advice and a strong selection of properties in Marrakech.' ),
+			array( 'name' => 'Dorothy K. Shipton',  'role' => 'Tenant, Casablanca',      'photo_url' => 'https://i.pravatar.cc/96?img=45', 'rating' => 4.7, 'text' => 'The Agence Murailles team supported me from the first meeting to the final signature. Responsive service, sound advice and a strong selection of properties in Marrakech.' ),
+			array( 'name' => 'Robert P. McKissack', 'role' => 'Owner',                   'photo_url' => 'https://i.pravatar.cc/96?img=68', 'rating' => 4.7, 'text' => 'The Agence Murailles team supported me from the first meeting to the final signature. Responsive service, sound advice and a strong selection of properties in Marrakech.' ),
+		),
+	);
+
+	return isset( $rows[ $lang ] ) ? $rows[ $lang ] : $rows['fr'];
+}
+
+function murailles_sanitize_testimonial_rows( $rows ) {
+	$clean = array();
+
+	if ( ! is_array( $rows ) ) {
+		return $clean;
+	}
+
+	foreach ( $rows as $row ) {
+		if ( empty( $row['name'] ) ) {
+			continue;
+		}
+
+		$clean[] = array(
+			'name'      => sanitize_text_field( $row['name'] ?? '' ),
+			'role'      => sanitize_text_field( $row['role'] ?? '' ),
+			'photo_url' => esc_url_raw( $row['photo_url'] ?? '' ),
+			'rating'    => floatval( $row['rating'] ?? 5 ),
+			'text'      => sanitize_textarea_field( $row['text'] ?? '' ),
+		);
+	}
+
+	return $clean;
+}
+
+function murailles_theme_testimonial_rows_for_admin( $lang = 'fr', $opts = null ) {
+	if ( ! in_array( $lang, array( 'fr', 'en' ), true ) ) {
+		$lang = 'fr';
+	}
+
+	if ( null === $opts ) {
+		$opts = (array) get_option( 'murailles_options', array() );
+	}
+
+	$key = 'testimonials_' . $lang;
+
+	if ( array_key_exists( $key, $opts ) && is_array( $opts[ $key ] ) ) {
+		return $opts[ $key ];
+	}
+
+	if ( 'fr' === $lang && array_key_exists( 'testimonials', $opts ) && is_array( $opts['testimonials'] ) ) {
+		return $opts['testimonials'];
+	}
+
+	return murailles_theme_testimonial_default_rows( $lang );
+}
+
+function murailles_theme_testimonial_rows_to_page_meta( $rows ) {
+	$mapped = array();
+
+	foreach ( (array) $rows as $row ) {
+		if ( empty( $row['name'] ) ) {
+			continue;
+		}
+
+		$mapped[] = array(
+			'person_name' => sanitize_text_field( $row['name'] ?? '' ),
+			'person_role' => sanitize_text_field( $row['role'] ?? '' ),
+			'rating'      => floatval( $row['rating'] ?? 5 ),
+			'description' => sanitize_textarea_field( $row['text'] ?? '' ),
+			'image_id'    => 0,
+			'image_url'   => esc_url_raw( $row['photo_url'] ?? '' ),
+			'alt_text'    => sanitize_text_field( $row['name'] ?? '' ),
+		);
+	}
+
+	return $mapped;
+}
+
+function murailles_get_theme_option_testimonials( $lang = '', $default = array() ) {
+	if ( ! $lang ) {
+		$lang = function_exists( 'murailles_current_lang' ) ? murailles_current_lang() : 'fr';
+	}
+	if ( ! in_array( $lang, array( 'fr', 'en' ), true ) ) {
+		$lang = 'fr';
+	}
+
+	$opts = (array) get_option( 'murailles_options', array() );
+	$key  = 'testimonials_' . $lang;
+
+	if ( array_key_exists( $key, $opts ) && is_array( $opts[ $key ] ) ) {
+		return murailles_theme_testimonial_rows_to_page_meta( $opts[ $key ] );
+	}
+
+	if ( 'fr' === $lang && array_key_exists( 'testimonials', $opts ) && is_array( $opts['testimonials'] ) ) {
+		return murailles_theme_testimonial_rows_to_page_meta( $opts['testimonials'] );
+	}
+
+	return $default;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    ADMIN MENU
 ───────────────────────────────────────────────────────────────────────────── */
@@ -150,19 +261,14 @@ add_action( 'admin_post_murailles_save_options', function () {
 	}
 
 	// ── Testimonials repeater ────────────────────────────────────────────────
-	if ( isset( $post['testimonials'] ) && is_array( $post['testimonials'] ) ) {
-		$testis = array();
-		foreach ( $post['testimonials'] as $t ) {
-			if ( empty( $t['name'] ) ) { continue; }
-			$testis[] = array(
-				'name'      => sanitize_text_field( $t['name'] ?? '' ),
-				'role'      => sanitize_text_field( $t['role'] ?? '' ),
-				'photo_url' => esc_url_raw( $t['photo_url'] ?? '' ),
-				'rating'    => floatval( $t['rating'] ?? 5 ),
-				'text'      => sanitize_textarea_field( $t['text'] ?? '' ),
-			);
+	foreach ( array( 'fr', 'en' ) as $lang ) {
+		$field = 'testimonials_' . $lang;
+		if ( isset( $post[ $field ] ) && is_array( $post[ $field ] ) ) {
+			$clean[ $field ] = murailles_sanitize_testimonial_rows( $post[ $field ] );
 		}
-		$clean['testimonials'] = $testis;
+	}
+	if ( isset( $clean['testimonials_fr'] ) ) {
+		$clean['testimonials'] = $clean['testimonials_fr'];
 	}
 
 	// ── Affaires du mois (managed separately) — preserve ────────────────────
@@ -462,6 +568,55 @@ function murailles_options_page() {
 			<?php
 			// ── Tab: Témoignages ──────────────────────────────────────────────
 			if ( $tab === 'testimonials' ) :
+				$testimonial_sets = array(
+					'fr' => array(
+						'label' => 'Francais',
+						'rows'  => murailles_theme_testimonial_rows_for_admin( 'fr', $opts ),
+					),
+					'en' => array(
+						'label' => 'English',
+						'rows'  => murailles_theme_testimonial_rows_for_admin( 'en', $opts ),
+					),
+				);
+			?>
+			<h2>TÃ©moignages clients</h2>
+			<p class="description">Ajoutez, modifiez ou supprimez les avis clients affiches sur la page d'accueil et la page A propos, avec un jeu distinct pour le francais et l'anglais.</p>
+			<?php foreach ( $testimonial_sets as $lang_code => $testimonial_set ) : ?>
+			<div style="margin:24px 0 12px;padding:16px;border:1px solid #dcdcde;border-radius:8px;background:#fff;">
+				<h3 style="margin-top:0;"><?php echo esc_html( $testimonial_set['label'] ); ?></h3>
+				<div id="murailles-testi-repeater-<?php echo esc_attr( $lang_code ); ?>" class="murailles-testi-repeater" data-lang="<?php echo esc_attr( $lang_code ); ?>">
+					<?php foreach ( $testimonial_set['rows'] as $i => $t ) : ?>
+					<div class="murailles-repeater-row" style="background:#f9f9f9;border:1px solid #e0e0e0;padding:16px;margin-bottom:12px;border-radius:6px;">
+						<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+							<div>
+								<label>Photo URL</label><br>
+								<input type="text" name="testimonials_<?php echo esc_attr( $lang_code ); ?>[<?php echo $i; ?>][photo_url]" value="<?php echo esc_attr( $t['photo_url'] ?? '' ); ?>" class="regular-text" placeholder="URL ou lien Gravatar">
+							</div>
+							<div>
+								<label>Nom</label><br>
+								<input type="text" name="testimonials_<?php echo esc_attr( $lang_code ); ?>[<?php echo $i; ?>][name]" value="<?php echo esc_attr( $t['name'] ?? '' ); ?>" class="regular-text">
+							</div>
+							<div>
+								<label>RÃ´le / Ville</label><br>
+								<input type="text" name="testimonials_<?php echo esc_attr( $lang_code ); ?>[<?php echo $i; ?>][role]" value="<?php echo esc_attr( $t['role'] ?? '' ); ?>" class="regular-text">
+							</div>
+							<div>
+								<label>Note (ex: 4.8)</label><br>
+								<input type="number" name="testimonials_<?php echo esc_attr( $lang_code ); ?>[<?php echo $i; ?>][rating]" value="<?php echo esc_attr( $t['rating'] ?? 5 ); ?>" min="1" max="5" step="0.1" class="small-text">
+							</div>
+							<div style="grid-column:span 2;">
+								<label>Texte du tÃ©moignage</label><br>
+								<textarea name="testimonials_<?php echo esc_attr( $lang_code ); ?>[<?php echo $i; ?>][text]" rows="3" class="large-text"><?php echo esc_textarea( $t['text'] ?? '' ); ?></textarea>
+							</div>
+						</div>
+						<p><button type="button" class="button button-link-delete murailles-remove-testi-row">Supprimer ce tÃ©moignage</button></p>
+					</div>
+					<?php endforeach; ?>
+				</div>
+				<button type="button" class="button button-primary murailles-add-testi" data-lang="<?php echo esc_attr( $lang_code ); ?>">+ Ajouter un tÃ©moignage</button>
+			</div>
+			<?php endforeach; ?>
+			<?php if ( false ) :
 				$testimonials = isset( $opts['testimonials'] ) && is_array( $opts['testimonials'] ) ? $opts['testimonials'] : array(
 					array( 'name' => 'Susan D. Murphy',       'role' => 'Acheteuse — Paris',    'photo_url' => 'https://i.pravatar.cc/96?img=1', 'rating' => 4.9, 'text' => 'Service exceptionnel, équipe très professionnelle.' ),
 					array( 'name' => 'Maxine E. Gagliardi',   'role' => 'Investisseur — Lyon',  'photo_url' => 'https://i.pravatar.cc/96?img=2', 'rating' => 4.8, 'text' => 'Excellent accompagnement pour mon riad à Marrakech.' ),
@@ -502,6 +657,7 @@ function murailles_options_page() {
 				<?php endforeach; ?>
 			</div>
 			<button type="button" class="button button-primary" id="murailles-add-testi">+ Ajouter un témoignage</button>
+			<?php endif; ?>
 			<?php endif; // testimonials ?>
 
 			<?php
@@ -565,6 +721,28 @@ function murailles_options_page() {
 			if (confirm('Supprimer cet élément ?')) {
 				$(this).closest('.murailles-repeater-row').remove();
 			}
+		});
+		$(document).on('click', '.murailles-add-testi', function(e){
+			e.preventDefault();
+			var lang = $(this).data('lang') || 'fr';
+			var $wrap = $('#murailles-testi-repeater-' + lang);
+			if (!$wrap.length) {
+				return;
+			}
+			var idx = $wrap.children('.murailles-repeater-row').length;
+			var prefix = 'testimonials_' + lang + '[' + idx + ']';
+			var row = ''
+				+ '<div class="murailles-repeater-row" style="background:#f9f9f9;border:1px solid #e0e0e0;padding:16px;margin-bottom:12px;border-radius:6px;">'
+				+   '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">'
+				+     '<div><label>Photo URL</label><br><input type="text" name="' + prefix + '[photo_url]" class="regular-text" placeholder="URL ou lien Gravatar"></div>'
+				+     '<div><label>Nom</label><br><input type="text" name="' + prefix + '[name]" class="regular-text"></div>'
+				+     '<div><label>Role / Ville</label><br><input type="text" name="' + prefix + '[role]" class="regular-text"></div>'
+				+     '<div><label>Note (ex: 4.8)</label><br><input type="number" name="' + prefix + '[rating]" value="5" min="1" max="5" step="0.1" class="small-text"></div>'
+				+     '<div style="grid-column:span 2;"><label>Texte du temoignage</label><br><textarea name="' + prefix + '[text]" rows="3" class="large-text"></textarea></div>'
+				+   '</div>'
+				+   '<p><button type="button" class="button button-link-delete murailles-remove-testi-row">Supprimer ce temoignage</button></p>'
+				+ '</div>';
+			$wrap.append(row);
 		});
 	})(jQuery);
 	</script>

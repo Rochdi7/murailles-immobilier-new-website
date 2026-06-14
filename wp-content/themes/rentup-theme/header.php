@@ -26,6 +26,7 @@ if (is_front_page() && ! isset($murailles_header_style)) {
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php if ( ! function_exists( 'has_site_icon' ) || ! has_site_icon() ) : ?>
 		<link rel="icon" href="<?php echo esc_url( murailles_img( 'logo.png' ) ); ?>" type="image/png">
+		<link rel="apple-touch-icon" href="<?php echo esc_url( murailles_img( 'logo.png' ) ); ?>">
 	<?php endif; ?>
 	<?php wp_head(); ?>
 	<?php /* Preloader safety net — pure CSS + inline JS, no jQuery dependency.
@@ -76,9 +77,9 @@ if (is_front_page() && ! isset($murailles_header_style)) {
 				<div class="container">
 					<nav id="navigation" class="navigation navigation-landscape">
 						<div class="nav-header">
-							<a class="nav-brand static-logo" href="<?php echo esc_url(home_url('/')); ?>"><img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" class="logo" alt="<?php bloginfo('name'); ?>" /></a>
-							<a class="nav-brand fixed-logo" href="<?php echo esc_url(home_url('/')); ?>"><img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" class="logo" alt="<?php bloginfo('name'); ?>" /></a>
-							<div class="nav-toggle"></div>
+							<a class="nav-brand static-logo" href="<?php echo esc_url(home_url('/')); ?>"><img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" class="logo" alt="<?php bloginfo('name'); ?>" width="200" height="57" decoding="async" /></a>
+							<a class="nav-brand fixed-logo" href="<?php echo esc_url(home_url('/')); ?>"><img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" class="logo" alt="<?php bloginfo('name'); ?>" width="200" height="57" decoding="async" /></a>
+							<div class="nav-toggle" role="button" tabindex="0" aria-label="<?php echo esc_attr( murailles_t( 'Ouvrir le menu', false ) ); ?>" aria-expanded="false"></div>
 							<div class="mobile_nav">
 								<ul class="nav-menu nav-menu-social mobile-lang-switcher">
 									<?php murailles_lang_switcher(); ?>
@@ -87,7 +88,7 @@ if (is_front_page() && ! isset($murailles_header_style)) {
 						</div>
 						<div class="nav-menus-wrapper" style="transition-property: none;">
 							<a class="nav-brand mobile-menu-logo" href="<?php echo esc_url(home_url('/')); ?>">
-								<img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" alt="<?php bloginfo('name'); ?>" />
+								<img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" alt="<?php bloginfo('name'); ?>" width="200" height="57" decoding="async" />
 							</a>
 							<?php if (has_nav_menu('primary')) :
 								wp_nav_menu(array(
@@ -113,9 +114,9 @@ if (is_front_page() && ! isset($murailles_header_style)) {
 					<nav id="navigation" class="navigation navigation-landscape">
 						<div class="nav-header">
 							<a class="nav-brand" href="<?php echo esc_url(home_url('/')); ?>">
-								<img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" class="logo" alt="<?php bloginfo('name'); ?>" />
+								<img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" class="logo" alt="<?php bloginfo('name'); ?>" width="200" height="57" decoding="async" />
 							</a>
-							<div class="nav-toggle"></div>
+							<div class="nav-toggle" role="button" tabindex="0" aria-label="<?php echo esc_attr( murailles_t( 'Ouvrir le menu', false ) ); ?>" aria-expanded="false"></div>
 							<div class="mobile_nav">
 								<ul class="nav-menu nav-menu-social mobile-lang-switcher">
 									<?php murailles_lang_switcher(); ?>
@@ -124,7 +125,7 @@ if (is_front_page() && ! isset($murailles_header_style)) {
 						</div>
 						<div class="nav-menus-wrapper" style="transition-property: none;">
 							<a class="nav-brand mobile-menu-logo" href="<?php echo esc_url(home_url('/')); ?>">
-								<img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" alt="<?php bloginfo('name'); ?>" />
+								<img src="<?php echo esc_url(murailles_img('logo.webp')); ?>" alt="<?php bloginfo('name'); ?>" width="200" height="57" decoding="async" />
 							</a>
 							<?php if (has_nav_menu('primary')) :
 								wp_nav_menu(array(

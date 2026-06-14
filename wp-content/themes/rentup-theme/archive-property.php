@@ -28,13 +28,16 @@ $all_locs  = get_terms( array(
 $all_areas = get_terms( array( 'taxonomy' => 'property_area',     'hide_empty' => false ) );
 $paged     = get_query_var( 'paged' ) ? get_query_var( 'paged' ) : 1;
 $per_page  = 6;
+$q_action  = get_query_var( 'action_t' );
+$q_ptype   = get_query_var( 'ptype' );
+$q_loc     = get_query_var( 'location' );
 
 /* ─── Read GET filters ────────────────────────────────────────────────── */
 $f = array(
 	'q'         => isset( $_GET['q'] )         ? sanitize_text_field( wp_unslash( $_GET['q'] ) )      : '',
-	'ptype'     => isset( $_GET['ptype'] )     ? sanitize_text_field( wp_unslash( $_GET['ptype'] ) )  : '',
-	'action'    => isset( $_GET['action_t'] )  ? sanitize_text_field( wp_unslash( $_GET['action_t'] ) ): '',
-	'location'  => isset( $_GET['location'] )  ? sanitize_text_field( wp_unslash( $_GET['location'] ) ): '',
+	'ptype'     => isset( $_GET['ptype'] )     ? sanitize_text_field( wp_unslash( $_GET['ptype'] ) )  : ( $q_ptype ? sanitize_text_field( wp_unslash( $q_ptype ) ) : '' ),
+	'action'    => murailles_property_action_value( isset( $_GET['action_t'] ) ? sanitize_text_field( wp_unslash( $_GET['action_t'] ) ) : ( $q_action ? sanitize_text_field( wp_unslash( $q_action ) ) : '' ) ),
+	'location'  => isset( $_GET['location'] )  ? sanitize_text_field( wp_unslash( $_GET['location'] ) ): ( $q_loc ? sanitize_text_field( wp_unslash( $q_loc ) ) : '' ),
 	'area'      => isset( $_GET['area'] )      ? sanitize_text_field( wp_unslash( $_GET['area'] ) )   : '',
 	'beds'      => isset( $_GET['beds'] )      ? intval( $_GET['beds'] )                              : 0,
 	'baths'     => isset( $_GET['baths'] )     ? intval( $_GET['baths'] )                             : 0,
@@ -178,20 +181,18 @@ foreach ( array( 'q','ptype','action','location','area','beds','baths','price_mi
 										$current_label = murailles_t( 'Plus récents', false );
 										if ( $f['orderby'] === 'price_asc' )  $current_label = murailles_t( 'Prix croissant', false );
 										if ( $f['orderby'] === 'price_desc' ) $current_label = murailles_t( 'Prix décroissant', false );
-										$keep = array_filter( $f, function ( $v ) { return $v !== '' && $v !== 0; } );
-										unset( $keep['orderby'] );
-										$sort_url = function ( $key ) use ( $keep ) {
-											return esc_url( add_query_arg( array_merge( $keep, array( 'orderby' => $key ) ), murailles_bien_url() ) );
+										$sort_url = function () {
+											return esc_url( murailles_bien_url() );
 										};
 										?>
 										<div class="dropdown show">
-											<a class="btn btn-filter dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<a class="btn btn-filter dropdown-toggle" href="<?php echo esc_url( murailles_bien_url() ); ?>" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 												<span class="selection"><?php echo esc_html( $current_label ); ?></span>
 											</a>
 											<div class="drp-select dropdown-menu">
-												<a class="dropdown-item" href="<?php echo $sort_url( 'recent' ); ?>"><?php murailles_t( 'Plus récents' ); ?></a>
-												<a class="dropdown-item" href="<?php echo $sort_url( 'price_asc' ); ?>"><?php murailles_t( 'Prix croissant' ); ?></a>
-												<a class="dropdown-item" href="<?php echo $sort_url( 'price_desc' ); ?>"><?php murailles_t( 'Prix décroissant' ); ?></a>
+												<a class="dropdown-item" href="<?php echo $sort_url(); ?>" data-murailles-orderby="recent"><?php murailles_t( 'Plus récents' ); ?></a>
+												<a class="dropdown-item" href="<?php echo $sort_url(); ?>" data-murailles-orderby="price_asc"><?php murailles_t( 'Prix croissant' ); ?></a>
+												<a class="dropdown-item" href="<?php echo $sort_url(); ?>" data-murailles-orderby="price_desc"><?php murailles_t( 'Prix décroissant' ); ?></a>
 											</div>
 										</div>
 									</div>

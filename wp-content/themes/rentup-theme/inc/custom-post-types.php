@@ -884,7 +884,7 @@ add_action( 'after_switch_theme', 'murailles_flush_rewrites' );
  * Runs once on the next request after deploy, then never again.
  */
 if ( ! defined( 'MURAILLES_REWRITE_VERSION' ) ) {
-	define( 'MURAILLES_REWRITE_VERSION', '2026-05-13-1' );
+	define( 'MURAILLES_REWRITE_VERSION', '2026-06-14-1' );
 }
 function murailles_maybe_flush_rewrites() {
 	if ( get_option( 'murailles_rewrite_version' ) === MURAILLES_REWRITE_VERSION ) {
@@ -894,6 +894,7 @@ function murailles_maybe_flush_rewrites() {
 	update_option( 'murailles_rewrite_version', MURAILLES_REWRITE_VERSION );
 }
 add_action( 'after_switch_theme', 'murailles_maybe_flush_rewrites', 99 );
+add_action( 'init', 'murailles_maybe_flush_rewrites', 99 );
 
 /* ╔═══════════════════════════════════════════════════╗
    ║  11. ADMIN UX — champs de contact biens           ║

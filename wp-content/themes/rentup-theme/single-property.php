@@ -86,7 +86,7 @@ $similar = new WP_Query( array(
 				<div class="container">
 					<div class="row align-items-center">
 						<div class="col-lg-8 col-md-7 col-sm-12 pr-1">
-							<div class="gg_single_part left"><a href="<?php echo esc_url( $main_img ); ?>" class="murailles-lightbox rounded"><img src="<?php echo esc_url( $main_img ); ?>" class="img-fluid mx-auto rounded" alt="" /></a></div>
+							<div class="gg_single_part left"><a href="<?php echo esc_url( $main_img ); ?>" class="murailles-lightbox rounded"><img src="<?php echo esc_url( $main_img ); ?>" class="img-fluid mx-auto rounded" alt="<?php echo esc_attr( get_the_title( $id ) ); ?>" /></a></div>
 						</div>
 						<div class="col-lg-4 col-md-5 col-sm-12 pl-1">
 							<?php for ( $i = 1; $i <= 3; $i++ ) :
@@ -103,9 +103,9 @@ $similar = new WP_Query( array(
 							?>
 							<div class="gg_single_part-right min<?php echo $mt; ?>">
 								<?php if ( $has_real ) : ?>
-								<a href="<?php echo esc_url( $gfull ); ?>" class="murailles-lightbox h-100"><img src="<?php echo esc_url( $gimg ); ?>" class="img-fluid full-width rounded object-fit h-100" alt="" /></a>
+								<a href="<?php echo esc_url( $gfull ); ?>" class="murailles-lightbox h-100"><img src="<?php echo esc_url( $gimg ); ?>" class="img-fluid full-width rounded object-fit h-100" alt="<?php echo esc_attr( get_the_title( $id ) ); ?>" /></a>
 								<?php else : ?>
-								<img src="<?php echo esc_url( $gimg ); ?>" class="img-fluid full-width rounded object-fit h-100" alt="" />
+								<img src="<?php echo esc_url( $gimg ); ?>" class="img-fluid full-width rounded object-fit h-100" alt="<?php echo esc_attr( get_the_title( $id ) ); ?>" />
 								<?php endif; ?>
 							</div>
 							<?php endfor; ?>
@@ -117,7 +117,7 @@ $similar = new WP_Query( array(
 					<?php if ( $mu_all_count > 4 ) : ?>
 					<div class="murailles-lightbox-extras" aria-hidden="true">
 						<?php foreach ( array_slice( $mu_all_imgs, 4 ) as $extra_url ) : ?>
-						<a href="<?php echo esc_url( $extra_url ); ?>" class="murailles-lightbox"></a>
+						<a href="<?php echo esc_url( $extra_url ); ?>" class="murailles-lightbox" tabindex="-1" aria-hidden="true"></a>
 						<?php endforeach; ?>
 					</div>
 					<?php endif; ?>
@@ -133,7 +133,7 @@ $similar = new WP_Query( array(
 						<?php foreach ( $mu_all_imgs as $i => $slide_url ) : ?>
 						<div class="murailles-mobile-gallery__slide" data-murailles-slide-index="<?php echo (int) $i; ?>">
 							<a href="<?php echo esc_url( $slide_url ); ?>" class="murailles-lightbox-mobile">
-								<img src="<?php echo esc_url( $slide_url ); ?>" alt="<?php the_title_attribute(); ?>" loading="<?php echo $i === 0 ? 'eager' : 'lazy'; ?>" />
+								<img src="<?php echo esc_url( $slide_url ); ?>" alt="<?php echo esc_attr( get_the_title( $id ) ); ?>" loading="<?php echo $i === 0 ? 'eager' : 'lazy'; ?>" />
 							</a>
 						</div>
 						<?php endforeach; ?>
@@ -176,6 +176,19 @@ $similar = new WP_Query( array(
 							tPrev: <?php echo wp_json_encode( murailles_t( 'Précédent', false ) ); ?>,
 							tNext: <?php echo wp_json_encode( murailles_t( 'Suivant', false ) ); ?>,
 							tCounter: '%curr% / %total%'
+						},
+						callbacks: {
+							open: function () {
+								var $wrap = this.wrap || $( '.mfp-wrap' );
+								if ( $wrap && $wrap.length ) {
+									$wrap.find( '.mfp-close' ).attr( {
+										'aria-label': <?php echo wp_json_encode( murailles_t( 'Fermer la galerie', false ) ); ?>,
+										'type': 'button'
+									} );
+									$wrap.find( '.mfp-arrow-left' ).attr( 'aria-label', <?php echo wp_json_encode( murailles_t( 'Image précédente', false ) ); ?> );
+									$wrap.find( '.mfp-arrow-right' ).attr( 'aria-label', <?php echo wp_json_encode( murailles_t( 'Image suivante', false ) ); ?> );
+								}
+							}
 						},
 						image: { tError: '<a href="%url%">Erreur de chargement</a>' }
 					};
@@ -262,8 +275,8 @@ $similar = new WP_Query( array(
 								<div class="property_detail_section">
 									<div class="prt-sect-pric">
 										<ul class="_share_lists">
-											<li><a href="#" class="murailles-prop-save" data-murailles-id="<?php echo esc_attr( get_the_ID() ); ?>" title="<?php echo esc_attr( murailles_t( 'Enregistrer dans mes favoris', false ) ); ?>"><i class="fa fa-bookmark"></i></a></li>
-											<li><a href="#" class="murailles-prop-share" data-murailles-share-url="<?php echo esc_url( get_permalink() ); ?>" data-murailles-share-title="<?php echo esc_attr( get_the_title() ); ?>" title="<?php echo esc_attr( murailles_t( 'Partager ce bien', false ) ); ?>"><i class="fa fa-share"></i></a></li>
+											<li><a href="<?php echo esc_url( get_permalink( $id ) ); ?>" class="murailles-prop-save" data-murailles-id="<?php echo esc_attr( get_the_ID() ); ?>" title="<?php echo esc_attr( murailles_t( 'Enregistrer dans mes favoris', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Enregistrer dans mes favoris', false ) ); ?>"><i class="fa fa-bookmark"></i></a></li>
+											<li><a href="<?php echo esc_url( get_permalink( $id ) ); ?>" class="murailles-prop-share" data-murailles-share-url="<?php echo esc_url( get_permalink() ); ?>" data-murailles-share-title="<?php echo esc_attr( get_the_title() ); ?>" title="<?php echo esc_attr( murailles_t( 'Partager ce bien', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Partager ce bien', false ) ); ?>"><i class="fa fa-share"></i></a></li>
 										</ul>
 									</div>
 								</div>
@@ -326,7 +339,7 @@ $similar = new WP_Query( array(
 								<div class="block-body">
 									<div class="property_video">
 										<div class="thumb">
-											<img class="pro_img img-fluid w100" src="<?php echo esc_url( $main_img ); ?>" alt="">
+											<img class="pro_img img-fluid w100" src="<?php echo esc_url( $main_img ); ?>" alt="<?php echo esc_attr( get_the_title( $id ) ); ?>">
 											<div class="overlay_icon">
 												<div class="bb-video-box">
 													<div class="bb-video-box-inner">
@@ -408,9 +421,9 @@ $similar = new WP_Query( array(
 								<div class="sider_blocks_wrap">
 									<div class="side-booking-body">
 										<div class="agent-_blocks_title">
-											<div class="agent-_blocks_thumb"><img src="<?php echo esc_url( $ag_thumb ); ?>" alt=""></div>
+											<div class="agent-_blocks_thumb"><img src="<?php echo esc_url( $ag_thumb ); ?>" alt="<?php echo esc_attr( $ag_name ); ?>"></div>
 											<div class="agent-_blocks_caption">
-												<h4><a href="#"><?php echo esc_html( $ag_name ); ?></a></h4>
+												<h4><a href="<?php echo esc_url( get_permalink( $agent_id ) ); ?>"><?php echo esc_html( $ag_name ); ?></a></h4>
 												<?php if ( $ag_pos ) : ?><span class="approved-agent"><i class="ti-check"></i><?php echo esc_html( $ag_pos ); ?></span><?php endif; ?>
 											</div>
 											<div class="clearfix"></div>
@@ -453,12 +466,12 @@ $similar = new WP_Query( array(
 										</div>
 										<div class="form-group">
 											<div class="input-with-icon">
-												<input type="text" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre téléphone', false ) ); ?>">
+												<input type="text" name="phone" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre téléphone', false ) ); ?>">
 												<i class="ti-mobile"></i>
 											</div>
 										</div>
 										<div class="form-group">
-											<textarea class="form-control light" rows="3" placeholder="<?php echo esc_attr( murailles_t( 'Je suis intéressé(e) par ce bien...', false ) ); ?>"></textarea>
+											<textarea name="message" class="form-control light" rows="3" placeholder="<?php echo esc_attr( murailles_t( 'Je suis intéressé(e) par ce bien...', false ) ); ?>"></textarea>
 										</div>
 										<button class="btn btn-danger full-width fw-medium"><?php murailles_t( 'Envoyer' ); ?></button>
 										</form>
@@ -481,7 +494,7 @@ $similar = new WP_Query( array(
 										?>
 										<div class="sides_list_property">
 											<div class="sides_list_property_thumb">
-												<img src="<?php echo esc_url( $sp_thumb ); ?>" class="img-fluid" alt="" />
+												<img src="<?php echo esc_url( $sp_thumb ); ?>" class="img-fluid" alt="<?php echo esc_attr( get_the_title( $sp_id ) ); ?>" />
 											</div>
 											<div class="sides_list_property_detail">
 												<h4><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h4>
