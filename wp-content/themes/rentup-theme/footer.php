@@ -29,7 +29,6 @@ if (! defined('ABSPATH')) {
 						<form class="foot-news-last mt-4 murailles-form" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 							<input type="hidden" name="action" value="murailles_newsletter">
 							<?php wp_nonce_field('murailles_newsletter', '_murailles_nonce'); ?>
-							<input type="hidden" name="_murailles_ts" value="<?php echo time(); ?>">
 							<input type="hidden" name="page_url" value="<?php echo esc_url( home_url( isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/' ) ); ?>">
 							<input type="hidden" name="language" value="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr' ); ?>">
 							<input type="text" name="_mw_hp_url" value="" tabindex="-1" autocomplete="new-password" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px;pointer-events:none;">

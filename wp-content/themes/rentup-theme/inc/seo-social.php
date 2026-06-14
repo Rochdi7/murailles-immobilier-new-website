@@ -73,8 +73,7 @@ function murailles_social_image_alt() {
  */
 add_action( 'wp_head', function () {
 	// Defer OG/Twitter tags to SEO plugin when one is active — prevents duplicates.
-	if ( defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ||
-	     class_exists( 'AIOSEO\Plugin\AIOSEO' ) || defined( 'SEOPRESS_VERSION' ) ) {
+	if ( function_exists( 'murailles_seo_plugin_active' ) && murailles_seo_plugin_active() ) {
 		return;
 	}
 

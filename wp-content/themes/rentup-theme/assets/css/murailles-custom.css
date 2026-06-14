@@ -1681,3 +1681,48 @@ small,
 ._tsl_flex_capst span {
 	color: #6f7c8f;
 }
+
+/* Heading semantics cleanup without visual drift. */
+.wpk_caption h3 {
+	font-size: 18px;
+	margin: 0;
+}
+
+._tsl_flex_capst ._testimonial_name {
+	font-size: 14px;
+	margin: 0;
+	line-height: 12px;
+	font-weight: 600;
+}
+
+.property-author .property-author__name {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.4;
+}
+
+.property-author .property-author__name a {
+	color: #808fa0;
+	text-decoration: none;
+}
+
+.modern_property_footer .property-author__name a {
+	color: #333c56;
+}
+
+/* Keep feature rows left-aligned when only one or two specs are available. */
+.property-listing .price-features-wrapper .list-fx-features {
+	justify-content: flex-start;
+	gap: 10px 18px;
+}
+
+.property-listing .price-features-wrapper .listing-card-info-icon {
+	width: auto;
+	flex: 0 0 auto;
+	min-width: 0;
+}
+
+.property-listing .price-features-wrapper .listing-card-info-icon .inc-fleat-icon {
+	margin-right: 5px;
+}

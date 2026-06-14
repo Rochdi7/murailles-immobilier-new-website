@@ -373,7 +373,7 @@ get_header();
 														<img src="<?php echo esc_url( $murailles_testimonial_image ); ?>" class="img-fluid" alt="<?php echo esc_attr( $murailles_testimonial_alt ); ?>">
 													</div>
 													<div class="_tsl_flex_capst">
-														<h5><?php echo esc_html( $murailles_testimonial_name ); ?></h5>
+														<div class="_testimonial_name"><?php echo esc_html( $murailles_testimonial_name ); ?></div>
 														<div class="_ovr_posts"><span><?php echo esc_html( $murailles_testimonial_role ); ?></span></div>
 														<div class="_ovr_rates"><span><i class="fa fa-star"></i></span><?php echo esc_html( $murailles_testimonial_rate ); ?></div>
 													</div>

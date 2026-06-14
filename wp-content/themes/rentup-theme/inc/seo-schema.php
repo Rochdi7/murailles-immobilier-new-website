@@ -77,8 +77,7 @@ function murailles_schema_decode_entities( $value ) {
 add_action( 'wp_head', function () {
 	// When a dedicated SEO plugin is active it outputs its own Organization/WebSite
 	// schema — suppress ours to avoid duplicate @type entries that confuse validators.
-	if ( defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ||
-	     class_exists( 'AIOSEO\Plugin\AIOSEO' ) || defined( 'SEOPRESS_VERSION' ) ) {
+	if ( function_exists( 'murailles_seo_plugin_active' ) && murailles_seo_plugin_active() ) {
 		return;
 	}
 
@@ -180,6 +179,10 @@ add_action( 'wp_head', function () {
  * Per-page schema. Hooked late so it appears after Organization/WebSite.
  */
 add_action( 'wp_head', function () {
+	if ( function_exists( 'murailles_seo_plugin_active' ) && murailles_seo_plugin_active() ) {
+		return;
+	}
+
 	$home = home_url( '/' );
 
 	// ─────────────────────────────────────────────────────────────────
@@ -411,8 +414,7 @@ add_action( 'wp_head', function () {
  * Google can show breadcrumb-style results in SERPs.
  */
 add_action( 'wp_head', function () {
-	if ( defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ||
-	     class_exists( 'AIOSEO\Plugin\AIOSEO' ) || defined( 'SEOPRESS_VERSION' ) ) {
+	if ( function_exists( 'murailles_seo_plugin_active' ) && murailles_seo_plugin_active() ) {
 		return;
 	}
 

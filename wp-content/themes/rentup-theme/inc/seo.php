@@ -25,6 +25,17 @@ if ( ! function_exists( 'murailles_opt' ) ) {
 	}
 }
 
+if ( ! function_exists( 'murailles_seo_plugin_active' ) ) {
+	function murailles_seo_plugin_active() {
+		return defined( 'WPSEO_VERSION' )
+			|| class_exists( 'WPSEO_Frontend' )
+			|| defined( 'RANK_MATH_VERSION' )
+			|| class_exists( 'RankMath' )
+			|| class_exists( 'AIOSEO\\Plugin\\AIOSEO' )
+			|| defined( 'SEOPRESS_VERSION' );
+	}
+}
+
 /**
  * REST auth callback for SEO meta fields.
  *
@@ -72,8 +83,7 @@ function murailles_sanitize_seo_meta_value( $meta_value, $meta_key ) {
  */
 add_filter( 'pre_get_document_title', function ( $title ) {
 	// Defer entirely to Yoast / Rank Math / AIOSEO / SEOPress when active.
-	if ( defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ||
-	     class_exists( 'AIOSEO\Plugin\AIOSEO' ) || defined( 'SEOPRESS_VERSION' ) ) {
+	if ( murailles_seo_plugin_active() ) {
 		return $title;
 	}
 
@@ -217,8 +227,7 @@ function murailles_seo_description() {
  * to prevent duplicate meta description tags.
  */
 add_action( 'wp_head', function () {
-	if ( defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ||
-	     class_exists( 'AIOSEO\Plugin\AIOSEO' ) || defined( 'SEOPRESS_VERSION' ) ) {
+	if ( murailles_seo_plugin_active() ) {
 		return;
 	}
 	$desc = apply_filters( 'murailles_seo_description_output', murailles_seo_description() );
@@ -259,52 +268,6 @@ add_filter( 'murailles_seo_description_output', function ( $desc ) {
 
 	return 'Agence immobilière à Marrakech spécialisée dans la vente, location et gestion de riads, villas et appartements au Maroc.';
 }, 20 );
-
-/**
- * If a third-party SEO plugin stays silent on the front page, inject the
- * theme fallback meta description without creating duplicates.
- */
-function murailles_capture_front_page_head_for_meta_description() {
-	if ( is_admin() || ! is_front_page() ) {
-		return;
-	}
-
-	if ( ! defined( 'WPSEO_VERSION' ) && ! defined( 'RANK_MATH_VERSION' ) &&
-		! class_exists( 'AIOSEO\\Plugin\\AIOSEO' ) && ! defined( 'SEOPRESS_VERSION' ) ) {
-		return;
-	}
-
-	$GLOBALS['murailles_head_desc_capture'] = true;
-	ob_start();
-}
-add_action( 'wp_head', 'murailles_capture_front_page_head_for_meta_description', 0 );
-
-function murailles_output_front_page_head_with_meta_description_fallback() {
-	if ( is_admin() || ! is_front_page() || empty( $GLOBALS['murailles_head_desc_capture'] ) || ! ob_get_level() ) {
-		return;
-	}
-
-	unset( $GLOBALS['murailles_head_desc_capture'] );
-	$head = (string) ob_get_clean();
-	$has_description = false !== stripos( $head, '<meta name="description"' )
-		|| false !== stripos( $head, "<meta name='description'" );
-
-	if ( ! $has_description ) {
-		$desc = apply_filters( 'murailles_seo_description_output', murailles_seo_description() );
-		$desc = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( (string) $desc ) ) );
-
-		if ( '' !== $desc ) {
-			if ( function_exists( 'mb_strlen' ) && mb_strlen( $desc ) > 160 ) {
-				$desc = mb_substr( $desc, 0, 157 ) . '...';
-			}
-
-			$head = sprintf( '<meta name="description" content="%s" />' . "\n", esc_attr( $desc ) ) . $head;
-		}
-	}
-
-	echo $head; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-}
-add_action( 'wp_head', 'murailles_output_front_page_head_with_meta_description_fallback', PHP_INT_MAX );
 
 /* ============================================================
  * Register all SEO meta keys for pages, posts, and properties.
@@ -372,8 +335,7 @@ function murailles_seo_metabox_render( $post ) {
 	$seo_canon   = (string) get_post_meta( $post->ID, '_seo_canonical',     true );
 	$seo_noindex = (string) get_post_meta( $post->ID, '_seo_noindex',       true );
 
-	$plugin_active = defined( 'WPSEO_VERSION' ) || defined( 'RANK_MATH_VERSION' ) ||
-	                 class_exists( 'AIOSEO\Plugin\AIOSEO' ) || defined( 'SEOPRESS_VERSION' );
+	$plugin_active = murailles_seo_plugin_active();
 
 	$notice_color = $plugin_active ? '#856404' : '#0c5460';
 	$notice_bg    = $plugin_active ? '#fff3cd' : '#d1ecf1';
@@ -488,6 +450,7 @@ add_action( 'save_post', 'murailles_seo_metabox_save' );
  * when the field is non-empty, by removing WP's canonical and printing ours.
  */
 add_action( 'wp_head', function () {
+	if ( murailles_seo_plugin_active() ) { return; }
 	if ( ! is_singular() ) { return; }
 	$canon = (string) get_post_meta( get_queried_object_id(), '_seo_canonical', true );
 	if ( ! $canon ) { return; }
@@ -501,6 +464,10 @@ add_action( 'wp_head', function () {
  * Also respects the per-post _seo_noindex meta set via admin or Royal MCP.
  */
 add_filter( 'wp_robots', function ( $robots ) {
+	if ( murailles_seo_plugin_active() ) {
+		return $robots;
+	}
+
 	$noindex_paths = array( '/favoris/', '/compare-property/', '/erreur/', '/checkout/' );
 	$req = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
 
@@ -547,63 +514,3 @@ add_filter( 'wp_robots', function ( $robots ) {
 	$robots['max-video-preview'] = -1;
 	return $robots;
 }, 10, 1 );
-
-add_filter( 'wpseo_robots', function ( $robots ) {
-	if ( ! function_exists( 'murailles_is_production_like_environment' ) || ! murailles_is_production_like_environment() || ! is_front_page() ) {
-		return $robots;
-	}
-
-	return 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
-} );
-
-add_filter( 'rank_math/frontend/robots', function ( $robots ) {
-	if ( ! function_exists( 'murailles_is_production_like_environment' ) || ! murailles_is_production_like_environment() || ! is_front_page() ) {
-		return $robots;
-	}
-
-	$robots['index'] = 'index';
-	$robots['follow'] = 'follow';
-	unset( $robots['noindex'], $robots['nofollow'] );
-
-	return $robots;
-} );
-
-/**
- * Emit hreflang tags for FR/EN translations when Polylang is active.
- */
-add_action( 'wp_head', function () {
-	if ( ! function_exists( 'pll_get_post_translations' ) || ! is_singular() ) {
-		return;
-	}
-
-	$post_id = get_queried_object_id();
-	if ( ! $post_id ) {
-		return;
-	}
-
-	$translations = pll_get_post_translations( $post_id );
-	if ( empty( $translations ) || count( $translations ) < 2 ) {
-		return;
-	}
-
-	echo "\n<!-- hreflang (Murailles) -->\n";
-	foreach ( $translations as $lang => $translation_id ) {
-		$url = get_permalink( $translation_id );
-		if ( ! $url ) {
-			continue;
-		}
-
-		printf(
-			'<link rel="alternate" hreflang="%s" href="%s" />' . "\n",
-			esc_attr( $lang ),
-			esc_url( $url )
-		);
-	}
-
-	if ( ! empty( $translations['fr'] ) ) {
-		printf(
-			'<link rel="alternate" hreflang="x-default" href="%s" />' . "\n",
-			esc_url( get_permalink( $translations['fr'] ) )
-		);
-	}
-}, 11 );

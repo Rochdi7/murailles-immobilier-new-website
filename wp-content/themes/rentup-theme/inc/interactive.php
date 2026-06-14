@@ -181,7 +181,7 @@ add_action('wp_ajax_murailles_get_properties',        'murailles_ajax_get_proper
  */
 add_action('wp_enqueue_scripts', function () {
 	$theme_uri = get_template_directory_uri();
-	$ver       = wp_get_theme()->get('Version');
+	$ver       = function_exists( 'murailles_asset_version' ) ? murailles_asset_version( 'assets/js/wishlist-compare.js' ) : wp_get_theme()->get('Version');
 	wp_enqueue_script('murailles-wishlist-compare', $theme_uri . '/assets/js/wishlist-compare.js', array(), $ver, true);
 	wp_localize_script('murailles-wishlist-compare', 'MuraillesWC', array(
 		'ajax_url'       => admin_url('admin-ajax.php'),

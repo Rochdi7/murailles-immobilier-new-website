@@ -894,8 +894,10 @@ $(function() {
 			$slider.attr('aria-roledescription', 'carousel');
 			$slider.find('.slick-prev').attr({ 'aria-label': 'Previous slide', 'type': 'button' });
 			$slider.find('.slick-next').attr({ 'aria-label': 'Next slide', 'type': 'button' });
-			$slider.find('[role="presentation"][aria-selected]').removeAttr('aria-selected');
-			$slider.find('.slick-dots').attr('role', 'tablist');
+			$slider.find('.slick-track').removeAttr('role');
+			$slider.find('.slick-slide').removeAttr('role aria-describedby');
+			$slider.find('.slick-dots').removeAttr('role');
+			$slider.find('.slick-dots li').removeAttr('role aria-selected aria-controls aria-hidden id');
 			$slider.find('.slick-dots li').each(function(index) {
 				var $dot = $(this);
 				$dot.find('button').first()
@@ -953,6 +955,7 @@ $(function() {
 	muraillesBootstrapPendingCarousels();
 	muraillesSetNavAriaState(false);
 	muraillesEnhanceSlickAccessibility();
+	$(document).on('init reInit afterChange', '.slick-slider', muraillesEnhanceSlickAccessibility);
 	$('#navigation').find('.nav-toggle').on('click.muraillesState touchstart.muraillesState', function() {
 		if ( window.innerWidth > 992 ) {
 			return;

@@ -49,14 +49,14 @@ if ( ! $author_avatar ) {
 		</div>
 
 		<div class="blog-body">
-			<h4 class="bl-title"><a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $title ); ?></a><?php echo $badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h4>
+			<h3 class="bl-title"><a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $title ); ?></a><?php echo $badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h3>
 			<p><?php echo esc_html( $excerpt ); ?></p>
 		</div>
 
 		<div class="modern_property_footer">
 			<div class="property-author">
 				<div class="path-img"><a href="<?php echo esc_url( $author_url ); ?>" aria-label="<?php echo esc_attr( $author_name ); ?>"><img src="<?php echo esc_url( $author_avatar ); ?>" class="img-fluid" alt="<?php echo esc_attr( $author_name ); ?>"></a></div>
-				<h5><a href="<?php echo esc_url( $author_url ); ?>"><?php echo esc_html( $author_name ); ?></a></h5>
+				<div class="property-author__name"><a href="<?php echo esc_url( $author_url ); ?>"><?php echo esc_html( $author_name ); ?></a></div>
 			</div>
 			<span class="article-pulish-date"><i class="ti-comment-alt me-2"></i><?php echo esc_html( $comment_cnt ); ?></span>
 		</div>

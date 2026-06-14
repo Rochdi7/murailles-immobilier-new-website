@@ -13,6 +13,31 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
+/**
+ * Stable asset versions for cache plugins/CDNs.
+ *
+ * Production uses the theme version so URLs remain cacheable. Developers can
+ * opt into filemtime-based busting with SCRIPT_DEBUG or MURAILLES_ASSET_DEBUG.
+ */
+if ( ! function_exists( 'murailles_asset_version' ) ) {
+	function murailles_asset_version( $relative_path = '' ) {
+		$version = wp_get_theme()->get( 'Version' );
+		$version = $version ? $version : '1.0.0';
+
+		$debug_assets = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG )
+			|| ( defined( 'MURAILLES_ASSET_DEBUG' ) && MURAILLES_ASSET_DEBUG );
+
+		if ( $debug_assets && $relative_path ) {
+			$path = get_template_directory() . '/' . ltrim( $relative_path, '/\\' );
+			if ( file_exists( $path ) ) {
+				return (string) filemtime( $path );
+			}
+		}
+
+		return $version;
+	}
+}
+
 // Theme options panel + murailles_opt() helper
 require_once get_template_directory() . '/inc/theme-options.php';
 require_once get_template_directory() . '/inc/page-editor.php';
@@ -142,7 +167,11 @@ function murailles_force_default_language_home() {
 		$target .= '?' . ltrim( (string) wp_unslash( $_SERVER['QUERY_STRING'] ), '?' );
 	}
 
-	if ( ! headers_sent() ) {
+	$current_lang_cookie = isset( $_COOKIE['pll_language'] )
+		? sanitize_key( wp_unslash( $_COOKIE['pll_language'] ) )
+		: '';
+
+	if ( $current_lang_cookie && $current_lang_cookie !== $default_lang && ! headers_sent() ) {
 		setcookie( 'pll_language', $default_lang, time() + YEAR_IN_SECONDS, COOKIEPATH ?: '/', COOKIE_DOMAIN );
 		$_COOKIE['pll_language'] = $default_lang;
 	}
@@ -317,10 +346,80 @@ add_filter( 'pre_handle_404', 'murailles_rescue_language_root_404', 10, 2 );
  * Enqueue Styles
  */
 function murailles_page_uses_advanced_filters() {
+	$filter_templates = array(
+		'page-templates/classical-layout-with-map.php',
+		'page-templates/grid-layout-with-map.php',
+		'page-templates/grid-layout-with-sidebar.php',
+		'page-templates/half-map.php',
+		'page-templates/home-2.php',
+		'page-templates/home-3.php',
+		'page-templates/home-6.php',
+		'page-templates/list-layout-with-map.php',
+		'page-templates/list-layout-with-map-2.php',
+		'page-templates/list-layout-with-sidebar.php',
+	);
+
 	return is_front_page()
 		|| is_post_type_archive( 'property' )
 		|| is_tax( array( 'property_category', 'property_location', 'property_area' ) )
-		|| is_singular( 'property' );
+		|| is_singular( 'property' )
+		|| is_page_template( $filter_templates );
+}
+
+function murailles_page_uses_carousel_assets() {
+	$carousel_templates = array(
+		'page-templates/about-us.php',
+		'page-templates/agents.php',
+		'page-templates/agents-2.php',
+		'page-templates/agency-page.php',
+		'page-templates/agent-page.php',
+		'page-templates/blog.php',
+		'page-templates/classical-layout-with-map.php',
+		'page-templates/grid-layout-2.php',
+		'page-templates/grid-layout-3.php',
+		'page-templates/grid-layout-with-map.php',
+		'page-templates/grid-layout-with-sidebar.php',
+		'page-templates/half-map.php',
+		'page-templates/home-2.php',
+		'page-templates/home-3.php',
+		'page-templates/home-4.php',
+		'page-templates/home-5.php',
+		'page-templates/home-6.php',
+		'page-templates/home-7.php',
+		'page-templates/list-layout-with-map.php',
+		'page-templates/list-layout-with-map-2.php',
+		'page-templates/list-layout-with-sidebar.php',
+		'page-templates/map.php',
+		'page-templates/single-property.php',
+		'page-templates/single-property-1.php',
+		'page-templates/single-property-2.php',
+		'page-templates/single-property-3.php',
+		'page-templates/single-property-4.php',
+	);
+
+	return is_front_page()
+		|| is_post_type_archive( 'property' )
+		|| is_tax( array( 'property_category', 'property_location', 'property_area' ) )
+		|| is_singular( 'property' )
+		|| is_page_template( $carousel_templates );
+}
+
+function murailles_page_uses_gallery_assets() {
+	return is_singular( 'property' )
+		|| is_page_template( array(
+			'page-templates/single-property.php',
+			'page-templates/single-property-1.php',
+			'page-templates/single-property-2.php',
+			'page-templates/single-property-3.php',
+			'page-templates/single-property-4.php',
+		) );
+}
+
+function murailles_page_uses_date_assets() {
+	return is_page_template( array(
+		'page-templates/single-property-2.php',
+		'page-templates/single-property-3.php',
+	) );
 }
 
 /**
@@ -335,7 +434,7 @@ function murailles_page_uses_submission_assets() {
 function murailles_enqueue_styles()
 {
 	$theme_uri = get_template_directory_uri();
-	$ver       = wp_get_theme()->get('Version');
+	$ver       = murailles_asset_version();
 
 	// Main combined stylesheet (contains Bootstrap, FontAwesome 5 classes, all vendor CSS)
 	wp_enqueue_style('murailles-styles', $theme_uri . '/assets/css/styles.css', array(), $ver);
@@ -350,10 +449,7 @@ function murailles_enqueue_styles()
 	wp_enqueue_style('murailles-fa6', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css', array('murailles-styles'), '6.5.2');
 
 	// Theme overrides — consolidated into murailles-custom.css for caching + SEO.
-	// filemtime() so cache busts automatically on every edit.
-	$custom_css_ver = file_exists(get_template_directory() . '/assets/css/murailles-custom.css')
-		? filemtime(get_template_directory() . '/assets/css/murailles-custom.css')
-		: $ver;
+	$custom_css_ver = murailles_asset_version( 'assets/css/murailles-custom.css' );
 	wp_enqueue_style('murailles-custom-css', $theme_uri . '/assets/css/murailles-custom.css', array('murailles-fa6'), $custom_css_ver);
 
 	// WordPress default stylesheet (theme metadata only)
@@ -361,14 +457,10 @@ function murailles_enqueue_styles()
 
 	// Unified dropdown / select / datepicker styling. Must load AFTER murailles-styles
 	// to override the legacy rules in styles.css.
-	// filemtime() so cache busts automatically on every edit.
-	$dropdown_css_ver = file_exists(get_template_directory() . '/assets/css/murailles-dropdown.css')
-		? filemtime(get_template_directory() . '/assets/css/murailles-dropdown.css')
-		: $ver;
+	$dropdown_css_ver = murailles_asset_version( 'assets/css/murailles-dropdown.css' );
 	wp_enqueue_style('murailles-dropdown', $theme_uri . '/assets/css/murailles-dropdown.css', array('murailles-styles', 'murailles-theme-style'), $dropdown_css_ver);
 
-	$scroll_css = get_stylesheet_directory() . '/assets/css/scroll-animations.css';
-	wp_enqueue_style('murailles-scroll-anim', get_stylesheet_directory_uri() . '/assets/css/scroll-animations.css', array(), file_exists($scroll_css) ? filemtime($scroll_css) : $ver);
+	wp_enqueue_style('murailles-scroll-anim', get_stylesheet_directory_uri() . '/assets/css/scroll-animations.css', array(), murailles_asset_version( 'assets/css/scroll-animations.css' ) );
 }
 add_action('wp_enqueue_scripts', 'murailles_enqueue_styles');
 
@@ -378,8 +470,11 @@ add_action('wp_enqueue_scripts', 'murailles_enqueue_styles');
 function murailles_enqueue_scripts()
 {
 	$theme_uri = get_template_directory_uri();
-	$ver       = wp_get_theme()->get('Version');
-	$uses_advanced_filters = murailles_page_uses_advanced_filters();
+	$ver       = murailles_asset_version();
+	$uses_advanced_filters  = murailles_page_uses_advanced_filters();
+	$uses_carousel_assets   = murailles_page_uses_carousel_assets();
+	$uses_gallery_assets    = murailles_page_uses_gallery_assets();
+	$uses_date_assets       = murailles_page_uses_date_assets();
 	$uses_submission_assets = murailles_page_uses_submission_assets();
 
 	// Use WordPress's bundled jQuery so Elementor, Royal Elementor Addons, and
@@ -393,64 +488,77 @@ function murailles_enqueue_scripts()
 	// Bootstrap JS
 	wp_enqueue_script('murailles-bootstrap', $theme_uri . '/assets/js/bootstrap.min.js', array('jquery', 'murailles-popper'), $ver, true);
 
-	// Magnific Popup
-	wp_enqueue_script('murailles-magnific', $theme_uri . '/assets/js/jquery.magnific-popup.min.js', array('jquery'), $ver, true);
+	if ( $uses_gallery_assets ) {
+		// Magnific Popup
+		wp_enqueue_script('murailles-magnific', $theme_uri . '/assets/js/jquery.magnific-popup.min.js', array('jquery'), $ver, true);
 
-	// Slick Slider
-	wp_enqueue_script('murailles-slick', $theme_uri . '/assets/js/slick.js', array('jquery'), $ver, true);
+		// Lightbox
+		wp_enqueue_script('murailles-lightbox', $theme_uri . '/assets/js/lightbox.js', array('jquery'), $ver, true);
 
-	// Slider Background
-	wp_enqueue_script('murailles-slider-bg', $theme_uri . '/assets/js/slider-bg.js', array('jquery'), $ver, true);
+		// Images Loaded
+		wp_enqueue_script('murailles-imagesloaded', $theme_uri . '/assets/js/imagesloaded.js', array('jquery'), $ver, true);
+	}
 
-	// Lightbox
-	wp_enqueue_script('murailles-lightbox', $theme_uri . '/assets/js/lightbox.js', array('jquery'), $ver, true);
+	if ( $uses_carousel_assets ) {
+		// Slick Slider
+		wp_enqueue_script('murailles-slick', $theme_uri . '/assets/js/slick.js', array('jquery'), $ver, true);
+	}
 
-	// Images Loaded
-	wp_enqueue_script('murailles-imagesloaded', $theme_uri . '/assets/js/imagesloaded.js', array('jquery'), $ver, true);
+	if ( is_page_template( 'page-templates/home-4.php' ) ) {
+		// Slider Background
+		wp_enqueue_script('murailles-slider-bg', $theme_uri . '/assets/js/slider-bg.js', array('jquery'), $ver, true);
+	}
 
 	if ( $uses_advanced_filters ) {
 		wp_enqueue_script('murailles-rangeslider', $theme_uri . '/assets/js/ion.rangeSlider.min.js', array('jquery'), $ver, true);
 	}
 
-	if ( $uses_submission_assets ) {
+	if ( $uses_date_assets ) {
 		wp_enqueue_script('murailles-daterangepicker', $theme_uri . '/assets/js/daterangepicker.js', array('jquery'), $ver, true);
+	}
+
+	if ( $uses_submission_assets ) {
 		wp_enqueue_script('murailles-dropzone', $theme_uri . '/assets/js/dropzone.js', array('jquery'), $ver, true);
 	}
 
 	// Custom JS (main theme script)
-	$custom_js_ver = file_exists(get_template_directory() . '/assets/js/custom.js')
-		? filemtime(get_template_directory() . '/assets/js/custom.js')
-		: $ver;
-	wp_enqueue_script('murailles-custom', $theme_uri . '/assets/js/custom.js', array('jquery', 'murailles-bootstrap', 'murailles-slick'), $custom_js_ver, true);
+	$custom_js_deps = array( 'jquery', 'murailles-bootstrap' );
+	if ( $uses_gallery_assets ) {
+		$custom_js_deps[] = 'murailles-magnific';
+		$custom_js_deps[] = 'murailles-imagesloaded';
+	}
+	if ( $uses_carousel_assets ) {
+		$custom_js_deps[] = 'murailles-slick';
+	}
+	if ( $uses_advanced_filters ) {
+		$custom_js_deps[] = 'murailles-rangeslider';
+	}
+	if ( $uses_date_assets ) {
+		$custom_js_deps[] = 'murailles-daterangepicker';
+	}
+	wp_enqueue_script('murailles-custom', $theme_uri . '/assets/js/custom.js', $custom_js_deps, murailles_asset_version( 'assets/js/custom.js' ), true);
 
 	// Unified dropdown enhancer — converts every <select.form-control> into the
 	// Murailles dropdown component. No dependencies, vanilla JS.
-	$dropdown_js_ver = file_exists(get_template_directory() . '/assets/js/murailles-dropdown.js')
-		? filemtime(get_template_directory() . '/assets/js/murailles-dropdown.js')
-		: $ver;
-	wp_enqueue_script('murailles-dropdown', $theme_uri . '/assets/js/murailles-dropdown.js', array(), $dropdown_js_ver, true);
+	wp_enqueue_script('murailles-dropdown', $theme_uri . '/assets/js/murailles-dropdown.js', array(), murailles_asset_version( 'assets/js/murailles-dropdown.js' ), true);
 
 	// File uploader with previews — used on submit-property.php and any other
 	// form that opts in with [data-murailles-uploader]. Vanilla JS, no deps.
-	$uploader_js_ver = file_exists(get_template_directory() . '/assets/js/murailles-uploader.js')
-		? filemtime(get_template_directory() . '/assets/js/murailles-uploader.js')
-		: $ver;
 	if ( $uses_submission_assets ) {
-		wp_enqueue_script('murailles-uploader', $theme_uri . '/assets/js/murailles-uploader.js', array(), $uploader_js_ver, true);
+		wp_enqueue_script('murailles-uploader', $theme_uri . '/assets/js/murailles-uploader.js', array(), murailles_asset_version( 'assets/js/murailles-uploader.js' ), true);
 	}
 
-	$scroll_js = get_stylesheet_directory() . '/assets/js/scroll-animations.js';
-	wp_enqueue_script('murailles-scroll-anim', get_stylesheet_directory_uri() . '/assets/js/scroll-animations.js', array(), file_exists($scroll_js) ? filemtime($scroll_js) : $ver, true);
+	wp_enqueue_script('murailles-scroll-anim', get_stylesheet_directory_uri() . '/assets/js/scroll-animations.js', array(), murailles_asset_version( 'assets/js/scroll-animations.js' ), true);
 
 	// Page-specific scripts — loaded only on their pages via is_page_template().
 	if (is_singular('property') || is_page_template('page-templates/single-property-1.php')) {
-		wp_enqueue_script('murailles-single-property', $theme_uri . '/assets/js/murailles-single-property.js', array('murailles-wishlist-compare'), $ver, true);
+		wp_enqueue_script('murailles-single-property', $theme_uri . '/assets/js/murailles-single-property.js', array('murailles-wishlist-compare'), murailles_asset_version( 'assets/js/murailles-single-property.js' ), true);
 	}
 	if (is_page_template('page-templates/favoris.php')) {
-		wp_enqueue_script('murailles-favoris', $theme_uri . '/assets/js/murailles-favoris.js', array('murailles-wishlist-compare'), $ver, true);
+		wp_enqueue_script('murailles-favoris', $theme_uri . '/assets/js/murailles-favoris.js', array('murailles-wishlist-compare'), murailles_asset_version( 'assets/js/murailles-favoris.js' ), true);
 	}
 	if (is_page_template('page-templates/compare-property.php')) {
-		wp_enqueue_script('murailles-compare', $theme_uri . '/assets/js/murailles-compare.js', array('murailles-wishlist-compare'), $ver, true);
+		wp_enqueue_script('murailles-compare', $theme_uri . '/assets/js/murailles-compare.js', array('murailles-wishlist-compare'), murailles_asset_version( 'assets/js/murailles-compare.js' ), true);
 	}
 }
 add_action('wp_enqueue_scripts', 'murailles_enqueue_scripts');

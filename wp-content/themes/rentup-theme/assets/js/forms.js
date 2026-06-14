@@ -4,8 +4,7 @@
  * Each form opts in by adding class="murailles-form" and data-action="<wp_ajax_action>".
  * Required hidden fields (rendered server-side):
  *   - name="action"          → wp_ajax action slug
- *   - name="_murailles_nonce"   → wp_nonce_field value
- *   - name="_murailles_ts"      → time() when page rendered
+ *   - name="_murailles_nonce"   → advisory nonce; server tolerates stale cache
  *   - name="_mw_hp_url"     → honeypot (must remain empty; obscure name avoids browser autofill)
  *
  * The script:

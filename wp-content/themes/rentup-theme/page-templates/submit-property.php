@@ -53,7 +53,6 @@ get_header();
 								<form class="murailles-form" method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 									<input type="hidden" name="action" value="murailles_submit_property">
 									<?php wp_nonce_field( 'murailles_submit_property', '_murailles_nonce' ); ?>
-									<input type="hidden" name="_murailles_ts" value="<?php echo time(); ?>">
 									<input type="hidden" name="page_url" value="<?php echo esc_url( get_permalink() ); ?>">
 									<input type="hidden" name="language" value="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr' ); ?>">
 									<input type="text" name="_mw_hp_url" value="" tabindex="-1" autocomplete="new-password" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px;pointer-events:none;">

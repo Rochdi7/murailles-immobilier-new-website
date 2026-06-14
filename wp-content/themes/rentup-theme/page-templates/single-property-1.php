@@ -618,7 +618,6 @@ $_map_q        = urlencode( $_prop_address ?: 'Marrakech, Maroc' );
 									<form class="murailles-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 										<input type="hidden" name="action" value="murailles_review">
 										<?php wp_nonce_field( 'murailles_review', '_murailles_nonce' ); ?>
-										<input type="hidden" name="_murailles_ts" value="<?php echo time(); ?>">
 										<input type="hidden" name="property_id" value="<?php echo esc_attr( get_the_ID() ); ?>">
 										<input type="text" name="_mw_hp_url" value="" tabindex="-1" autocomplete="new-password" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px;pointer-events:none;">
 

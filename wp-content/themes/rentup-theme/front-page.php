@@ -735,7 +735,7 @@ get_header();
 									</div>
 								</div>
 								<div class="wpk_caption">
-									<h4><?php echo esc_html( $murailles_front_how_step_1_title ); ?></h4>
+									<h3><?php echo esc_html( $murailles_front_how_step_1_title ); ?></h3>
 									<p><?php echo esc_html( $murailles_front_how_step_1_text ); ?></p>
 								</div>
 							</div>
@@ -749,7 +749,7 @@ get_header();
 									</div>
 								</div>
 								<div class="wpk_caption">
-									<h4><?php echo esc_html( $murailles_front_how_step_2_title ); ?></h4>
+									<h3><?php echo esc_html( $murailles_front_how_step_2_title ); ?></h3>
 									<p><?php echo esc_html( $murailles_front_how_step_2_text ); ?></p>
 								</div>
 							</div>
@@ -763,7 +763,7 @@ get_header();
 									</div>
 								</div>
 								<div class="wpk_caption">
-									<h4><?php echo esc_html( $murailles_front_how_step_3_title ); ?></h4>
+									<h3><?php echo esc_html( $murailles_front_how_step_3_title ); ?></h3>
 									<p><?php echo esc_html( $murailles_front_how_step_3_text ); ?></p>
 								</div>
 							</div>
@@ -1076,7 +1076,7 @@ get_header();
 														<img src="<?php echo esc_url( $murailles_testimonial_image ); ?>" class="img-fluid" alt="<?php echo esc_attr( $murailles_testimonial_alt ); ?>">
 													</div>
 													<div class="_tsl_flex_capst">
-														<h5><?php echo esc_html( $murailles_testimonial_name ); ?></h5>
+														<div class="_testimonial_name"><?php echo esc_html( $murailles_testimonial_name ); ?></div>
 														<div class="_ovr_posts"><span><?php echo esc_html( $murailles_testimonial_role ); ?></span></div>
 														<div class="_ovr_rates"><span><i class="fa fa-star"></i></span><?php echo esc_html( $murailles_testimonial_rate ); ?></div>
 													</div>
@@ -1296,24 +1296,24 @@ get_header();
 								</div>
 
 								<div class="blog-body">
-									<h4 class="bl-title">
-										<a href="<?php echo esc_url( $mu_url ); ?>"><?php echo esc_html( $mu_title ); ?></a>
-										<?php if ( $mu_is_hot ) : ?>
-											<span class="latest_new_post hot"><?php murailles_t( 'Tendance' ); ?></span>
-										<?php elseif ( $mu_is_new ) : ?>
-											<span class="latest_new_post"><?php murailles_t( 'Nouveau' ); ?></span>
-										<?php endif; ?>
-									</h4>
-									<p><?php echo esc_html( $mu_excerpt ); ?></p>
-								</div>
+								<h3 class="bl-title">
+									<a href="<?php echo esc_url( $mu_url ); ?>"><?php echo esc_html( $mu_title ); ?></a>
+									<?php if ( $mu_is_hot ) : ?>
+										<span class="latest_new_post hot"><?php murailles_t( 'Tendance' ); ?></span>
+									<?php elseif ( $mu_is_new ) : ?>
+										<span class="latest_new_post"><?php murailles_t( 'Nouveau' ); ?></span>
+									<?php endif; ?>
+								</h3>
+								<p><?php echo esc_html( $mu_excerpt ); ?></p>
+							</div>
 
-								<div class="modern_property_footer">
-									<div class="property-author">
-										<div class="path-img"><a href="<?php echo esc_url( $mu_aurl ); ?>" tabindex="-1" aria-label="<?php echo esc_attr( $mu_aname ); ?>"><img src="<?php echo esc_url( $mu_aav ); ?>" class="img-fluid" alt="<?php echo esc_attr( $mu_aname ); ?>"></a></div>
-										<h5><a href="<?php echo esc_url( $mu_aurl ); ?>" tabindex="-1"><?php echo esc_html( $mu_aname ); ?></a></h5>
-									</div>
-									<span class="article-pulish-date"><i class="ti-comment-alt me-2"></i><?php echo (int) $mu_comm; ?></span>
+							<div class="modern_property_footer">
+								<div class="property-author">
+									<div class="path-img"><a href="<?php echo esc_url( $mu_aurl ); ?>" aria-label="<?php echo esc_attr( $mu_aname ); ?>"><img src="<?php echo esc_url( $mu_aav ); ?>" class="img-fluid" alt="<?php echo esc_attr( $mu_aname ); ?>"></a></div>
+									<div class="property-author__name"><a href="<?php echo esc_url( $mu_aurl ); ?>"><?php echo esc_html( $mu_aname ); ?></a></div>
 								</div>
+								<span class="article-pulish-date"><i class="ti-comment-alt me-2"></i><?php echo (int) $mu_comm; ?></span>
+							</div>
 
 							</div>
 						</div>

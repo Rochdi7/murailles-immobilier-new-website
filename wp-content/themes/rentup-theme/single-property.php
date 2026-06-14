@@ -447,7 +447,6 @@ $similar = new WP_Query( array(
 										<form class="murailles-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 											<input type="hidden" name="action" value="murailles_property_inquiry">
 											<?php wp_nonce_field( 'murailles_property_inquiry', '_murailles_nonce' ); ?>
-											<input type="hidden" name="_murailles_ts" value="<?php echo time(); ?>">
 											<input type="hidden" name="property_id" value="<?php echo esc_attr( $id ); ?>">
 											<input type="hidden" name="page_url" value="<?php echo esc_url( get_permalink( $id ) ); ?>">
 											<input type="hidden" name="language" value="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr' ); ?>">
