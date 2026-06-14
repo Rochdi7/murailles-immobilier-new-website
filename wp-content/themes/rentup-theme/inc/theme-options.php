@@ -331,7 +331,7 @@ function murailles_options_page() {
 	if ( ! current_user_can( 'manage_options' ) ) { return; }
 
 	$opts    = (array) get_option( 'murailles_options', array() );
-	$tab     = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'home';
+	$tab     = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard';
 	$saved   = isset( $_GET['saved'] );
 
 	$o = function( $key, $default = '' ) use ( $opts ) {
@@ -341,17 +341,33 @@ function murailles_options_page() {
 		return isset( $opts[ $key ] ) && $opts[ $key ] !== '' ? esc_url( $opts[ $key ] ) : esc_url( $default );
 	};
 
-	// Sidebar navigation: icon + label + description. Slugs preserved for back-compat.
+	/*
+	 * IMPORTANT — what this page actually controls:
+	 *   The live site reads PAGE CONTENT (hero, about, contact, etc.) from
+	 *   per-page post meta via murailles_page_section_meta(), edited in the
+	 *   "Contenu de la page" meta box on each Page (Polylang gives each
+	 *   language its own page = bilingual editing). Theme Options only drives
+	 *   the SEO/analytics keys and the testimonials list.
+	 *
+	 *   $nav      = sections shown in the sidebar (only the ones that work).
+	 *   $nav_meta = full label map; the legacy hero/about/contact/agency/team
+	 *               panels still render if reached via ?tab=… (kept, not deleted)
+	 *               but are no longer advertised in the nav to avoid confusing
+	 *               staff with fields that don't affect the frontend.
+	 */
 	$nav = array(
-		'home'         => array( '🖼️', 'Accueil',      'Hero, étapes et présentation' ),
-		'about'        => array( '📖', 'À propos',      'Histoire et distinctions' ),
-		'contact'      => array( '📞', 'Contact',       'Coordonnées et carte' ),
-		'agency'       => array( '🏢', 'Agence',        'Identité, logos, réseaux' ),
-		'team'         => array( '👥', 'Équipe',        'Membres et fonctions' ),
-		'testimonials' => array( '💬', 'Témoignages',   'Avis clients FR / EN' ),
+		'dashboard'    => array( '🏠', 'Tableau de bord', 'Vue d\'ensemble et aide' ),
+		'testimonials' => array( '💬', 'Témoignages',     'Avis clients FR / EN' ),
 		'seo'          => array( '🔍', 'SEO & Analytics', 'Référencement et suivi' ),
 	);
-	if ( ! isset( $nav[ $tab ] ) ) { $tab = 'home'; }
+	$nav_meta = $nav + array(
+		'home'    => array( '🖼️', 'Accueil (héritée)',  'Section non connectée au site' ),
+		'about'   => array( '📖', 'À propos (héritée)', 'Section non connectée au site' ),
+		'contact' => array( '📞', 'Contact (héritée)',  'Section non connectée au site' ),
+		'agency'  => array( '🏢', 'Agence (héritée)',   'Section non connectée au site' ),
+		'team'    => array( '👥', 'Équipe (héritée)',   'Section non connectée au site' ),
+	);
+	if ( ! isset( $nav_meta[ $tab ] ) ) { $tab = 'dashboard'; }
 
 	/**
 	 * Renders the modern "media field" card. Wraps the existing single-image
@@ -424,10 +440,52 @@ function murailles_options_page() {
 			<?php endif; ?>
 
 			<div class="mi-panel-head">
-				<h2><?php echo $nav[ $tab ][0] . ' ' . esc_html( $nav[ $tab ][1] ); ?></h2>
-				<p><?php echo esc_html( $nav[ $tab ][2] ); ?></p>
+				<h2><?php echo $nav_meta[ $tab ][0] . ' ' . esc_html( $nav_meta[ $tab ][1] ); ?></h2>
+				<p><?php echo esc_html( $nav_meta[ $tab ][2] ); ?></p>
 			</div>
 
+			<?php
+			// ── Tab: Tableau de bord (informational, no form) ─────────────────
+			if ( $tab === 'dashboard' ) :
+			?>
+			<div class="mi-card">
+				<div class="mi-card-head"><span class="mi-card-ico">👋</span><h3>Bienvenue</h3></div>
+				<div class="mi-card-body">
+					<p style="margin-top:0;color:#646970;font-size:13px;line-height:1.6;">
+						Cette page gère les <strong>témoignages clients</strong> et les réglages <strong>SEO / Analytics</strong>.
+						Le <strong>contenu des pages</strong> (titres, textes, images du hero, « à propos », contact…)
+						se modifie <strong>directement sur chaque page</strong>, dans le bloc « Contenu de la page ».
+						Comme vous utilisez <strong>Polylang</strong>, chaque langue possède sa propre page :
+						modifiez la page française pour le 🇫🇷, la page anglaise pour le 🇬🇧.
+					</p>
+				</div>
+			</div>
+
+			<div class="mi-dash-grid">
+				<a class="mi-dash-card" href="<?php echo esc_url( admin_url( 'admin.php?page=murailles-options&tab=testimonials' ) ); ?>">
+					<span class="mi-dash-ico">💬</span>
+					<h3>Témoignages</h3>
+					<p>Ajouter / modifier les avis clients (jeux FR et EN distincts).</p>
+				</a>
+				<a class="mi-dash-card" href="<?php echo esc_url( admin_url( 'admin.php?page=murailles-options&tab=seo' ) ); ?>">
+					<span class="mi-dash-ico">🔍</span>
+					<h3>SEO & Analytics</h3>
+					<p>Google Analytics, Tag Manager, vérifications, image de partage.</p>
+				</a>
+				<a class="mi-dash-card" href="<?php echo esc_url( admin_url( 'edit.php?post_type=page' ) ); ?>">
+					<span class="mi-dash-ico">📄</span>
+					<h3>Contenu des pages</h3>
+					<p>Hero, « à propos », contact… Modifiez chaque page (FR / EN) via son bloc « Contenu de la page ».</p>
+				</a>
+				<a class="mi-dash-card" href="<?php echo esc_url( admin_url( 'edit.php?post_type=property' ) ); ?>">
+					<span class="mi-dash-ico">🏘️</span>
+					<h3>Biens immobiliers</h3>
+					<p>Gérer les annonces (propriétés) affichées sur le site.</p>
+				</a>
+			</div>
+			<?php endif; // dashboard ?>
+
+			<?php if ( $tab !== 'dashboard' ) : ?>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data">
 			<?php wp_nonce_field( 'murailles_options_nonce', '_murailles_options_nonce' ); ?>
 			<input type="hidden" name="action" value="murailles_save_options">
@@ -782,12 +840,25 @@ function murailles_options_page() {
 				<span class="mi-save-note">Vos données existantes sont conservées — seule cette section est mise à jour.</span>
 			</div>
 		</form>
+		<?php endif; // not dashboard ?>
 		</div><!-- .mi-content -->
 		</div><!-- .mi-shell -->
 	</div>
 
 	<script>
 	(function($){
+		// ── Language tabs (FR / EN) ──
+		$(document).on('click', '.mi-langtab', function(){
+			var $tab   = $(this);
+			var $group = $tab.closest('[data-langgroup]');
+			var lang   = $tab.data('lang');
+			$group.find('.mi-langtab').removeClass('is-active').attr('aria-selected', 'false');
+			$tab.addClass('is-active').attr('aria-selected', 'true');
+			$group.find('.mi-langpane').removeClass('is-active').each(function(){
+				if (String($(this).data('lang')) === String(lang)) { $(this).addClass('is-active'); }
+			});
+		});
+
 		function muraillesOptionPreview($row, url) {
 			var $preview = $row.find('.murailles-option-image-preview').first();
 			if (!$preview.length) {
