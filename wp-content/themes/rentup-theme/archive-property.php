@@ -416,14 +416,14 @@ foreach ( array( 'q','ptype','action','location','area','beds','baths','price_mi
 													</div>
 													<?php if ( $pprice !== '' ) : ?>
 													<div class="_card_flex_last">
-														<h6 class="listing-card-info-price text-seegreen mb-0"><?php echo esc_html( $pprice ); ?> €</h6>
+														<div class="listing-card-info-price text-seegreen mb-0"><?php echo esc_html( $pprice ); ?> €</div>
 														<?php if ( $psuffix ) : ?><small><?php echo esc_html( $psuffix ); ?></small><?php endif; ?>
 													</div>
 													<?php endif; ?>
 												</div>
 												<div class="_card_list_flex">
 													<div class="_card_flex_01">
-														<h4 class="listing-name verified"><a href="<?php echo esc_url( $link ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h4>
+														<h3 class="listing-name verified"><a href="<?php echo esc_url( $link ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h3>
 													</div>
 												</div>
 											</div>
@@ -457,17 +457,17 @@ foreach ( array( 'q','ptype','action','location','area','beds','baths','price_mi
 												<ul class="selio_style">
 													<li>
 														<div class="prt_saveed_12lk">
-															<label class="toggler toggler-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Sauvegarder', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Sauvegarder', false ) ); ?>"><input type="checkbox"><i class="fa-solid fa-heart"></i></label>
+															<label class="toggler toggler-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Sauvegarder', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Sauvegarder %s', false ), get_the_title( $pid ) ) ); ?>"><input type="checkbox"><i class="fa-solid fa-heart" aria-hidden="true"></i></label>
 														</div>
 													</li>
 													<li>
 														<div class="prt_saveed_12lk">
-															<a href="<?php echo esc_url( home_url( '/compare-property/' ) ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Comparer', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Comparer', false ) ); ?>"><i class="fa-solid fa-share"></i></a>
+															<a href="<?php echo esc_url( home_url( '/compare-property/' ) ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Comparer', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Comparer %s', false ), get_the_title( $pid ) ) ); ?>"><i class="fa-solid fa-share" aria-hidden="true"></i></a>
 														</div>
 													</li>
 													<li>
 														<div class="prt_saveed_12lk">
-															<a href="<?php echo esc_url( $link ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>"><i class="fa-regular fa-circle-right"></i></a>
+															<a href="<?php echo esc_url( $link ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Voir le bien %s', false ), get_the_title( $pid ) ) ); ?>"><i class="fa-regular fa-circle-right" aria-hidden="true"></i></a>
 														</div>
 													</li>
 												</ul>

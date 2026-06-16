@@ -31,9 +31,9 @@ $recent = new WP_Query( array(
 		<h4 class="sidebar_title"><?php murailles_t( 'Recherche' ); ?></h4>
 		<form role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 			<div class="input-group">
-				<input type="text" class="form-control" name="s" placeholder="<?php echo esc_attr( murailles_t( 'Rechercher...', false ) ); ?>" value="<?php echo esc_attr( get_search_query() ); ?>">
+				<input type="text" class="form-control" name="s" placeholder="<?php echo esc_attr( murailles_t( 'Rechercher...', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Rechercher', false ) ); ?>" value="<?php echo esc_attr( get_search_query() ); ?>">
 				<div class="input-group-append">
-					<button class="btn btn-danger" type="submit"><i class="ti-search"></i></button>
+					<button class="btn btn-danger" type="submit" aria-label="<?php echo esc_attr( murailles_t( 'Rechercher', false ) ); ?>"><i class="ti-search" aria-hidden="true"></i></button>
 				</div>
 			</div>
 		</form>

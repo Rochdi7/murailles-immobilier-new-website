@@ -24,9 +24,15 @@ if (is_front_page() && ! isset($murailles_header_style)) {
 <head>
 	<meta charset="<?php bloginfo('charset'); ?>" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<?php if ( ! function_exists( 'has_site_icon' ) || ! has_site_icon() ) : ?>
-		<link rel="icon" href="<?php echo esc_url( murailles_img( 'logo.png' ) ); ?>" type="image/png">
-		<link rel="apple-touch-icon" href="<?php echo esc_url( murailles_img( 'logo.png' ) ); ?>">
+	<?php if ( ! function_exists( 'has_site_icon' ) || ! has_site_icon() ) :
+		$murailles_favicon = trailingslashit( get_template_directory_uri() ) . 'assets/images/favicon/';
+	?>
+		<link rel="icon" type="image/x-icon" href="<?php echo esc_url( $murailles_favicon . 'favicon.ico' ); ?>">
+		<link rel="icon" type="image/svg+xml" href="<?php echo esc_url( $murailles_favicon . 'favicon.svg' ); ?>">
+		<link rel="icon" type="image/png" sizes="96x96" href="<?php echo esc_url( $murailles_favicon . 'favicon-96x96.png' ); ?>">
+		<link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( $murailles_favicon . 'apple-touch-icon.png' ); ?>">
+		<link rel="manifest" href="<?php echo esc_url( $murailles_favicon . 'site.webmanifest' ); ?>">
+		<meta name="theme-color" content="#ffffff">
 	<?php endif; ?>
 	<?php wp_head(); ?>
 	<?php /* Preloader safety net — pure CSS + inline JS, no jQuery dependency.
@@ -147,5 +153,23 @@ if (is_front_page() && ! isset($murailles_header_style)) {
 			</div>
 		<?php endif; ?>
 		<!-- End Navigation -->
+		<?php /* Sticky-header fallback (vanilla JS, no jQuery): keeps the navbar pinned
+		         on scroll even if custom.js fails to load. Mirrors custom.js by toggling
+		         the existing .header-fixed class past 50px — idempotent if both run. */ ?>
+		<script>
+			(function () {
+				var header = document.querySelector('.header');
+				if (!header) { return; }
+				var onScroll = function () {
+					if ((window.pageYOffset || document.documentElement.scrollTop) >= 50) {
+						header.classList.add('header-fixed');
+					} else {
+						header.classList.remove('header-fixed');
+					}
+				};
+				window.addEventListener('scroll', onScroll, { passive: true });
+				onScroll();
+			})();
+		</script>
 		<div class="clearfix"></div>
 		<main id="site-content" class="murailles-site-content" role="main">

@@ -5,7 +5,7 @@
  * - Configures wp_mail() to send via Gmail SMTP using constants in wp-config.php
  * - Registers a 'lead' CPT to persist every submission (admin-only)
  * - Registers admin-post + admin-ajax handlers for each form
- * - Anti-spam: advisory WP nonce + honeypot field (`_mw_hp_url`)
+ * - Anti-spam: required WP nonce + honeypot field (`_mw_hp_url`)
  *
  * @package Murailles Immobilier
  */
@@ -15,6 +15,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/email-templates.php';
+
+if ( ! function_exists( 'murailles_forms_is_local_host' ) ) {
+	function murailles_forms_is_local_host() {
+		$host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+		return in_array( $host, array( 'localhost', '127.0.0.1' ), true ) || str_starts_with( $host, 'localhost:' );
+	}
+}
+
+if ( ! function_exists( 'murailles_property_submission_post_type' ) ) {
+	function murailles_property_submission_post_type() {
+		return 'murailles_submission';
+	}
+}
 
 /**
  * Extract a likely first name from a full name string.
@@ -45,8 +58,7 @@ add_action( 'phpmailer_init', function ( $phpmailer ) {
 
 	// Local XAMPP has no CA bundle by default — TLS handshake fails silently.
 	// Disable peer verification ONLY on localhost (dev convenience).
-	$host_is_local = in_array( $_SERVER['HTTP_HOST'] ?? '', array( 'localhost', '127.0.0.1' ), true )
-		|| ( isset( $_SERVER['HTTP_HOST'] ) && strpos( $_SERVER['HTTP_HOST'], 'localhost' ) === 0 );
+	$host_is_local = murailles_forms_is_local_host();
 	if ( $host_is_local ) {
 		$phpmailer->SMTPOptions = array(
 			'ssl' => array(
@@ -58,7 +70,7 @@ add_action( 'phpmailer_init', function ( $phpmailer ) {
 	}
 
 	// Capture verbose debug output to debug.log so we can see what's failing.
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $host_is_local ) {
 		$phpmailer->SMTPDebug   = 2; // 0=off, 1=client, 2=client+server
 		$phpmailer->Debugoutput = function ( $str, $level ) {
 			error_log( '[murailles-smtp] ' . trim( $str ) );
@@ -82,6 +94,9 @@ add_action( 'wp_mail_failed', function ( $wp_error ) {
  * Log every successful send so we can confirm SMTP is working.
  */
 add_action( 'wp_mail_succeeded', function ( $mail_data ) {
+	if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG || ! murailles_forms_is_local_host() ) {
+		return;
+	}
 	$to = is_array( $mail_data['to'] ?? null ) ? implode( ',', $mail_data['to'] ) : (string) ( $mail_data['to'] ?? '' );
 	error_log( '[murailles-mail] wp_mail OK → ' . $to . ' | subject: ' . ( $mail_data['subject'] ?? '' ) );
 } );
@@ -119,7 +134,7 @@ add_action( 'init', function () {
 		'rewrite'             => false,
 	) );
 
-	register_post_type( 'murailles_property_submission', array(
+	register_post_type( murailles_property_submission_post_type(), array(
 		'labels'              => array(
 			'name'          => 'Soumissions biens',
 			'singular_name' => 'Soumission bien',
@@ -250,7 +265,18 @@ function murailles_form_context() {
  * Resolve the backoffice notification inbox for form events.
  */
 function murailles_form_notification_recipient() {
-	return defined( 'MURAILLES_LEAD_NOTIFY' ) ? MURAILLES_LEAD_NOTIFY : get_option( 'admin_email' );
+	// Server-level override always wins.
+	if ( defined( 'MURAILLES_LEAD_NOTIFY' ) && is_email( MURAILLES_LEAD_NOTIFY ) ) {
+		return MURAILLES_LEAD_NOTIFY;
+	}
+	// Address set in Theme Options → Notifications.
+	if ( function_exists( 'murailles_opt' ) ) {
+		$opt = murailles_opt( 'notify_email', '' );
+		if ( $opt && is_email( $opt ) ) {
+			return $opt;
+		}
+	}
+	return get_option( 'admin_email' );
 }
 
 /**
@@ -341,7 +367,7 @@ add_action(
 
 		foreach ( $submission_string_meta as $meta_key ) {
 			register_post_meta(
-				'murailles_property_submission',
+				murailles_property_submission_post_type(),
 				$meta_key,
 				array(
 					'single'            => true,
@@ -501,10 +527,9 @@ function murailles_form_is_legit( $nonce_action, $strict = true ) {
 		return false;
 	}
 	// Nonce
-	if ( empty( $_POST['_murailles_nonce'] ) || ! wp_verify_nonce( $_POST['_murailles_nonce'], $nonce_action ) ) {
-		if ( ! $strict ) {
-			return true;
-		}
+	$nonce = isset( $_POST['_murailles_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_murailles_nonce'] ) ) : '';
+	if ( '' === $nonce || ! wp_verify_nonce( $nonce, $nonce_action ) ) {
+		unset( $strict );
 		return false;
 	}
 	return true;
@@ -559,7 +584,7 @@ function murailles_save_lead( $type, $title, $fields, $body = '' ) {
 function murailles_save_property_submission( $submission ) {
 	$post_id = wp_insert_post(
 		array(
-			'post_type'    => 'murailles_property_submission',
+			'post_type'    => murailles_property_submission_post_type(),
 			'post_status'  => 'publish',
 			'post_title'   => wp_strip_all_tags( $submission['post_title'] ?? '' ),
 			'post_content' => wp_kses_post( $submission['post_content'] ?? '' ),
@@ -728,6 +753,7 @@ add_filter(
 			'lead_type'   => 'Type',
 			'lead_status' => 'Statut',
 			'lead_email'  => 'E-mail',
+			'lead_visit'  => 'Visite souhaitée',
 			'lead_lang'   => 'Langue',
 			'date'        => $columns['date'],
 		);
@@ -753,6 +779,15 @@ add_action(
 					echo '—';
 				}
 				break;
+			case 'lead_visit':
+				$vd = get_post_meta( $post_id, '_lead_visit_date', true );
+				$vt = get_post_meta( $post_id, '_lead_visit_time', true );
+				if ( $vd ) {
+					echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $vd ) ) . ( $vt ? ' — ' . $vt : '' ) );
+				} else {
+					echo '—';
+				}
+				break;
 			case 'lead_lang':
 				echo esc_html( strtoupper( get_post_meta( $post_id, '_lead_language', true ) ?: 'fr' ) );
 				break;
@@ -766,7 +801,7 @@ add_action(
  * Add backoffice columns for property submissions.
  */
 add_filter(
-	'manage_murailles_property_submission_posts_columns',
+	'manage_' . murailles_property_submission_post_type() . '_posts_columns',
 	function ( $columns ) {
 		return array(
 			'cb'                => $columns['cb'],
@@ -781,7 +816,7 @@ add_filter(
 );
 
 add_action(
-	'manage_murailles_property_submission_posts_custom_column',
+	'manage_' . murailles_property_submission_post_type() . '_posts_custom_column',
 	function ( $column, $post_id ) {
 		switch ( $column ) {
 			case 'submission_owner':
@@ -825,16 +860,19 @@ add_action(
 	'add_meta_boxes',
 	function () {
 		add_meta_box( 'murailles-lead-workflow', 'Workflow', 'murailles_render_lead_workflow_metabox', 'murailles_lead', 'side', 'high' );
-		add_meta_box( 'murailles-submission-workflow', 'Workflow', 'murailles_render_submission_workflow_metabox', 'murailles_property_submission', 'side', 'high' );
+		add_meta_box( 'murailles-submission-workflow', 'Workflow', 'murailles_render_submission_workflow_metabox', murailles_property_submission_post_type(), 'side', 'high' );
 	}
 );
 
 function murailles_render_lead_workflow_metabox( $post ) {
 	wp_nonce_field( 'murailles_save_internal_workflow', 'murailles_internal_workflow_nonce' );
-	$status   = get_post_meta( $post->ID, '_lead_status', true ) ?: 'new';
-	$email    = get_post_meta( $post->ID, '_lead_email', true );
-	$page_url = get_post_meta( $post->ID, '_lead_page_url', true );
-	$lang     = get_post_meta( $post->ID, '_lead_language', true ) ?: 'fr';
+	$status     = get_post_meta( $post->ID, '_lead_status', true ) ?: 'new';
+	$email      = get_post_meta( $post->ID, '_lead_email', true );
+	$phone      = get_post_meta( $post->ID, '_lead_phone', true );
+	$visit_date = get_post_meta( $post->ID, '_lead_visit_date', true );
+	$visit_time = get_post_meta( $post->ID, '_lead_visit_time', true );
+	$page_url   = get_post_meta( $post->ID, '_lead_page_url', true );
+	$lang       = get_post_meta( $post->ID, '_lead_language', true ) ?: 'fr';
 	?>
 	<p>
 		<label for="murailles-lead-status"><strong>Statut</strong></label><br>
@@ -844,9 +882,15 @@ function murailles_render_lead_workflow_metabox( $post ) {
 			<?php endforeach; ?>
 		</select>
 	</p>
+	<?php if ( $visit_date ) : ?>
+	<p><strong>Visite souhaitée :</strong><br><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $visit_date ) ) . ( $visit_time ? ' — ' . $visit_time : '' ) ); ?></p>
+	<?php endif; ?>
 	<p><strong>Langue :</strong> <?php echo esc_html( strtoupper( $lang ) ); ?></p>
 	<?php if ( $email && is_email( $email ) ) : ?>
 	<p><strong>E-mail :</strong><br><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></p>
+	<?php endif; ?>
+	<?php if ( $phone ) : ?>
+	<p><strong>Téléphone :</strong><br><a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $phone ) ); ?>"><?php echo esc_html( $phone ); ?></a></p>
 	<?php endif; ?>
 	<?php if ( $page_url ) : ?>
 	<p><strong>Page source :</strong><br><a href="<?php echo esc_url( $page_url ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $page_url ); ?></a></p>
@@ -902,7 +946,7 @@ add_action(
 			}
 		}
 
-		if ( 'murailles_property_submission' === $post->post_type && ! empty( $_POST['murailles_submission_status'] ) ) {
+		if ( murailles_property_submission_post_type() === $post->post_type && ! empty( $_POST['murailles_submission_status'] ) ) {
 			$status = sanitize_key( wp_unslash( $_POST['murailles_submission_status'] ) );
 			if ( isset( murailles_property_submission_statuses()[ $status ] ) ) {
 				update_post_meta( $post_id, '_submission_status', $status );
@@ -918,7 +962,7 @@ add_action(
  * ---------------------------------------------------------------------- */
 
 function murailles_handle_contact() {
-	if ( ! murailles_form_is_legit( 'murailles_contact', false ) ) {
+	if ( ! murailles_form_is_legit( 'murailles_contact' ) ) {
 		murailles_form_response( false, 'Requête invalide. Merci de réessayer.' );
 	}
 
@@ -981,7 +1025,7 @@ add_action( 'wp_ajax_murailles_contact',           'murailles_handle_contact' );
  * ---------------------------------------------------------------------- */
 
 function murailles_handle_review() {
-	if ( ! murailles_form_is_legit( 'murailles_review', false ) ) {
+	if ( ! murailles_form_is_legit( 'murailles_review' ) ) {
 		murailles_form_response( false, 'Requête invalide. Merci de réessayer.' );
 	}
 
@@ -1071,7 +1115,7 @@ add_action( 'wp_ajax_murailles_review',           'murailles_handle_review' );
  * ---------------------------------------------------------------------- */
 
 function murailles_handle_newsletter() {
-	if ( ! murailles_form_is_legit( 'murailles_newsletter', false ) ) {
+	if ( ! murailles_form_is_legit( 'murailles_newsletter' ) ) {
 		murailles_form_response( false, 'Requête invalide.' );
 	}
 
@@ -1141,7 +1185,7 @@ add_action( 'wp_ajax_murailles_newsletter',           'murailles_handle_newslett
  * ---------------------------------------------------------------------- */
 
 function murailles_handle_property_inquiry() {
-	if ( ! murailles_form_is_legit( 'murailles_property_inquiry', false ) ) {
+	if ( ! murailles_form_is_legit( 'murailles_property_inquiry' ) ) {
 		murailles_form_response( false, murailles_form_i18n( 'Requête invalide. Merci de réessayer.', 'Invalid request. Please try again.' ) );
 	}
 
@@ -1211,12 +1255,107 @@ add_action( 'wp_ajax_nopriv_murailles_property_inquiry',    'murailles_handle_pr
 add_action( 'wp_ajax_murailles_property_inquiry',           'murailles_handle_property_inquiry' );
 
 /* -------------------------------------------------------------------------
+ * Form: Request a viewing — "Demander une visite" (single-property.php)
+ * Creates a murailles_lead with the requested date/time + emails admin.
+ * ---------------------------------------------------------------------- */
+
+function murailles_handle_visit_request() {
+	if ( ! murailles_form_is_legit( 'murailles_visit_request' ) ) {
+		murailles_form_response( false, murailles_form_i18n( 'Requête invalide. Merci de réessayer.', 'Invalid request. Please try again.' ) );
+	}
+
+	$name        = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+	$email       = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+	$phone       = isset( $_POST['phone'] ) ? murailles_normalize_phone( wp_unslash( $_POST['phone'] ) ) : '';
+	$visit_date  = isset( $_POST['visit_date'] ) ? sanitize_text_field( wp_unslash( $_POST['visit_date'] ) ) : '';
+	$visit_time  = isset( $_POST['visit_time'] ) ? sanitize_text_field( wp_unslash( $_POST['visit_time'] ) ) : '';
+	$message     = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
+	$property_id = isset( $_POST['property_id'] ) ? absint( $_POST['property_id'] ) : 0;
+	$context     = murailles_form_context();
+
+	if ( ! $name || ! is_email( $email ) || ! $phone || ! $property_id ) {
+		murailles_form_response( false, murailles_form_i18n( 'Merci de renseigner votre nom, votre e-mail et votre téléphone.', 'Please provide your name, email, and phone number.' ) );
+	}
+
+	// Validate the requested date (must be a real, future-or-today date).
+	$date_obj = $visit_date ? DateTime::createFromFormat( 'Y-m-d', $visit_date ) : false;
+	if ( ! $date_obj || $date_obj->format( 'Y-m-d' ) !== $visit_date ) {
+		murailles_form_response( false, murailles_form_i18n( 'Merci de choisir une date de visite valide.', 'Please choose a valid viewing date.' ) );
+	}
+	$today = current_time( 'Y-m-d' );
+	if ( $visit_date < $today ) {
+		murailles_form_response( false, murailles_form_i18n( 'La date de visite doit être aujourd\'hui ou ultérieure.', 'The viewing date must be today or later.' ) );
+	}
+	// Validate the requested time slot (HH:MM, 24h).
+	if ( ! $visit_time || ! preg_match( '/^([01][0-9]|2[0-3]):[0-5][0-9]$/', $visit_time ) ) {
+		murailles_form_response( false, murailles_form_i18n( 'Merci de choisir un horaire de visite valide.', 'Please choose a valid viewing time.' ) );
+	}
+
+	$property_title = get_the_title( $property_id );
+	$property_url   = get_permalink( $property_id );
+	$visit_when     = date_i18n( get_option( 'date_format' ), strtotime( $visit_date ) ) . ' — ' . $visit_time;
+
+	$fields = array(
+		'name'        => $name,
+		'email'       => $email,
+		'phone'       => $phone,
+		'visit_date'  => $visit_date,
+		'visit_time'  => $visit_time,
+		'message'     => $message,
+		'property_id' => $property_id,
+		'property'    => $property_title,
+	);
+
+	$admin_html = murailles_email_admin(
+		'Nouvelle demande de visite',
+		'Un visiteur souhaite organiser une visite pour un bien publié.',
+		array(
+			'Langue'        => esc_html( strtoupper( $context['language'] ) ),
+			'Bien'          => '<a href="' . esc_url( $property_url ) . '" style="color:#dc3545;">' . esc_html( $property_title ) . '</a>',
+			'Date souhaitée' => esc_html( $visit_when ),
+			'Nom'           => esc_html( $name ),
+			'E-mail'        => '<a href="mailto:' . esc_attr( $email ) . '" style="color:#dc3545;">' . esc_html( $email ) . '</a>',
+			'Téléphone'     => esc_html( $phone ),
+			'Message'       => $message ? nl2br( esc_html( $message ) ) : '—',
+		),
+		'Voir le bien',
+		$property_url
+	);
+
+	murailles_save_lead( 'visit_request', 'Demande de visite — ' . $property_title, $fields, $admin_html );
+	murailles_send_mail(
+		murailles_form_notification_recipient(),
+		'[Agence Murailles] Demande de visite — ' . $property_title,
+		$admin_html,
+		$email
+	);
+
+	$user_html = murailles_email_user(
+		murailles_first_name( $name ),
+		murailles_form_i18n( 'Votre demande de visite a bien été reçue', 'Your viewing request has been received' ),
+		murailles_form_i18n(
+			'<p>Merci pour votre demande de visite concernant <strong>' . esc_html( $property_title ) . '</strong>.</p><p>Notre équipe vous recontactera rapidement pour confirmer le rendez-vous.</p>',
+			'<p>Thank you for your viewing request for <strong>' . esc_html( $property_title ) . '</strong>.</p><p>Our team will contact you shortly to confirm the appointment.</p>'
+		),
+		murailles_form_i18n( '<p style="margin:0;"><strong>Créneau souhaité :</strong></p>', '<p style="margin:0;"><strong>Requested slot:</strong></p>' )
+		. '<p style="margin:8px 0 0;padding:12px 16px;background:#fff;border-left:3px solid #dc3545;border-radius:4px;">' . esc_html( $visit_when ) . '</p>'
+	);
+	murailles_send_mail( $email, murailles_form_i18n( 'Votre demande de visite — Agence Murailles', 'Your viewing request — Agence Murailles' ), $user_html );
+
+	murailles_form_response( true, murailles_form_i18n( 'Merci ! Votre demande de visite a bien été envoyée. Notre équipe vous contactera pour confirmer.', 'Thank you. Your viewing request has been sent. Our team will contact you to confirm.' ) );
+}
+add_action( 'admin_post_nopriv_murailles_visit_request', 'murailles_handle_visit_request' );
+add_action( 'admin_post_murailles_visit_request',        'murailles_handle_visit_request' );
+add_action( 'wp_ajax_nopriv_murailles_visit_request',    'murailles_handle_visit_request' );
+add_action( 'wp_ajax_murailles_visit_request',           'murailles_handle_visit_request' );
+
+/* -------------------------------------------------------------------------
  * Form: Submit property (submit-property.php)
  * Creates a DRAFT property post + uploads photos + emails admin.
  * ---------------------------------------------------------------------- */
 
 function murailles_handle_submit_property() {
-	if ( ! murailles_form_is_legit( 'murailles_submit_property', false ) ) {
+	if ( ! murailles_form_is_legit( 'murailles_submit_property' ) ) {
 		murailles_form_response(
 			false,
 			murailles_form_i18n(

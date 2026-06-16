@@ -922,7 +922,7 @@ add_filter( 'robots_txt', function ( $output, $public ) {
 	$ai .= "User-agent: GPTBot\nAllow: /\n{$disallow_private}\n";
 	$ai .= "User-agent: Google-Extended\nAllow: /\n{$disallow_private}\n";
 	$ai .= "User-agent: Googlebot\nAllow: /\n{$disallow_private}\n";
-	$ai .= "\n# LLMs.txt discovery\nSitemap: " . esc_url_raw( home_url( '/llms.txt' ) ) . "\n";
+	$ai .= "\n# LLMs.txt discovery: " . esc_url_raw( home_url( '/llms.txt' ) ) . "\n";
 
 	return rtrim( $output ) . "\n" . $ai;
 }, 15, 2 );

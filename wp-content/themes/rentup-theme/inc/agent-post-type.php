@@ -121,7 +121,7 @@ function murailles_render_agent_metabox($post)
 			<div class="murailles-field-row">
 				<div class="murailles-field-label">WhatsApp<small>Numéro avec indicatif pays</small></div>
 				<div class="murailles-field-input">
-					<input type="text" name="_agent_whatsapp" value="<?php echo esc_attr($m('_agent_whatsapp')); ?>" placeholder="+212661425150" />
+					<input type="text" name="_agent_whatsapp" value="<?php echo esc_attr($m('_agent_whatsapp')); ?>" placeholder="+212661665161" />
 				</div>
 			</div>
 			<div class="murailles-field-row">

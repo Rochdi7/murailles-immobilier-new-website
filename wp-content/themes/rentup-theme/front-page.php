@@ -386,13 +386,13 @@ get_header();
 											</div>
 											<?php if ( $pprice !== '' ) : ?>
 											<div class="_card_flex_last">
-												<h6 class="listing-card-info-price mb-0"><?php echo esc_html( $pprice ); ?> €<?php if ( $psuffix ) echo ' ' . esc_html( $psuffix ); ?></h6>
+												<div class="listing-card-info-price mb-0"><?php echo esc_html( $pprice ); ?> €<?php if ( $psuffix ) echo ' ' . esc_html( $psuffix ); ?></div>
 											</div>
 											<?php endif; ?>
 										</div>
 										<div class="_card_list_flex">
 											<div class="_card_flex_01">
-												<h4 class="listing-name verified"><a href="<?php echo esc_url( $plink ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h4>
+												<h3 class="listing-name verified"><a href="<?php echo esc_url( $plink ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h3>
 											</div>
 										</div>
 									</div>
@@ -426,17 +426,17 @@ get_header();
 										<ul class="selio_style">
 											<li>
 												<div class="prt_saveed_12lk">
-													<label class="toggler toggler-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Enregistrer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Enregistrer le bien', false ) ); ?>"><input type="checkbox"><i class="fa-solid fa-heart"></i></label>
+													<label class="toggler toggler-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Enregistrer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Enregistrer le bien %s', false ), get_the_title( $pid ) ) ); ?>"><input type="checkbox"><i class="fa-solid fa-heart" aria-hidden="true"></i></label>
 												</div>
 											</li>
 											<li>
 												<div class="prt_saveed_12lk">
-													<a href="<?php echo esc_url( home_url( '/compare-property/' ) ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Comparer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Comparer le bien', false ) ); ?>"><i class="fa-solid fa-share"></i></a>
+													<a href="<?php echo esc_url( home_url( '/compare-property/' ) ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Comparer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Comparer le bien %s', false ), get_the_title( $pid ) ) ); ?>"><i class="fa-solid fa-share" aria-hidden="true"></i></a>
 												</div>
 											</li>
 											<li>
 												<div class="prt_saveed_12lk">
-													<a href="<?php echo esc_url( $plink ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>"><i class="fa-regular fa-circle-right"></i></a>
+													<a href="<?php echo esc_url( $plink ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Voir le bien %s', false ), get_the_title( $pid ) ) ); ?>"><i class="fa-regular fa-circle-right" aria-hidden="true"></i></a>
 												</div>
 											</li>
 										</ul>
@@ -532,13 +532,13 @@ get_header();
 											</div>
 											<?php if ( $pprice !== '' ) : ?>
 											<div class="_card_flex_last">
-												<h6 class="listing-card-info-price mb-0"><?php echo esc_html( $pprice ); ?> €<?php if ( $psuffix ) echo ' ' . esc_html( $psuffix ); ?></h6>
+												<div class="listing-card-info-price mb-0"><?php echo esc_html( $pprice ); ?> €<?php if ( $psuffix ) echo ' ' . esc_html( $psuffix ); ?></div>
 											</div>
 											<?php endif; ?>
 										</div>
 										<div class="_card_list_flex">
 											<div class="_card_flex_01">
-												<h4 class="listing-name verified"><a href="<?php echo esc_url( $plink ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h4>
+												<h3 class="listing-name verified"><a href="<?php echo esc_url( $plink ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h3>
 											</div>
 										</div>
 									</div>
@@ -572,17 +572,17 @@ get_header();
 										<ul class="selio_style">
 											<li>
 												<div class="prt_saveed_12lk">
-													<label class="toggler toggler-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Enregistrer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Enregistrer le bien', false ) ); ?>"><input type="checkbox"><i class="fa-solid fa-heart"></i></label>
+													<label class="toggler toggler-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Enregistrer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Enregistrer le bien %s', false ), get_the_title( $pid ) ) ); ?>"><input type="checkbox"><i class="fa-solid fa-heart" aria-hidden="true"></i></label>
 												</div>
 											</li>
 											<li>
 												<div class="prt_saveed_12lk">
-													<a href="<?php echo esc_url( home_url( '/compare-property/' ) ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Comparer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Comparer le bien', false ) ); ?>"><i class="fa-solid fa-share"></i></a>
+													<a href="<?php echo esc_url( home_url( '/compare-property/' ) ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Comparer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Comparer le bien %s', false ), get_the_title( $pid ) ) ); ?>"><i class="fa-solid fa-share" aria-hidden="true"></i></a>
 												</div>
 											</li>
 											<li>
 												<div class="prt_saveed_12lk">
-													<a href="<?php echo esc_url( $plink ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>"><i class="fa-regular fa-circle-right"></i></a>
+													<a href="<?php echo esc_url( $plink ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Voir le bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Voir le bien %s', false ), get_the_title( $pid ) ) ); ?>"><i class="fa-regular fa-circle-right" aria-hidden="true"></i></a>
 												</div>
 											</li>
 										</ul>
@@ -640,12 +640,12 @@ get_header();
 												<span class="_list_blickes types"><?php echo esc_html( $d['category'] ); ?></span>
 											</div>
 											<div class="_card_flex_last">
-												<h6 class="listing-card-info-price mb-0"><?php echo esc_html( $d['price'] ); ?></h6>
+												<div class="listing-card-info-price mb-0"><?php echo esc_html( $d['price'] ); ?></div>
 											</div>
 										</div>
 										<div class="_card_list_flex">
 											<div class="_card_flex_01">
-												<h4 class="listing-name verified"><a href="<?php echo $_browse; ?>" class="prt-link-detail"><?php echo esc_html( $d['title'] ); ?></a></h4>
+												<h3 class="listing-name verified"><a href="<?php echo $_browse; ?>" class="prt-link-detail"><?php echo esc_html( $d['title'] ); ?></a></h3>
 											</div>
 										</div>
 									</div>
@@ -663,9 +663,9 @@ get_header();
 									</div>
 									<div class="footer-flex">
 										<ul class="selio_style">
-											<li><div class="prt_saveed_12lk"><label class="toggler toggler-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Enregistrer le bien', false ) ); ?>"><input type="checkbox"><i class="fa-solid fa-heart"></i></label></div></li>
-											<li><div class="prt_saveed_12lk"><a href="<?php echo esc_url( home_url( '/compare-property/' ) ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Comparer le bien', false ) ); ?>"><i class="fa-solid fa-share"></i></a></div></li>
-											<li><div class="prt_saveed_12lk"><a href="<?php echo $_browse; ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Voir tous les biens', false ) ); ?>"><i class="fa-regular fa-circle-right"></i></a></div></li>
+											<li><div class="prt_saveed_12lk"><label class="toggler toggler-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Enregistrer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Enregistrer le bien %s', false ), $d['title'] ) ); ?>"><input type="checkbox"><i class="fa-solid fa-heart" aria-hidden="true"></i></label></div></li>
+											<li><div class="prt_saveed_12lk"><a href="<?php echo esc_url( home_url( '/compare-property/' ) ); ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Comparer le bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Comparer le bien %s', false ), $d['title'] ) ); ?>"><i class="fa-solid fa-share" aria-hidden="true"></i></a></div></li>
+											<li><div class="prt_saveed_12lk"><a href="<?php echo $_browse; ?>" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php echo esc_attr( murailles_t( 'Voir tous les biens', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Voir le bien %s', false ), $d['title'] ) ); ?>"><i class="fa-regular fa-circle-right" aria-hidden="true"></i></a></div></li>
 										</ul>
 									</div>
 								</div>

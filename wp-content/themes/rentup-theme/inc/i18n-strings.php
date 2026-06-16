@@ -72,6 +72,16 @@ function murailles_i18n_dictionary() {
 		"S'abonner"                => 'Subscribe',
 		'Tous droits réservés.'    => 'All rights reserved.',
 		'Retour en haut'           => 'Back to top',
+		'Voir sur Google Maps'     => 'View on Google Maps',
+		'Google Maps'              => 'Google Maps',
+
+		// === Cookie consent banner =========================================
+		'Nous respectons votre vie privée' => 'We respect your privacy',
+		'Nous utilisons des cookies de mesure d\'audience pour améliorer votre expérience. Vous pouvez accepter ou refuser. Voir notre'
+			=> 'We use analytics cookies to improve your experience. You can accept or decline. See our',
+		'politique de confidentialité' => 'privacy policy',
+		'Accepter'                 => 'Accept',
+		'Refuser'                  => 'Decline',
 
 		// === Call to action ================================================
 		'Vous avez des questions ?' => 'Have questions?',
@@ -287,6 +297,10 @@ function murailles_i18n_dictionary() {
 		'Je suis intéressé(e) par ce bien...'
 			=> 'I am interested in this property...',
 		'Envoyer'                      => 'Send',
+		'Demander une visite'          => 'Request a viewing',
+		'Date souhaitée'               => 'Preferred date',
+		'Heure'                        => 'Time',
+		'Précisions (optionnel)...'    => 'Additional details (optional)...',
 		'Biens similaires'             => 'Similar properties',
 		'Enregistrer dans mes favoris' => 'Save to favourites',
 		'Partager ce bien'             => 'Share this property',
@@ -387,6 +401,29 @@ function murailles_i18n_dictionary() {
 		'Sujet'                        => 'Subject',
 		'Message'                      => 'Message',
 		'Envoyer ma demande'           => 'Send my request',
+
+		// === Demander une visite (standalone page) ========================
+		'Planifiez votre rendez-vous'  => 'Schedule your appointment',
+		"Choisissez le bien qui vous intéresse, une date et un créneau : notre équipe vous recontacte pour confirmer votre visite."
+			=> 'Pick the property you are interested in, a date and a time slot: our team will get back to you to confirm your viewing.',
+		'Réservez votre visite'        => 'Book your viewing',
+		'Bien à visiter'               => 'Property to visit',
+		'Sélectionnez un bien…'        => 'Select a property…',
+		'Message (optionnel)'          => 'Message (optional)',
+		'Précisions sur votre projet, vos disponibilités…'
+			=> 'Details about your project, your availability…',
+		'Comment se passe une visite ?' => 'How does a viewing work?',
+		'Vous choisissez un créneau'   => 'You pick a time slot',
+		'Sélectionnez le bien, une date et une heure qui vous conviennent.'
+			=> 'Select the property, a date and a time that suit you.',
+		'Nous confirmons'              => 'We confirm',
+		"Notre équipe vous rappelle sous 24 à 48h pour confirmer la disponibilité."
+			=> 'Our team calls you back within 24 to 48 hours to confirm availability.',
+		'Vous visitez le bien'         => 'You visit the property',
+		'Un conseiller vous accompagne sur place et répond à toutes vos questions.'
+			=> 'An advisor accompanies you on site and answers all your questions.',
+		'Une question avant de réserver ?' => 'A question before booking?',
+
 		'Nos derniers biens'           => 'Our latest properties',
 		"Découvrez les biens immobiliers les plus récemment ajoutés par l'Agence Murailles à travers le Maroc."
 			=> 'Discover the most recently added properties by Agence Murailles across Morocco.',
@@ -497,6 +534,12 @@ function murailles_i18n_dictionary() {
 			=> 'Our team travels daily across Marrakech and other cities of the Kingdom to offer you a carefully curated selection of properties: exceptional riads, villas, modern apartments, building land and commercial premises.',
 		'En savoir plus'               => 'Learn more',
 		'Nos distinctions'             => 'Our awards',
+		'Nos chiffres clés'            => 'Key figures',
+		'Des repères concrets sur notre accompagnement immobilier à Marrakech et dans tout le Maroc.'
+			=> 'Concrete benchmarks about our real-estate support in Marrakech and across Morocco.',
+		'Biens à découvrir'            => 'Properties to discover',
+		'Une sélection récente de biens à Marrakech et dans les autres villes du Royaume.'
+			=> 'A recent selection of properties in Marrakech and other cities across the Kingdom.',
 		'Des centaines de clients satisfaits qui continuent à nous faire confiance pour leurs projets immobiliers.'
 			=> 'Hundreds of satisfied clients who continue to trust us for their real-estate projects.',
 		'Prix Excellence Immobilier'   => 'Real Estate Excellence Award',
@@ -529,6 +572,9 @@ function murailles_i18n_dictionary() {
 		'min de lecture'               => 'min read',
 		'commentaires'                 => 'comments',
 		'Partager :'                   => 'Share:',
+		'Partager cette page'          => 'Share this page',
+		'Ouvrir les options de partage'
+			=> 'Open share options',
 		'Partager sur Facebook'        => 'Share on Facebook',
 		'Partager sur X'               => 'Share on X',
 		'Partager sur WhatsApp'        => 'Share on WhatsApp',

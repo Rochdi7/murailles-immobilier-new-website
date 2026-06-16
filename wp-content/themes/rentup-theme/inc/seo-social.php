@@ -155,3 +155,59 @@ add_action( 'wp_head', function () {
 		printf( '<meta name="twitter:image:alt" content="%s" />' . "\n", esc_attr( $image_alt ) );
 	}
 }, 5 );
+
+if ( ! function_exists( 'murailles_render_share_dock' ) ) {
+	/**
+	 * Compact social-share dock for singular pages and property listings.
+	 * Adds crawlable share links so on-page SEO tools detect multiple
+	 * distribution options beyond a single generic share button.
+	 */
+	function murailles_render_share_dock() {
+		if ( is_admin() || is_feed() || post_password_required() ) {
+			return;
+		}
+
+		if ( ! is_page() && ! is_singular( 'property' ) ) {
+			return;
+		}
+
+		$url   = get_permalink();
+		$title = get_the_title();
+
+		if ( ! $url || ! $title ) {
+			return;
+		}
+
+		$share_url    = rawurlencode( $url );
+		$share_title  = rawurlencode( $title );
+		$label        = function_exists( 'murailles_t' ) ? murailles_t( 'Partager :', false ) : 'Share:';
+		$toggle_label = function_exists( 'murailles_t' ) ? murailles_t( 'Partager cette page', false ) : 'Share this page';
+		$toggle_aria  = $toggle_label . ' - ' . ( function_exists( 'murailles_t' ) ? murailles_t( 'ouvrir les options de partage', false ) : 'open share options' );
+		?>
+		<div class="murailles-share-fab-wrap">
+			<details class="murailles-share-fab">
+				<summary class="murailles-share-fab__toggle" aria-label="<?php echo esc_attr( $toggle_aria ); ?>">
+					<i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+					<span class="murailles-share-fab__text"><?php echo esc_html( $toggle_label ); ?></span>
+				</summary>
+				<div class="murailles-share-fab__panel" role="group" aria-label="<?php echo esc_attr( $label ); ?>">
+					<a class="murailles-share-fab__link is-facebook" href="https://www.facebook.com/sharer/sharer.php?u=<?php echo esc_attr( $share_url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( murailles_t( 'Partager sur Facebook', false ) ); ?>">
+						<i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
+					</a>
+					<a class="murailles-share-fab__link is-x" href="https://twitter.com/intent/tweet?url=<?php echo esc_attr( $share_url ); ?>&text=<?php echo esc_attr( $share_title ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( murailles_t( 'Partager sur X', false ) ); ?>">
+						<i class="fa-brands fa-x-twitter" aria-hidden="true"></i>
+					</a>
+					<a class="murailles-share-fab__link is-whatsapp" href="https://wa.me/?text=<?php echo esc_attr( $share_title ); ?>%20<?php echo esc_attr( $share_url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( murailles_t( 'Partager sur WhatsApp', false ) ); ?>">
+						<i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+					</a>
+					<a class="murailles-share-fab__link is-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo esc_attr( $share_url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( murailles_t( 'Partager sur LinkedIn', false ) ); ?>">
+						<i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+					</a>
+				</div>
+			</details>
+		</div>
+		<?php
+	}
+}
+
+add_action( 'wp_footer', 'murailles_render_share_dock', 20 );

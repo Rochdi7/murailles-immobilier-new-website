@@ -345,19 +345,36 @@ add_filter('robots_txt', function ($output, $public) {
 		return $output;
 	} // Site is set to discourage crawling — respect that.
 
-	$additions  = "\n";
-	$additions .= "Disallow: /favoris/\n";
-	$additions .= "Disallow: /compare-property/\n";
-	$additions .= "Disallow: /erreur/\n";
-	$additions .= "Disallow: /checkout/\n";
-	$additions .= "Disallow: /*?s=\n";          // search queries
-	$additions .= "Disallow: /wp-admin/\n";     // already covered, repeat for older crawlers
-	$additions .= "Allow: /wp-admin/admin-ajax.php\n";
-	$additions .= "\nSitemap: " . esc_url_raw(home_url('/wp-sitemap.xml')) . "\n";
+	$home = (string) get_option('home');
+	$install = (string) wp_parse_url($home, PHP_URL_PATH);
+	$install = '/' === $install ? '' : rtrim($install, '/');
+	$path = function ($value) use ($install) {
+		return $install . '/' . ltrim($value, '/');
+	};
 
-	// Append before the existing Sitemap line WP adds, if any.
-	$output = rtrim($output) . "\n" . $additions;
-	return $output;
+	$sitemap_path = '/wp-sitemap.xml';
+	if (function_exists('murailles_seo_plugin_active') && murailles_seo_plugin_active()) {
+		if (defined('WPSEO_VERSION') || class_exists('WPSEO_Frontend') || defined('RANK_MATH_VERSION') || class_exists('RankMath')) {
+			$sitemap_path = '/sitemap_index.xml';
+		} elseif (defined('AIOSEO_VERSION') || class_exists('AIOSEO\\Plugin\\AIOSEO')) {
+			$sitemap_path = '/sitemap.xml';
+		}
+	}
+
+	$lines = array(
+		'User-agent: *',
+		'Disallow: ' . $path('/favoris/'),
+		'Disallow: ' . $path('/compare-property/'),
+		'Disallow: ' . $path('/erreur/'),
+		'Disallow: ' . $path('/checkout/'),
+		'Disallow: /*?s=',
+		'Disallow: ' . $path('/wp-admin/'),
+		'Allow: ' . $path('/wp-admin/admin-ajax.php'),
+		'',
+		'Sitemap: ' . esc_url_raw(trailingslashit($home) . ltrim($sitemap_path, '/')),
+	);
+
+	return implode("\n", $lines) . "\n";
 }, 10, 2);
 
 /**
@@ -438,6 +455,57 @@ add_action('wp_body_open', function () {
 	echo '<a class="murailles-skip-link screen-reader-text" href="#site-content">' . esc_html($label) . '</a>';
 });
 
+if ( ! function_exists( 'murailles_seo_image_alt_from_src' ) ) {
+	/**
+	 * Build a descriptive fallback alt text from the image source and current page context.
+	 */
+	function murailles_seo_image_alt_from_src( $src ) {
+		$src       = (string) $src;
+		$basename  = strtolower( wp_basename( wp_parse_url( $src, PHP_URL_PATH ) ?: $src ) );
+		$page_name = is_singular() ? wp_strip_all_tags( get_the_title( get_queried_object_id() ) ) : '';
+		$fallback  = $page_name ? $page_name : 'Murailles Immobilier';
+
+		$map = array(
+			'logo.webp'                         => 'Logo Murailles Immobilier',
+			'logo.png'                          => 'Logo Murailles Immobilier',
+			'aboutus murailles immobilier.jpeg' => 'Agence Murailles Immobilier à Marrakech',
+			'trust.webp'                        => 'Avis Trustpilot Murailles Immobilier',
+			'clutch.webp'                       => 'Profil Clutch Murailles Immobilier',
+			'cap.webp'                          => 'Label d’excellence Murailles Immobilier',
+			'banner-home.jpg'                   => 'Murailles Immobilier à Marrakech',
+		);
+
+		if ( isset( $map[ $basename ] ) ) {
+			return $map[ $basename ];
+		}
+
+		if ( preg_match( '#(?:^|/)(p-\d+|property|villa|riad|appartement)#i', $src ) ) {
+			return $page_name ? $page_name : 'Bien immobilier Murailles Immobilier';
+		}
+
+		if ( preg_match( '#(?:^|/)(b-\d+|blog|article)#i', $src ) ) {
+			return $page_name ? $page_name : 'Article immobilier Murailles Immobilier';
+		}
+
+		if ( preg_match( '#(?:^|/)(team-|user-|avatar|gravatar)#i', $src ) ) {
+			if ( is_singular( 'post' ) ) {
+				$author_id = (int) get_post_field( 'post_author', get_queried_object_id() );
+				$author    = $author_id ? get_the_author_meta( 'display_name', $author_id ) : '';
+				if ( $author ) {
+					return 'Photo de ' . $author;
+				}
+			}
+			return 'Photo Murailles Immobilier';
+		}
+
+		if ( preg_match( '#(?:^|/)(about|hero|banner|cover)#i', $src ) ) {
+			return $page_name ? $page_name : 'Murailles Immobilier à Marrakech';
+		}
+
+		return $fallback;
+	}
+}
+
 /**
  * Auto-add accessibility/perf attributes to <img> tags emitted by templates:
  *   • Empty alt="" + class containing "fa", "icon", or src ends with .svg
@@ -454,10 +522,14 @@ add_action('template_redirect', function () {
 	}
 	ob_start(function ($html) {
 
+		$alt_fallback = function_exists('murailles_t')
+			? murailles_t('Murailles Immobilier à Marrakech', false)
+			: 'Murailles Immobilier';
+
 		// Decorative icons: empty alt + class hints → aria-hidden.
 		$html = preg_replace_callback(
 			'#<img\s([^>]*?)alt=""([^>]*?)>#i',
-			function ($m) {
+			function ($m) use ( $alt_fallback ) {
 				$before = $m[1];
 				$after  = $m[2];
 				$full   = $before . $after;
@@ -473,10 +545,20 @@ add_action('template_redirect', function () {
 				if (preg_match('#src="[^"]*(bed|bath|move|pin|verified|flaticon)[^"]*\.svg"#i', $full)) {
 					$decorative = true;
 				}
-				if (! $decorative) {
-					return $m[0];
+				if ($decorative) {
+					return '<img ' . $before . 'alt="" aria-hidden="true" role="presentation"' . $after . '>';
 				}
-				return '<img ' . $before . 'alt="" aria-hidden="true" role="presentation"' . $after . '>';
+
+				$src = '';
+				if ( preg_match( '#src="([^"]+)"#i', $full, $src_match ) ) {
+					$src = $src_match[1];
+				}
+				$alt = $src ? murailles_seo_image_alt_from_src( $src ) : $alt_fallback;
+				if ( ! $alt ) {
+					$alt = $alt_fallback;
+				}
+
+				return '<img ' . $before . 'alt="' . esc_attr( $alt ) . '"' . $after . '>';
 			},
 			$html
 		);
@@ -525,16 +607,26 @@ add_action('template_redirect', function () {
 		// alt. Images that already declare alt — including decorative alt="" —
 		// are left exactly as they are. Catches dynamic WPBakery/Elementor
 		// markup that the WP attachment filter can't reach.
-		$alt_fallback = function_exists('murailles_t')
-			? murailles_t('Agence immobilière Murailles Immobilier à Marrakech', false)
-			: 'Murailles Immobilier';
 		$html = preg_replace_callback(
-			'#<img\b([^>]*)>#i',
+			'#<img\b([^>]*?)src="([^"]+)"([^>]*)>#i',
 			function ($m) use ($alt_fallback) {
+				$full_attrs = $m[1] . $m[3];
 				if (preg_match('/\balt\s*=/i', $m[1])) {
 					return $m[0]; // Already has an alt (empty or not) — leave it.
 				}
-				return '<img' . $m[1] . ' alt="' . esc_attr($alt_fallback) . '">';
+				if (preg_match('/\balt\s*=/i', $m[3])) {
+					return $m[0];
+				}
+				$is_decorative = preg_match( '#class="[^"]*(inc-fleat-icon|fa-|ti-|icon|flag)[^"]*"#i', $full_attrs )
+					|| preg_match( '#src="[^"]*(bed|bath|move|pin|verified|flaticon)[^"]*\.svg"#i', $m[0] );
+				$alt = murailles_seo_image_alt_from_src( $m[2] );
+				if ( $is_decorative ) {
+					return '<img ' . $m[1] . 'src="' . $m[2] . '" alt="" aria-hidden="true" role="presentation"' . $m[3] . '>';
+				}
+				if ( ! $alt ) {
+					$alt = $alt_fallback;
+				}
+				return '<img ' . $m[1] . 'src="' . $m[2] . '" alt="' . esc_attr($alt) . '"' . $m[3] . '>';
 			},
 			$html
 		);

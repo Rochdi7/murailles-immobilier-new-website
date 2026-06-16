@@ -265,6 +265,12 @@ add_action( 'admin_post_murailles_save_options', function () {
 	if ( isset( $post['contact_email'] ) ) {
 		$clean['contact_email'] = sanitize_email( $post['contact_email'] );
 	}
+	if ( isset( $post['notify_email'] ) ) {
+		// Address that receives all form notifications. If cleared or invalid,
+		// fall back to the WordPress admin email so notifications never vanish.
+		$notify = sanitize_email( $post['notify_email'] );
+		$clean['notify_email'] = is_email( $notify ) ? $notify : get_option( 'admin_email' );
+	}
 
 	// ── URL / image fields ───────────────────────────────────────────────────
 	$url_fields = array(
@@ -358,6 +364,7 @@ function murailles_options_page() {
 	$nav = array(
 		'dashboard'    => array( '🏠', 'Tableau de bord', 'Vue d\'ensemble et aide' ),
 		'testimonials' => array( '💬', 'Témoignages',     'Avis clients FR / EN' ),
+		'notifications'=> array( '📧', 'Notifications',   'E-mail de réception des formulaires' ),
 		'seo'          => array( '🔍', 'SEO & Analytics', 'Référencement et suivi' ),
 	);
 	$nav_meta = $nav + array(
@@ -586,10 +593,10 @@ function murailles_options_page() {
 				<div class="mi-card-body">
 					<?php
 					$counter_defaults = array(
-						1 => array('32 M', 'Prix Excellence Immobilier'),
-						2 => array('43 M', 'Trophée Service Client'),
-						3 => array('51 M', 'Certification Qualité'),
-						4 => array('42 M', 'Label Confiance Client'),
+						1 => array('15+', "Années d'expérience"),
+						2 => array('850+', 'Biens vendus'),
+						3 => array('1200+', 'Clients satisfaits'),
+						4 => array('24/7', 'Disponibilité'),
 					);
 					for ( $i = 1; $i <= 4; $i++ ) :
 					?>
@@ -792,6 +799,28 @@ function murailles_options_page() {
 				</div>
 			</div>
 			<?php endif; // testimonials ?>
+
+			<?php
+			// ── Tab: Notifications ────────────────────────────────────────────
+			if ( $tab === 'notifications' ) :
+				$notify_current = murailles_opt( 'notify_email', get_option( 'admin_email' ) );
+			?>
+			<div class="mi-card">
+				<div class="mi-card-head"><span class="mi-card-ico">📧</span><h3>E-mail de réception</h3><span class="mi-card-sub">Formulaires du site</span></div>
+				<div class="mi-card-body">
+					<p class="mi-hint" style="margin-top:0;">
+						C'est l'adresse qui recevra <strong>toutes les notifications</strong> des formulaires :
+						contact, demande d'information sur un bien, demande de visite, dépôt d'annonce et newsletter.
+						Le champ affiche l'adresse actuellement utilisée.
+					</p>
+					<div class="mi-field">
+						<label>Adresse e-mail de notification</label>
+						<input type="email" name="notify_email" value="<?php echo esc_attr( $notify_current ); ?>" placeholder="contact@votre-domaine.com" required>
+						<span class="mi-hint">Cette adresse remplace l'e-mail d'administration de WordPress pour les formulaires.</span>
+					</div>
+				</div>
+			</div>
+			<?php endif; // notifications ?>
 
 			<?php
 			// ── Tab: SEO & Analytics ──────────────────────────────────────────

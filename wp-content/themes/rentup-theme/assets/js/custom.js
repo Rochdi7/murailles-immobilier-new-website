@@ -891,6 +891,12 @@ $(function() {
 				return;
 			}
 
+			if ( $slider.is('.modern-testimonial, .testi-slide') ) {
+				$slider.attr({
+					'role': 'region',
+					'aria-label': 'Témoignages clients'
+				});
+			}
 			$slider.attr('aria-roledescription', 'carousel');
 			$slider.find('.slick-prev').attr({ 'aria-label': 'Previous slide', 'type': 'button' });
 			$slider.find('.slick-next').attr({ 'aria-label': 'Next slide', 'type': 'button' });
@@ -900,10 +906,23 @@ $(function() {
 			$slider.find('.slick-dots li').removeAttr('role aria-selected aria-controls aria-hidden id');
 			$slider.find('.slick-dots li').each(function(index) {
 				var $dot = $(this);
-				$dot.find('button').first()
-					.attr('aria-label', 'Go to slide ' + (index + 1))
-					.attr('aria-current', $dot.hasClass('slick-active') ? 'true' : 'false')
-					.attr('type', 'button');
+				var $button = $dot.find('button').first();
+				if ( ! $button.length ) {
+					return;
+				}
+
+				$button
+					.removeAttr('role data-role aria-selected aria-controls aria-pressed')
+					.attr({
+						'aria-label': 'Go to slide ' + (index + 1),
+						'type': 'button'
+					});
+
+				if ( $dot.hasClass('slick-active') ) {
+					$button.attr('aria-current', 'true');
+				} else {
+					$button.removeAttr('aria-current');
+				}
 			});
 
 			$slider.find('.slick-slide').each(function() {
@@ -955,7 +974,36 @@ $(function() {
 	muraillesBootstrapPendingCarousels();
 	muraillesSetNavAriaState(false);
 	muraillesEnhanceSlickAccessibility();
-	$(document).on('init reInit afterChange', '.slick-slider', muraillesEnhanceSlickAccessibility);
+	$(document).on('init reInit afterChange setPosition afterSetPosition', function() {
+		window.setTimeout(muraillesEnhanceSlickAccessibility, 0);
+	});
+	if ( window.MutationObserver ) {
+		var muraillesSlickA11yQueued = false;
+		var muraillesSlickA11yObserver = new MutationObserver(function(mutations) {
+			var shouldRun = mutations.some(function(mutation) {
+				var target = mutation.target;
+				if ( ! target || target.nodeType !== 1 ) {
+					return false;
+				}
+				return $(target).is('.slick-slider, .slick-track, .slick-slide, .slick-dots, .slick-dots *') ||
+					$(target).find('.slick-slider, .slick-track, .slick-slide, .slick-dots').length > 0;
+			});
+			if ( ! shouldRun || muraillesSlickA11yQueued ) {
+				return;
+			}
+			muraillesSlickA11yQueued = true;
+			window.requestAnimationFrame(function() {
+				muraillesSlickA11yQueued = false;
+				muraillesEnhanceSlickAccessibility();
+			});
+		});
+		muraillesSlickA11yObserver.observe(document.documentElement, {
+			attributes: true,
+			childList: true,
+			subtree: true,
+			attributeFilter: ['role', 'aria-selected', 'aria-controls', 'aria-hidden', 'id', 'class', 'tabindex']
+		});
+	}
 	$('#navigation').find('.nav-toggle').on('click.muraillesState touchstart.muraillesState', function() {
 		if ( window.innerWidth > 992 ) {
 			return;
@@ -1185,13 +1233,19 @@ $(function() {
 		$ctx.find('.slick-dots > li')
 			.removeAttr('role')
 			.removeAttr('aria-selected')
-			.removeAttr('aria-controls');
+			.removeAttr('aria-controls')
+			.removeAttr('aria-hidden')
+			.removeAttr('id');
 		// The clickable dot button: give it a name + a valid current-state hook.
 		$ctx.find('.slick-dots > li').each(function(i) {
-			var $btn = $(this).find('button');
-			if ($btn.length && !$btn.attr('aria-label')) {
-				$btn.attr('aria-label', 'Diapositive ' + (i + 1));
+			var $btn = $(this).find('button').first();
+			if (!$btn.length) {
+				return;
 			}
+			$btn
+				.removeAttr('role data-role aria-selected aria-controls aria-pressed')
+				.attr('aria-label', 'Go to slide ' + (i + 1))
+				.attr('type', 'button');
 			if ($(this).hasClass('slick-active')) {
 				$btn.attr('aria-current', 'true');
 			} else {

@@ -31,11 +31,12 @@ function murailles_schema_agency_data() {
 		'address_line2' => '2ème étage Bureau N°10',
 		'address_city'  => 'Marrakech 40000',
 		'contact_name'  => 'Youssef',
-		'phone_display' => '+212 6 61 42 51 50',
-		'phone_tel'     => '+212661425150',
+		'phone_display' => '+212 6 61 66 51 61',
+		'phone_tel'     => '+212661665161',
 		'email'         => 'contact@murailles-immobilier.com',
-		'facebook'      => '',
-		'instagram'     => '',
+		'google_maps'   => 'https://share.google/4ZxBBGSJPmgNMiNvt',
+		'facebook'      => 'https://www.facebook.com/profile.php?id=100063563441285',
+		'instagram'     => 'https://www.instagram.com/murailles_immobilier',
 		'twitter'       => '',
 	) );
 }
@@ -148,6 +149,9 @@ add_action( 'wp_head', function () {
 			),
 		),
 	);
+	if ( ! empty( $ci['google_maps'] ) && $ci['google_maps'] !== '#' ) {
+		$org['hasMap'] = $ci['google_maps'];
+	}
 	if ( $social ) {
 		$org['sameAs'] = array_values( $social );
 	}

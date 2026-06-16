@@ -28,17 +28,13 @@ get_header();
 
 <!-- ============================ Page Title ================================== -->
 <?php if ( murailles_page_section_is_visible( 'hero', $murailles_services_page_id ) ) : ?>
-<div class="page-title nos-services-hero" style="background:linear-gradient(135deg,rgba(220,53,69,0.85),rgba(26,35,50,0.85)),url(<?php echo esc_url( $murailles_services_hero_bg ); ?>) center/cover no-repeat;padding:100px 0;color:#fff;">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<span style="display:inline-block;padding:6px 16px;background:rgba(255,255,255,0.15);border-radius:20px;font-size:13px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;backdrop-filter:blur(4px);margin-bottom:14px;"><?php echo esc_html( $murailles_services_hero_eyebrow ); ?></span>
-				<h1 style="color:#fff;font-size:42px;font-weight:800;margin:0 0 12px;text-shadow:0 2px 10px rgba(0,0,0,0.2);"><?php echo esc_html( $murailles_services_hero_title ); ?></h1>
-				<p style="color:rgba(255,255,255,0.92);font-size:17px;max-width:680px;margin:0 auto;line-height:1.6;"><?php echo wp_kses_post( $murailles_services_hero_subtitle ); ?></p>
-			</div>
-		</div>
-	</div>
-</div>
+<?php get_template_part( 'template-parts/hero-page-title', null, array(
+	'bg'                  => $murailles_services_hero_bg,
+	'eyebrow'             => $murailles_services_hero_eyebrow,
+	'title'               => $murailles_services_hero_title,
+	'subtitle'            => $murailles_services_hero_subtitle,
+	'allow_html_subtitle' => true,
+) ); ?>
 <?php endif; ?>
 
 <!-- ============================ Intro ================================== -->

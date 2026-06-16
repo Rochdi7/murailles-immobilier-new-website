@@ -33,7 +33,7 @@ if (! defined('ABSPATH')) {
 							<input type="hidden" name="language" value="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr' ); ?>">
 							<input type="text" name="_mw_hp_url" value="" tabindex="-1" autocomplete="new-password" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px;pointer-events:none;">
 							<div class="input-group">
-								<input type="email" name="email" class="form-control" placeholder="<?php echo esc_attr(murailles_t('Adresse e-mail', false)); ?>" required>
+								<input type="email" name="email" class="form-control" placeholder="<?php echo esc_attr(murailles_t('Adresse e-mail', false)); ?>" aria-label="<?php echo esc_attr(murailles_t('Adresse e-mail', false)); ?>" required>
 								<div class="input-group-append">
 									<button type="submit" class="btn btn-danger b-0 text-light"><?php murailles_t("S'abonner"); ?></button>
 								</div>
@@ -51,6 +51,7 @@ if (! defined('ABSPATH')) {
 								<ul class="footer-menu">
 									<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php murailles_t('Accueil'); ?></a></li>
 									<li><a href="<?php echo esc_url(murailles_bien_url()); ?>"><?php murailles_t('Biens immobiliers'); ?></a></li>
+									<li><a href="<?php echo esc_url(home_url('/demander-une-visite/')); ?>"><?php murailles_t('Demander une visite'); ?></a></li>
 									<li><a href="<?php echo esc_url(home_url('/nos-services/')); ?>"><?php murailles_t('Nos Services'); ?></a></li>
 									<li><a href="<?php echo esc_url(home_url('/compare-property/')); ?>"><?php murailles_t('Comparer'); ?></a></li>
 									<li><a href="<?php echo esc_url(home_url('/blog/')); ?>"><?php murailles_t('Blog'); ?></a></li>
@@ -78,11 +79,19 @@ if (! defined('ABSPATH')) {
 								<ul class="footer-menu murailles-contact-list">
 									<li>
 										<i class="ti-location-pin"></i>
+										<?php if ( ! empty( $murailles_ci['google_maps'] ) && $murailles_ci['google_maps'] !== '#' ) : ?>
+										<a href="<?php echo esc_url($murailles_ci['google_maps']); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( trim( $murailles_ci['address_line1'] . ' ' . $murailles_ci['address_line2'] . ' ' . $murailles_ci['address_city'] ) ); ?>">
+											<?php echo esc_html($murailles_ci['address_line1']); ?><br>
+											<?php echo esc_html($murailles_ci['address_line2']); ?><br>
+											<?php echo esc_html($murailles_ci['address_city']); ?>
+										</a>
+										<?php else : ?>
 										<span>
 											<?php echo esc_html($murailles_ci['address_line1']); ?><br>
 											<?php echo esc_html($murailles_ci['address_line2']); ?><br>
 											<?php echo esc_html($murailles_ci['address_city']); ?>
 										</span>
+										<?php endif; ?>
 									</li>
 									<li>
 										<i class="ti-mobile"></i>
@@ -95,22 +104,26 @@ if (! defined('ABSPATH')) {
 								</ul>
 
 								<!-- Social media -->
+								<?php
+								$murailles_social_links = array(
+									'facebook'  => array( 'icon' => 'fab fa-facebook-f',  'label' => 'Facebook' ),
+									'instagram' => array( 'icon' => 'fab fa-instagram',   'label' => 'Instagram' ),
+									'twitter'   => array( 'icon' => 'fab fa-twitter',     'label' => 'Twitter' ),
+									'google_maps' => array( 'icon' => 'fas fa-map-marker-alt', 'label' => murailles_t('Google Maps', false) ),
+								);
+								$murailles_social_style = 'display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);color:#fff;transition:background .15s ease, transform .15s ease;';
+								?>
 								<ul class="footer-social mt-3" style="list-style:none;padding:0;margin:0;display:flex;gap:10px;">
+									<?php foreach ( $murailles_social_links as $murailles_social_key => $murailles_social ) :
+										$murailles_social_url = isset( $murailles_ci[ $murailles_social_key ] ) ? $murailles_ci[ $murailles_social_key ] : '';
+										if ( empty( $murailles_social_url ) || $murailles_social_url === '#' ) { continue; }
+										?>
 									<li>
-										<a href="<?php echo esc_url($murailles_ci['facebook']); ?>" target="_blank" rel="noopener" aria-label="Facebook" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);color:#fff;transition:background .15s ease, transform .15s ease;">
-											<i class="fab fa-facebook-f"></i>
+										<a href="<?php echo esc_url($murailles_social_url); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr($murailles_social['label']); ?>" style="<?php echo esc_attr($murailles_social_style); ?>">
+											<i class="<?php echo esc_attr($murailles_social['icon']); ?>"></i>
 										</a>
 									</li>
-									<li>
-										<a href="<?php echo esc_url($murailles_ci['instagram']); ?>" target="_blank" rel="noopener" aria-label="Instagram" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);color:#fff;transition:background .15s ease, transform .15s ease;">
-											<i class="fab fa-instagram"></i>
-										</a>
-									</li>
-									<li>
-										<a href="<?php echo esc_url($murailles_ci['twitter']); ?>" target="_blank" rel="noopener" aria-label="Twitter" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);color:#fff;transition:background .15s ease, transform .15s ease;">
-											<i class="fab fa-twitter"></i>
-										</a>
-									</li>
+									<?php endforeach; ?>
 								</ul>
 							</div>
 						</div>

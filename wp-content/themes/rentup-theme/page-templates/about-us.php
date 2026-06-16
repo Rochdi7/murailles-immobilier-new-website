@@ -25,12 +25,12 @@ $murailles_about_story_text_1 = murailles_page_section_meta( 'story_text_1', mur
 $murailles_about_story_text_2 = murailles_page_section_meta( 'story_text_2', murailles_t( "Notre équipe sillonne quotidiennement Marrakech et les autres villes du Royaume pour vous proposer une sélection rigoureuse de biens : riads d'exception, villas, appartements modernes, terrains à bâtir et locaux commerciaux.", false ) );
 $murailles_about_story_button_label = murailles_page_section_meta( 'story_button_label', murailles_t( 'Contacter notre agence', false ) );
 $murailles_about_story_button_url = murailles_page_section_meta( 'story_button_url', home_url( '/contact/' ) );
-$murailles_about_team_heading = murailles_page_section_meta( 'team_heading', murailles_t( 'Notre équipe', false ) );
-$murailles_about_team_subheading = murailles_page_section_meta( 'team_subheading', murailles_t( 'Une équipe professionnelle et dévouée à vos côtés', false ) );
-$murailles_about_awards_eyebrow = murailles_page_section_meta( 'awards_eyebrow', murailles_t( 'Nos distinctions', false ) );
-$murailles_about_awards_heading = murailles_page_section_meta( 'awards_heading', murailles_t( 'Des centaines de clients satisfaits qui continuent à nous faire confiance pour leurs projets immobiliers.', false ) );
+$murailles_about_awards_eyebrow = murailles_page_section_meta( 'awards_eyebrow', murailles_t( 'Nos chiffres clés', false ) );
+$murailles_about_awards_heading = murailles_page_section_meta( 'awards_heading', murailles_t( 'Des repères concrets sur notre accompagnement immobilier à Marrakech et dans tout le Maroc.', false ) );
 $murailles_about_testimonials_heading = murailles_page_section_meta( 'testimonials_heading', murailles_t( 'Avis de nos clients', false ) );
 $murailles_about_testimonials_subtitle = murailles_page_section_meta( 'testimonials_subtitle', murailles_t( 'Découvrez les témoignages de propriétaires et acheteurs qui nous ont fait confiance pour leur projet immobilier au Maroc.', false ) );
+$murailles_about_properties_heading = murailles_t( 'Biens à découvrir', false );
+$murailles_about_properties_subtitle = murailles_t( 'Une sélection récente de biens à Marrakech et dans les autres villes du Royaume.', false );
 $murailles_about_blog_heading = murailles_page_section_meta( 'blog_heading', murailles_t( 'Actualités & Articles', false ) );
 $murailles_about_blog_subtitle = murailles_page_section_meta( 'blog_subtitle', murailles_t( 'Conseils, tendances du marché et guides pour acheter, vendre ou louer votre bien immobilier au Maroc.', false ) );
 
@@ -45,23 +45,12 @@ get_header();
 
 <!-- ============================ Page Title Start================================== -->
 			<?php if ( murailles_page_section_is_visible( 'hero', $murailles_about_page_id ) ) : ?>
-			<div class="page-title" style="background:#f4f4f4 url(<?php echo esc_url( $murailles_about_hero_bg ); ?>);" data-overlay="5">
-				<div class="container">
-					<div class="row">
-						<div class="col-lg-12 col-md-12">
-							
-							<div class="breadcrumbs-wrap position-relative z-1">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php murailles_t( 'Accueil' ); ?></a></li>
-									<li class="breadcrumb-item active" aria-current="page"><?php murailles_t( 'À propos' ); ?></li>
-								</ol>
-								<h2 class="breadcrumb-title"><?php echo esc_html( $murailles_about_hero_title ); ?></h2>
-							</div>
-							
-						</div>
-					</div>
-				</div>
-			</div>
+			<?php get_template_part( 'template-parts/hero-page-title', null, array(
+				'bg'       => $murailles_about_hero_bg,
+				'eyebrow'  => murailles_t( 'À propos de nous', false ),
+				'title'    => $murailles_about_hero_title,
+				'subtitle' => $murailles_about_story_subtitle,
+			) ); ?>
 			<?php endif; ?>
 			<!-- ============================ Page Title End ================================== -->
 			
@@ -86,7 +75,7 @@ get_header();
 						</div>
 						
 						<div class="col-lg-6 col-md-6">
-							<?php echo murailles_page_section_image( 'story_image_id', murailles_img( 'b-1.jpg' ), array( 'class' => 'img-fluid rounded', 'alt' => $murailles_about_story_title ), $murailles_about_page_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<?php echo murailles_page_section_image( 'story_image_id', murailles_img( 'aboutus murailles immobilier.jpeg' ), array( 'class' => 'img-fluid rounded shadow-sm w-100', 'alt' => $murailles_about_story_title ), $murailles_about_page_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</div>
 						
 					</div>
@@ -100,6 +89,30 @@ get_header();
 			
 			<!-- ============================ Our Counter Start ================================== -->
 			<?php if ( murailles_page_section_is_visible( 'distinctions', $murailles_about_page_id ) ) : ?>
+			<?php
+			$murailles_about_stats = array(
+				array(
+					'value' => '15+',
+					'label' => murailles_t( "Années d'expérience", false ),
+					'icon'  => 'ti-medall-alt',
+				),
+				array(
+					'value' => '850+',
+					'label' => murailles_t( 'Biens vendus', false ),
+					'icon'  => 'ti-home',
+				),
+				array(
+					'value' => '1200+',
+					'label' => murailles_t( 'Clients satisfaits', false ),
+					'icon'  => 'ti-user',
+				),
+				array(
+					'value' => '24/7',
+					'label' => murailles_t( 'Disponibilité', false ),
+					'icon'  => 'ti-headphone-alt',
+				),
+			);
+			?>
 			<section class="image-cover" style="background:#a70a29 url(<?php echo esc_url( murailles_img( 'pattern.png' ) ); ?>) no-repeat;">
 				<div class="container">
 					
@@ -113,42 +126,17 @@ get_header();
 					</div>
 					
 					<div class="row justify-content-center">
+						<?php foreach ( $murailles_about_stats as $murailles_about_stat ) : ?>
 						<div class="col-lg-3 col-md-6 col-sm-6">
 							<div class="_morder_counter">
-								<div class="_morder_counter_thumb"><i class="ti-cup"></i></div>
+								<div class="_morder_counter_thumb"><i class="<?php echo esc_attr( $murailles_about_stat['icon'] ); ?>"></i></div>
 								<div class="_morder_counter_caption">
-									<h5 class="text-light"><span>32</span> M</h5>
-									<span class="text-light"><?php murailles_t( 'Prix Excellence Immobilier' ); ?></span>
+									<h5 class="text-light"><?php echo esc_html( $murailles_about_stat['value'] ); ?></h5>
+									<span class="text-light"><?php echo esc_html( $murailles_about_stat['label'] ); ?></span>
 								</div>
 							</div>
 						</div>
-						<div class="col-lg-3 col-md-6 col-sm-6">
-							<div class="_morder_counter">
-								<div class="_morder_counter_thumb"><i class="ti-briefcase"></i></div>
-								<div class="_morder_counter_caption">
-									<h5 class="text-light"><span>43</span> M</h5>
-									<span class="text-light"><?php murailles_t( 'Trophée Service Client' ); ?></span>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-3 col-md-6 col-sm-6">
-							<div class="_morder_counter">
-								<div class="_morder_counter_thumb"><i class="ti-light-bulb"></i></div>
-								<div class="_morder_counter_caption">
-									<h5 class="text-light"><span>51</span> M</h5>
-									<span class="text-light"><?php murailles_t( 'Certification Qualité' ); ?></span>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-3 col-md-6 col-sm-6">
-							<div class="_morder_counter">
-								<div class="_morder_counter_thumb"><i class="ti-heart"></i></div>
-								<div class="_morder_counter_caption">
-									<h5 class="text-light"><span>42</span> M</h5>
-									<span class="text-light"><?php murailles_t( 'Label Confiance Client' ); ?></span>
-								</div>
-							</div>
-						</div>
+						<?php endforeach; ?>
 					</div>
 					
 				</div>
@@ -156,184 +144,148 @@ get_header();
 			<?php endif; ?>
 			<!-- ============================ Our Counter End ================================== -->
 			
-			<!-- ================= Our Team================= -->
-			<?php if ( murailles_page_section_is_visible( 'team-section', $murailles_about_page_id ) ) : ?>
-			<section>
+			<!-- ============================ Featured Properties Start ================================== -->
+			<section class="gray-simple">
 				<div class="container">
-				
-					<div class="row">
-						<div class="col-lg-12 col-md-12">
+
+					<div class="row justify-content-center">
+						<div class="col-lg-7 col-md-8">
 							<div class="sec-heading center">
-								<h2><?php echo esc_html( $murailles_about_team_heading ); ?></h2>
-								<p><?php echo esc_html( $murailles_about_team_subheading ); ?></p>
+								<h2><?php echo esc_html( $murailles_about_properties_heading ); ?></h2>
+								<p><?php echo esc_html( $murailles_about_properties_subtitle ); ?></p>
 							</div>
 						</div>
 					</div>
-					
-					<div class="row">
-						<div class="col-lg-12 col-md-12 col-sm-12">
-						
-							<div class="team-slide item-slide">
-								
-								<!-- Single Teamm -->
-								<div class="single-team">
-									<div class="team-grid">
-								
-										<div class="teamgrid-user">
-											<img src="https://i.pravatar.cc/96?img=47" alt="" class="img-fluid" />
+
+						<?php
+						$mu_about_featured = new WP_Query( array(
+							'post_type'      => 'property',
+							'posts_per_page' => 9,
+							'post_status'    => 'publish',
+							'orderby'        => 'modified',
+							'order'          => 'DESC',
+						) );
+						if ( $mu_about_featured->have_posts() ) :
+						?>
+					<div class="item-slide space">
+						<?php
+							while ( $mu_about_featured->have_posts() ) :
+								$mu_about_featured->the_post();
+								$pid     = get_the_ID();
+								$plink   = get_permalink();
+								$pprice  = get_post_meta( $pid, '_property_price', true );
+								$psuffix = get_post_meta( $pid, '_property_price_suffix', true );
+								$paction = get_post_meta( $pid, '_property_action', true );
+								$paddr   = get_post_meta( $pid, '_property_address', true );
+								$psize   = get_post_meta( $pid, '_property_size', true );
+								$pbeds   = get_post_meta( $pid, '_property_bedrooms', true );
+								$pbaths  = get_post_meta( $pid, '_property_bathrooms', true );
+								$pcats   = wp_get_post_terms( $pid, 'property_category', array( 'fields' => 'names' ) );
+								$plocs   = wp_get_post_terms( $pid, 'property_location', array( 'fields' => 'names' ) );
+								$pcat    = $pcats ? $pcats[0] : '';
+								$ploc    = $plocs ? $plocs[0] : '';
+								$thumb   = has_post_thumbnail() ? get_the_post_thumbnail_url( $pid, 'medium_large' ) : murailles_img( 'p-' . ( ( $pid % 9 ) + 1 ) . '.png' );
+								$gallery = get_post_meta( $pid, '_property_gallery_ids', true );
+								$imgs    = array();
+								if ( $gallery ) {
+									foreach ( array_slice( array_filter( explode( ',', $gallery ) ), 0, 3 ) as $gid ) {
+										$img_url = wp_get_attachment_image_url( (int) $gid, 'medium_large' );
+										if ( $img_url ) {
+											$imgs[] = $img_url;
+										}
+									}
+								}
+								if ( empty( $imgs ) ) {
+									$imgs[] = $thumb;
+								}
+						?>
+						<div class="single_items" data-murailles-id="<?php echo esc_attr( $pid ); ?>">
+							<div class="property-listing property-2 h-100">
+								<div class="listing-img-wrapper">
+									<?php if ( $paction ) : ?>
+									<div class="_exlio_125"><?php echo esc_html( $paction ); ?></div>
+									<?php endif; ?>
+									<div class="list-img-slide">
+										<div class="click">
+											<?php foreach ( $imgs as $img_url ) : ?>
+											<div><a href="<?php echo esc_url( $plink ); ?>"><img src="<?php echo esc_url( $img_url ); ?>" class="img-fluid mx-auto" alt="<?php the_title_attribute(); ?>" width="1200" height="800" loading="lazy" decoding="async" /></a></div>
+											<?php endforeach; ?>
 										</div>
-										
-										<div class="teamgrid-content">
-											<h4>Shaurya Preet</h4>
-											<span><?php murailles_t( 'Co-fondateur' ); ?></span>
-										</div>
-										
-										<div class="teamgrid-social">
-											<ul>
-												<li><a href="#" class="f-cl"><i class="ti-facebook"></i></a></li>
-												<li><a href="#" class="t-cl"><i class="ti-twitter"></i></a></li>
-												<li><a href="#" class="i-cl"><i class="ti-instagram"></i></a></li>
-												<li><a href="#" class="l-cl"><i class="ti-linkedin"></i></a></li>
-											</ul>
-										</div>
-							
 									</div>
 								</div>
-								
-								<!-- Single Teamm -->
-								<div class="single-team">
-									<div class="team-grid">
-								
-										<div class="teamgrid-user">
-											<img src="https://i.pravatar.cc/96?img=32" alt="" class="img-fluid" />
+
+								<div class="listing-detail-wrapper">
+									<div class="listing-short-detail-wrap">
+										<div class="_card_list_flex mb-2">
+											<div class="_card_flex_01">
+												<?php if ( $pbeds ) : ?><span class="_list_blickes _netork"><?php echo esc_html( $pbeds ); ?> <?php murailles_t( 'Ch.' ); ?></span><?php endif; ?>
+												<?php if ( $pcat ) : ?><span class="_list_blickes types"><?php echo esc_html( $pcat ); ?></span><?php endif; ?>
+											</div>
+											<?php if ( '' !== (string) $pprice ) : ?>
+											<div class="_card_flex_last">
+												<div class="listing-card-info-price mb-0"><?php echo esc_html( $pprice ); ?> €<?php if ( $psuffix ) : ?> <?php echo esc_html( $psuffix ); ?><?php endif; ?></div>
+											</div>
+											<?php endif; ?>
 										</div>
-										
-										<div class="teamgrid-content">
-											<h4>Shivangi Preet</h4>
-											<span><?php murailles_t( 'Rédacteur' ); ?></span>
+										<div class="_card_list_flex">
+											<div class="_card_flex_01">
+												<h3 class="listing-name verified"><a href="<?php echo esc_url( $plink ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h3>
+											</div>
 										</div>
-										
-										<div class="teamgrid-social">
-											<ul>
-												<li><a href="#" class="f-cl"><i class="ti-facebook"></i></a></li>
-												<li><a href="#" class="t-cl"><i class="ti-twitter"></i></a></li>
-												<li><a href="#" class="i-cl"><i class="ti-instagram"></i></a></li>
-												<li><a href="#" class="l-cl"><i class="ti-linkedin"></i></a></li>
-											</ul>
-										</div>
-							
 									</div>
 								</div>
-								
-								<!-- Single Teamm -->
-								<div class="single-team">
-									<div class="team-grid">
-								
-										<div class="teamgrid-user">
-											<img src="https://i.pravatar.cc/96?img=12" alt="" class="img-fluid" />
+
+								<div class="price-features-wrapper">
+									<div class="list-fx-features">
+										<?php if ( $pbeds ) : ?>
+										<div class="listing-card-info-icon">
+											<div class="inc-fleat-icon"><img src="<?php echo esc_url( murailles_img( 'bed.svg' ) ); ?>" width="15" height="15" alt="" loading="lazy" decoding="async" /></div><?php echo esc_html( $pbeds ); ?> <?php murailles_t( 'Ch.' ); ?>
 										</div>
-										
-										<div class="teamgrid-content">
-											<h4>Yash Preet</h4>
-											<span><?php murailles_t( 'Rédacteur' ); ?></span>
+										<?php endif; ?>
+										<?php if ( $pbaths ) : ?>
+										<div class="listing-card-info-icon">
+											<div class="inc-fleat-icon"><img src="<?php echo esc_url( murailles_img( 'bathtub.svg' ) ); ?>" width="15" height="15" alt="" loading="lazy" decoding="async" /></div><?php echo esc_html( $pbaths ); ?> <?php murailles_t( 'SdB' ); ?>
 										</div>
-										
-										<div class="teamgrid-social">
-											<ul>
-												<li><a href="#" class="f-cl"><i class="ti-facebook"></i></a></li>
-												<li><a href="#" class="t-cl"><i class="ti-twitter"></i></a></li>
-												<li><a href="#" class="i-cl"><i class="ti-instagram"></i></a></li>
-												<li><a href="#" class="l-cl"><i class="ti-linkedin"></i></a></li>
-											</ul>
+										<?php endif; ?>
+										<?php if ( $psize ) : ?>
+										<div class="listing-card-info-icon">
+											<div class="inc-fleat-icon"><img src="<?php echo esc_url( murailles_img( 'move.svg' ) ); ?>" width="15" alt="" /></div><?php echo esc_html( $psize ); ?> m²
 										</div>
-							
+										<?php endif; ?>
 									</div>
 								</div>
-								
-								<!-- Single Teamm -->
-								<div class="single-team">
-									<div class="team-grid">
-								
-										<div class="teamgrid-user">
-											<img src="https://i.pravatar.cc/96?img=45" alt="" class="img-fluid" />
-										</div>
-										
-										<div class="teamgrid-content">
-											<h4>Dhananjay Preet</h4>
-											<span><?php murailles_t( 'PDG & Directeur' ); ?></span>
-										</div>
-										
-										<div class="teamgrid-social">
-											<ul>
-												<li><a href="#" class="f-cl"><i class="ti-facebook"></i></a></li>
-												<li><a href="#" class="t-cl"><i class="ti-twitter"></i></a></li>
-												<li><a href="#" class="i-cl"><i class="ti-instagram"></i></a></li>
-												<li><a href="#" class="l-cl"><i class="ti-linkedin"></i></a></li>
-											</ul>
-										</div>
-							
+
+								<div class="listing-detail-footer">
+									<div class="footer-first">
+										<div class="foot-location"><img src="<?php echo esc_url( murailles_img( 'pin.svg' ) ); ?>" width="18" alt="" /><?php echo esc_html( $paddr ? $paddr : $ploc ); ?></div>
+									</div>
+									<div class="footer-flex">
+										<a href="<?php echo esc_url( $plink ); ?>" class="prt_saveed_12lk" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Voir le bien %s', false ), get_the_title() ) ); ?>"><i class="fa-regular fa-circle-right" aria-hidden="true"></i></a>
 									</div>
 								</div>
-								
-								<!-- Single Teamm -->
-								<div class="single-team">
-									<div class="team-grid">
-								
-										<div class="teamgrid-user">
-											<img src="https://i.pravatar.cc/96?img=68" alt="" class="img-fluid" />
-										</div>
-										
-										<div class="teamgrid-content">
-											<h4>Rahul Gilkrist</h4>
-											<span><?php murailles_t( 'Designer' ); ?></span>
-										</div>
-										
-										<div class="teamgrid-social">
-											<ul>
-												<li><a href="#" class="f-cl"><i class="ti-facebook"></i></a></li>
-												<li><a href="#" class="t-cl"><i class="ti-twitter"></i></a></li>
-												<li><a href="#" class="i-cl"><i class="ti-instagram"></i></a></li>
-												<li><a href="#" class="l-cl"><i class="ti-linkedin"></i></a></li>
-											</ul>
-										</div>
-							
-									</div>
-								</div>
-								
-								<!-- Single Teamm -->
-								<div class="single-team">
-									<div class="team-grid">
-								
-										<div class="teamgrid-user">
-											<img src="https://i.pravatar.cc/96?img=53" alt="" class="img-fluid" />
-										</div>
-										
-										<div class="teamgrid-content">
-											<h4>Adam Wilcard</h4>
-											<span><?php murailles_t( 'Développeur Web' ); ?></span>
-										</div>
-										
-										<div class="teamgrid-social">
-											<ul>
-												<li><a href="#" class="f-cl"><i class="ti-facebook"></i></a></li>
-												<li><a href="#" class="t-cl"><i class="ti-twitter"></i></a></li>
-												<li><a href="#" class="i-cl"><i class="ti-instagram"></i></a></li>
-												<li><a href="#" class="l-cl"><i class="ti-linkedin"></i></a></li>
-											</ul>
-										</div>
-							
-									</div>
-								</div>
-								
 							</div>
-						
+						</div>
+						<?php
+							endwhile;
+							wp_reset_postdata();
+						?>
+					</div>
+					<div class="text-center mt-4">
+						<a href="<?php echo esc_url( murailles_bien_url() ); ?>" class="btn btn-danger"><?php murailles_t( 'Voir tous les biens' ); ?></a>
+					</div>
+						<?php else : ?>
+					<div class="row justify-content-center">
+						<div class="col-lg-6">
+							<div class="property-listing property-2 text-center p-5 h-100">
+								<p class="mb-3"><?php murailles_t( 'Aucun bien disponible pour le moment.' ); ?></p>
+								<a href="<?php echo esc_url( murailles_bien_url() ); ?>" class="btn btn-danger"><?php murailles_t( 'Voir tous les biens' ); ?></a>
+							</div>
 						</div>
 					</div>
-				
+						<?php endif; ?>
 				</div>
 			</section>
-			<?php endif; ?>
-			<!-- =============================== Our Team ================================== -->
+			<!-- ============================ Featured Properties End ================================== -->
 			
 			<!-- ============================ Smart Testimonials ================================== -->
 			<?php if ( murailles_page_section_is_visible( 'testimonials', $murailles_about_page_id ) ) : ?>

@@ -22,7 +22,7 @@ $murailles_contact_hero_eyebrow = murailles_page_section_meta( 'hero_eyebrow', m
 $murailles_contact_hero_title = murailles_page_section_meta( 'hero_title', murailles_t( 'Une équipe à votre écoute', false ) );
 $murailles_contact_hero_subtitle = murailles_page_section_meta( 'hero_subtitle', murailles_t( "Besoin d'aide pour votre projet immobilier ? Nous sommes joignables 7 jours sur 7.", false ) );
 $murailles_contact_phone_label = murailles_page_section_meta( 'phone_label', murailles_t( 'Téléphone', false ) );
-$murailles_contact_phone_value = murailles_page_section_meta( 'phone_value', '+212 (0) 6 61 42 51 50' );
+$murailles_contact_phone_value = murailles_page_section_meta( 'phone_value', '+212 (0) 6 61 66 51 61' );
 $murailles_contact_phone_note = murailles_page_section_meta( 'phone_note', murailles_t( 'Joignable 7j/7', false ) );
 $murailles_contact_email_label = murailles_page_section_meta( 'email_label', murailles_t( 'E-mail', false ) );
 $murailles_contact_email_value = murailles_page_section_meta( 'email_value', 'contact@murailles-immobilier.com' );
@@ -218,12 +218,12 @@ get_header();
 												<?php if ( $pcat ) : ?><span class="_list_blickes types"><?php echo esc_html( $pcat ); ?></span><?php endif; ?>
 											</div>
 											<div class="_card_flex_last">
-												<h6 class="listing-card-info-price mb-0"><?php echo esc_html( $pprice ); ?> €<?php if ( $psuffix ) echo ' ' . esc_html( $psuffix ); ?></h6>
+												<div class="listing-card-info-price mb-0"><?php echo esc_html( $pprice ); ?> €<?php if ( $psuffix ) echo ' ' . esc_html( $psuffix ); ?></div>
 											</div>
 										</div>
 										<div class="_card_list_flex">
 											<div class="_card_flex_01">
-												<h4 class="listing-name verified"><a href="<?php echo esc_url( $plink ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h4>
+												<h3 class="listing-name verified"><a href="<?php echo esc_url( $plink ); ?>" class="prt-link-detail"><?php the_title(); ?></a></h3>
 											</div>
 										</div>
 									</div>
@@ -246,7 +246,7 @@ get_header();
 										<div class="foot-location"><img src="<?php echo esc_url( murailles_img( 'pin.svg' ) ); ?>" width="18" alt="" /><?php echo esc_html( $paddr ?: $ploc ); ?></div>
 									</div>
 									<div class="footer-flex">
-										<a href="<?php echo esc_url( $plink ); ?>" class="prt_saveed_12lk"><i class="fa-regular fa-circle-right"></i></a>
+										<a href="<?php echo esc_url( $plink ); ?>" class="prt_saveed_12lk" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Voir le bien %s', false ), get_the_title() ) ); ?>"><i class="fa-regular fa-circle-right" aria-hidden="true"></i></a>
 									</div>
 								</div>
 							</div>

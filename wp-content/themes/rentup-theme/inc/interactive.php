@@ -358,13 +358,13 @@ add_action('admin_init', function () {
  * Override the number via wp-config.php constant MURAILLES_WHATSAPP_NUMBER if needed.
  */
 add_action('wp_footer', function () {
-	$number = defined('MURAILLES_WHATSAPP_NUMBER') ? MURAILLES_WHATSAPP_NUMBER : '212661425150';
+	$number = defined('MURAILLES_WHATSAPP_NUMBER') ? MURAILLES_WHATSAPP_NUMBER : '212661665161';
 	$msg    = 'Bonjour, je vous contacte depuis le site Agence Murailles. J\'aimerais avoir plus d\'informations sur vos biens immobiliers.';
 	$wa_url = 'https://wa.me/' . preg_replace('/[^0-9]/', '', $number) . '?text=' . rawurlencode($msg);
 	// CSS lives in /assets/css/murailles-custom.css under "Floating WhatsApp button".
 ?>
-	<a href="<?php echo esc_url($wa_url); ?>" target="_blank" rel="noopener noreferrer" id="murailles-whatsapp-btn" title="Discuter sur WhatsApp">
-		<i class="fa-brands fa-whatsapp"></i>
+	<a href="<?php echo esc_url($wa_url); ?>" target="_blank" rel="noopener noreferrer" id="murailles-whatsapp-btn" title="Discuter sur WhatsApp" aria-label="<?php echo esc_attr( function_exists( 'murailles_t' ) ? murailles_t( 'Contacter sur WhatsApp', false ) : 'Contacter sur WhatsApp' ); ?>">
+		<i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
 		<span class="murailles-wa-pulse"></span>
 		<span class="murailles-wa-tip">Discuter sur WhatsApp</span>
 	</a>

@@ -77,7 +77,7 @@ function murailles_email_wrap( $title, $intro_html, $body_html, $cta_label = '',
 				' . ( function () use ( $brand, $site, $year ) {
 					$ci = function_exists( 'murailles_contact_info' ) ? murailles_contact_info() : array(
 						'email'         => 'contact@murailles-immobilier.com',
-						'phone_display' => '+212 6 61 42 51 50',
+						'phone_display' => '+212 6 61 66 51 61',
 						'address_line1' => '13 Rue Mouslim, Résidence Boukar',
 						'address_city'  => 'Marrakech 40000, Maroc',
 					);

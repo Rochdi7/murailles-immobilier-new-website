@@ -23,8 +23,8 @@ get_header();
 				<p class="text-light mb-4"><?php murailles_t( 'Acheter, louer, vendre ou louer son bien au Maroc — toutes les réponses ici.' ); ?></p>
 				<div class="faq-search">
 					<form method="get" action="<?php echo esc_url( murailles_bien_url() ); ?>">
-						<input name="q" class="form-control" placeholder="<?php echo esc_attr( murailles_t( 'Recherchez un bien (riad, villa, ville…)', false ) ); ?>">
-						<button type="submit" class="theme-cl" aria-label="<?php echo esc_attr( murailles_t( 'Rechercher', false ) ); ?>"><i class="ti-search"></i></button>
+						<input name="q" class="form-control" placeholder="<?php echo esc_attr( murailles_t( 'Recherchez un bien (riad, villa, ville…)', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Rechercher un bien', false ) ); ?>">
+						<button type="submit" class="theme-cl" aria-label="<?php echo esc_attr( murailles_t( 'Rechercher', false ) ); ?>"><i class="ti-search" aria-hidden="true"></i></button>
 					</form>
 				</div>
 			</div>

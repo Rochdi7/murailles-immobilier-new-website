@@ -172,6 +172,18 @@
 
 /* ─── 3. Nav z-index + back-to-top ─────────────────────────────────── */
 .header        { position:relative; z-index:1000; }
+
+/* Sticky header — pure-CSS fallback so the navbar stays pinned on scroll even
+   when custom.js (the JS that adds .header-fixed past 50px) fails to load.
+   Applies only to the solid (light) header; the transparent front-page header
+   stays overlaid on the hero and is handled by the existing .header-fixed JS so
+   it does not push the hero down. */
+.header.header-light {
+	position: -webkit-sticky;
+	position: sticky;
+	top: 0;
+	z-index: 1000;
+}
 .nav-dropdown  { z-index:1001; }
 .gallery_parts { position:relative; z-index:1; }
 #back2Top {
@@ -580,18 +592,28 @@ a > i[class*="fa-"]:only-child {
 	left:24px;
 	bottom:24px;
 	z-index:9998;
-	width:60px;
-	height:60px;
+	width:46px;
+	height:46px;
 	border-radius:50%;
 	background:#25D366;
 	color:#fff;
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	font-size:30px;
+	font-size:23px;
 	text-decoration:none;
 	box-shadow:0 8px 24px rgba(37,211,102,0.45);
 	transition:transform .2s ease, box-shadow .2s ease;
+}
+/* Root cause: the theme's `a>i[class*="fa-"]` rule adds `margin-right:6px`, which
+   pushes the WhatsApp glyph off-center inside its circle. Zero that margin (and
+   any inherited padding) so the flexbox centers it exactly. Icon only — the
+   circle, position and animations are untouched. */
+#murailles-whatsapp-btn i {
+	display:block;
+	line-height:1;
+	margin:0 !important;
+	padding:0 !important;
 }
 #murailles-whatsapp-btn:hover { transform:scale(1.08); box-shadow:0 12px 32px rgba(37,211,102,0.6); }
 #murailles-whatsapp-btn .murailles-wa-pulse {
@@ -603,7 +625,7 @@ a > i[class*="fa-"]:only-child {
 }
 #murailles-whatsapp-btn .murailles-wa-tip {
 	position:absolute;
-	left:72px;
+	left:58px;
 	top:50%;
 	transform:translateY(-50%);
 	background:#1a2332;
@@ -1877,4 +1899,226 @@ footer.skin-dark-footer a:focus {
 
 .property-listing .price-features-wrapper .listing-card-info-icon .inc-fleat-icon {
 	margin-right: 5px;
+}
+
+/* Keep inner-page heroes consistent across templates that inject their own inline padding. */
+.page-title {
+	min-height: 220px;
+	padding: 72px 0 56px !important;
+	justify-content: center;
+	align-items: stretch;
+}
+
+.page-title .container,
+.page-title .container-fluid {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+}
+
+.page-title .breadcrumbs-wrap {
+	margin-bottom: 0;
+}
+
+@media (min-width: 992px) {
+	.page-title {
+		min-height: 320px;
+		padding: 84px 0 68px !important;
+	}
+}
+
+@media (max-width: 767px) {
+	.page-title {
+		min-height: 190px;
+		padding: 60px 0 44px !important;
+	}
+}
+
+/* Share control sits above WhatsApp on the left so it never fights the right-side action stack. */
+.murailles-share-fab-wrap {
+	position: fixed;
+	left: 24px;
+	bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+	z-index: 9997;
+}
+
+.murailles-share-fab {
+	position: relative;
+}
+
+.murailles-share-fab summary {
+	list-style: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	height: 52px;
+	padding: 0 18px;
+	border: 0;
+	border-radius: 999px;
+	background: #1a2332;
+	color: #ffffff;
+	box-shadow: 0 12px 28px rgba(18, 27, 43, 0.24);
+	cursor: pointer;
+	user-select: none;
+	transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.murailles-share-fab summary::-webkit-details-marker {
+	display: none;
+}
+
+.murailles-share-fab summary:hover,
+.murailles-share-fab[open] summary {
+	transform: translateY(-2px);
+	box-shadow: 0 16px 32px rgba(18, 27, 43, 0.3);
+	background: #243146;
+}
+
+.murailles-share-fab summary:focus-visible {
+	outline: 3px solid rgba(220, 53, 69, 0.28);
+	outline-offset: 3px;
+}
+
+.murailles-share-fab__text {
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+
+.murailles-share-fab__panel {
+	position: absolute;
+	left: 0;
+	bottom: calc(100% + 12px);
+	display: grid;
+	gap: 10px;
+	opacity: 0;
+	transform: translateY(8px) scale(0.96);
+	transform-origin: bottom left;
+	pointer-events: none;
+	transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.murailles-share-fab[open] .murailles-share-fab__panel {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+	pointer-events: auto;
+}
+
+.murailles-share-fab__link {
+	width: 46px;
+	height: 46px;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: #ffffff;
+	text-decoration: none;
+	box-shadow: 0 10px 22px rgba(15, 23, 38, 0.2);
+	transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.murailles-share-fab__link:hover {
+	transform: translateY(-2px);
+	opacity: 0.94;
+	color: #ffffff;
+}
+
+.murailles-share-fab__link.is-facebook { background: #1877f2; }
+.murailles-share-fab__link.is-x { background: #111827; }
+.murailles-share-fab__link.is-whatsapp { background: #25d366; }
+.murailles-share-fab__link.is-linkedin { background: #0a66c2; }
+
+@media (max-width: 767px) {
+	.murailles-share-fab-wrap {
+		left: 16px;
+		bottom: calc(94px + env(safe-area-inset-bottom, 0px));
+	}
+
+	.murailles-share-fab summary {
+		width: 52px;
+		padding: 0;
+		border-radius: 50%;
+	}
+
+	.murailles-share-fab__text {
+		display: none;
+	}
+}
+
+.screen-reader-text,
+.sr-only,
+.visually-hidden {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+}
+
+.blog-body .latest_new_post {
+	background: #007a49;
+	color: #ffffff;
+}
+
+.blog-body .latest_new_post.hot {
+	background: #c51616;
+	color: #ffffff;
+}
+
+.sec-heading p,
+.wpk_process .wpk_caption p,
+.facts-detail p,
+.blog-body p,
+.foot-location,
+div.container > div.row > div.col-lg-6 > p,
+div.container > div.row > div.col-lg-6 > p strong,
+._testimonial_name {
+	color: #5a647a;
+}
+
+.murailles-share-fab__text {
+	color: #ffffff;
+}
+
+footer.skin-dark-footer .footer-bottom p,
+footer.skin-dark-footer .murailles-built-by,
+footer.skin-dark-footer .murailles-built-by__link {
+	color: #d8dee9;
+}
+
+footer.skin-dark-footer .footer-bottom .container .row .col-lg-6 p.mb-0,
+footer.skin-dark-footer .footer-bottom .container .row .col-lg-6 p.murailles-built-by {
+	color: #d8dee9;
+}
+
+span._list_blickes._netork {
+	color: #b63b17;
+	background: #fff0eb;
+}
+
+span._list_blickes.types {
+	color: #176b49;
+	background: #e9f8f2;
+}
+
+._ovr_rates {
+	color: #ffffff;
+	background: #9b5200;
+}
+
+.item-slide .slick-prev,
+.item-slide .slick-next,
+.slick-slider .slick-prev,
+.slick-slider .slick-next {
+	min-width: 44px;
+	min-height: 44px;
+}
+
+.btn>i.fa, .btn>i.fas, .btn>i.far, .btn>i.fab, .btn>i[class*="fa-solid"], .btn>i[class*="fa-regular"], .btn>i[class*="fa-brands"], button>i[class*="fa-"], a>i[class*="fa-"] {
+    margin-right: 0px !important;
 }

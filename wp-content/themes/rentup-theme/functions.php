@@ -57,6 +57,9 @@ require_once get_template_directory() . '/inc/seo-social.php';
 // Schema.org JSON-LD: Organization, RealEstateAgent, WebSite, RealEstateListing,
 // BlogPosting, FAQPage, BreadcrumbList, ItemList.
 require_once get_template_directory() . '/inc/seo-schema.php';
+// Cookie consent banner + Google Consent Mode v2 (gates GA4/GTM cookies).
+// Loaded before seo-perf.php so the consent defaults register ahead of the tag.
+require_once get_template_directory() . '/inc/consent.php';
 // Performance + crawlability: preconnect, defer JS, lazy images, robots.txt
 // extensions, sitemap tuning.
 require_once get_template_directory() . '/inc/seo-perf.php';
@@ -1137,6 +1140,7 @@ function murailles_create_pages_legacy( $force = false )
 		'home'                       => array('Home',                        ''),
 		'about-us'                   => array('About Us',                    'page-templates/about-us.php'),
 		'contact'                    => array('Contact',                     'page-templates/contact.php'),
+		'demander-une-visite'        => array('Demander une visite',         'page-templates/demander-une-visite.php'),
 		'blog'                       => array('Blog',                        ''),
 		'faq'                        => array('FAQ',                         'page-templates/faq.php'),
 		'pricing'                    => array('Pricing',                     'page-templates/pricing.php'),
@@ -1242,6 +1246,7 @@ function murailles_create_pages( $force = false, $repair_existing = false )
 		'home'                      => array( 'title' => 'Home', 'template' => '', 'titles' => array( 'fr' => 'Accueil', 'en' => 'Home' ) ),
 		'about-us'                  => array( 'title' => 'About Us', 'template' => 'page-templates/about-us.php', 'titles' => array( 'fr' => 'A propos', 'en' => 'About Us' ) ),
 		'contact'                   => array( 'title' => 'Contact', 'template' => 'page-templates/contact.php', 'titles' => array( 'fr' => 'Contact', 'en' => 'Contact' ) ),
+		'demander-une-visite'       => array( 'title' => 'Demander une visite', 'template' => 'page-templates/demander-une-visite.php', 'titles' => array( 'fr' => 'Demander une visite', 'en' => 'Request a Viewing' ) ),
 		'blog'                      => array( 'title' => 'Blog', 'template' => '', 'titles' => array( 'fr' => 'Blog', 'en' => 'Blog' ) ),
 		'faq'                       => array( 'title' => 'FAQ', 'template' => 'page-templates/faq.php' ),
 		'pricing'                   => array( 'title' => 'Pricing', 'template' => 'page-templates/pricing.php' ),
@@ -1444,6 +1449,48 @@ function murailles_create_pages( $force = false, $repair_existing = false )
 }
 // Page creation is intentionally NOT wired to after_switch_theme.
 // An admin notice with a manual button triggers it instead (see murailles_admin_setup_notice).
+
+/**
+ * Ensure the "Demander une visite" page exists, even on installs where the
+ * one-time page seeder already ran (murailles_pages_created is set). Runs once,
+ * guarded by its own option, so it never touches the other pages and never
+ * re-creates the page if an admin later deletes it on purpose.
+ */
+add_action( 'admin_init', function () {
+	if ( get_option( 'murailles_visit_page_created' ) ) {
+		return;
+	}
+
+	$slug     = 'demander-une-visite';
+	$template = 'page-templates/demander-une-visite.php';
+	$existing = get_page_by_path( $slug );
+
+	if ( $existing ) {
+		if ( ! get_post_meta( $existing->ID, '_wp_page_template', true ) ) {
+			update_post_meta( $existing->ID, '_wp_page_template', $template );
+		}
+	} else {
+		$page_id = wp_insert_post( array(
+			'post_title'   => 'Demander une visite',
+			'post_name'    => $slug,
+			'post_status'  => 'publish',
+			'post_type'    => 'page',
+			'post_content' => '',
+		) );
+		if ( $page_id && ! is_wp_error( $page_id ) ) {
+			update_post_meta( $page_id, '_wp_page_template', $template );
+			// Tag the page for Polylang in the source language if available.
+			if ( function_exists( 'pll_set_post_language' ) && function_exists( 'pll_default_language' ) ) {
+				$lang = pll_default_language( 'slug' );
+				if ( $lang ) {
+					pll_set_post_language( $page_id, $lang );
+				}
+			}
+		}
+	}
+
+	update_option( 'murailles_visit_page_created', true );
+} );
 
 /**
  * Admin notice shown after theme activation for one-time manual setup.
@@ -1771,17 +1818,18 @@ function murailles_seed_demo_blog_posts()
 function murailles_contact_info()
 {
 	return array(
-		'phone'         => defined('MURAILLES_PHONE')         ? MURAILLES_PHONE         : '+212 (0) 6 61 42 51 50',
-		'phone_tel'     => defined('MURAILLES_PHONE_TEL')     ? MURAILLES_PHONE_TEL     : '+212661425150',
-		'phone_display' => defined('MURAILLES_PHONE_DISPLAY') ? MURAILLES_PHONE_DISPLAY : '+212 6 61 42 51 50',
+		'phone'         => defined('MURAILLES_PHONE')         ? MURAILLES_PHONE         : '+212 (0) 6 61 66 51 61',
+		'phone_tel'     => defined('MURAILLES_PHONE_TEL')     ? MURAILLES_PHONE_TEL     : '+212661665161',
+		'phone_display' => defined('MURAILLES_PHONE_DISPLAY') ? MURAILLES_PHONE_DISPLAY : '+212 6 61 66 51 61',
 		'email'         => defined('MURAILLES_EMAIL')         ? MURAILLES_EMAIL         : 'contact@murailles-immobilier.com',
 		'address_line1' => defined('MURAILLES_ADDR1')         ? MURAILLES_ADDR1         : '13 Rue Mouslim, Résidence Boukar',
 		'address_line2' => defined('MURAILLES_ADDR2')         ? MURAILLES_ADDR2         : '2ème étage Bureau N°10',
 		'address_city'  => defined('MURAILLES_CITY')          ? MURAILLES_CITY          : 'Marrakech 40000, Maroc',
 		'contact_name'  => defined('MURAILLES_CONTACT_NAME')  ? MURAILLES_CONTACT_NAME  : 'Youssef',
+		'google_maps'   => defined('MURAILLES_GOOGLE_MAPS')   ? MURAILLES_GOOGLE_MAPS   : 'https://share.google/4ZxBBGSJPmgNMiNvt',
 		'facebook'      => defined('MURAILLES_FACEBOOK')      ? MURAILLES_FACEBOOK      : 'https://www.facebook.com/profile.php?id=100063563441285',
-		'instagram'     => defined('MURAILLES_INSTAGRAM')     ? MURAILLES_INSTAGRAM     : '#',
-		'twitter'       => defined('MURAILLES_TWITTER')       ? MURAILLES_TWITTER       : '#',
+		'instagram'     => defined('MURAILLES_INSTAGRAM')     ? MURAILLES_INSTAGRAM     : 'https://www.instagram.com/murailles_immobilier',
+		'twitter'       => defined('MURAILLES_TWITTER')       ? MURAILLES_TWITTER       : '',
 	);
 }
 

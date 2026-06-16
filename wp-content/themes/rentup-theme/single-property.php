@@ -275,8 +275,8 @@ $similar = new WP_Query( array(
 								<div class="property_detail_section">
 									<div class="prt-sect-pric">
 										<ul class="_share_lists">
-											<li><a href="<?php echo esc_url( get_permalink( $id ) ); ?>" class="murailles-prop-save" data-murailles-id="<?php echo esc_attr( get_the_ID() ); ?>" title="<?php echo esc_attr( murailles_t( 'Enregistrer dans mes favoris', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Enregistrer dans mes favoris', false ) ); ?>"><i class="fa fa-bookmark"></i></a></li>
-											<li><a href="<?php echo esc_url( get_permalink( $id ) ); ?>" class="murailles-prop-share" data-murailles-share-url="<?php echo esc_url( get_permalink() ); ?>" data-murailles-share-title="<?php echo esc_attr( get_the_title() ); ?>" title="<?php echo esc_attr( murailles_t( 'Partager ce bien', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Partager ce bien', false ) ); ?>"><i class="fa fa-share"></i></a></li>
+											<li><a href="<?php echo esc_url( get_permalink( $id ) ); ?>" class="murailles-prop-save" data-murailles-id="<?php echo esc_attr( get_the_ID() ); ?>" title="<?php echo esc_attr( murailles_t( 'Enregistrer dans mes favoris', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Enregistrer %s dans mes favoris', false ), get_the_title() ) ); ?>"><i class="fa fa-bookmark" aria-hidden="true"></i></a></li>
+											<li><a href="<?php echo esc_url( get_permalink( $id ) ); ?>" class="murailles-prop-share" data-murailles-share-url="<?php echo esc_url( get_permalink() ); ?>" data-murailles-share-title="<?php echo esc_attr( get_the_title() ); ?>" title="<?php echo esc_attr( murailles_t( 'Partager ce bien', false ) ); ?>" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Partager %s', false ), get_the_title() ) ); ?>"><i class="fa fa-share" aria-hidden="true"></i></a></li>
 										</ul>
 									</div>
 								</div>
@@ -344,7 +344,7 @@ $similar = new WP_Query( array(
 												<div class="bb-video-box">
 													<div class="bb-video-box-inner">
 														<div class="bb-video-box-innerup">
-															<a href="<?php echo esc_url( $video ); ?>" data-bs-toggle="modal" data-bs-target="#popup-video" class="theme-cl"><i class="ti-control-play"></i></a>
+															<a href="<?php echo esc_url( $video ); ?>" data-bs-toggle="modal" data-bs-target="#popup-video" class="theme-cl" aria-label="<?php echo esc_attr( murailles_t( 'Lire la vidéo du bien', false ) ); ?>"><i class="ti-control-play" aria-hidden="true"></i></a>
 														</div>
 													</div>
 												</div>
@@ -401,7 +401,7 @@ $similar = new WP_Query( array(
 											<div class="col-lg-12 col-md-12 col-sm-12">
 												<div class="stbooking-footer mt-1">
 													<div class="form-group mb-0 pb-0">
-														<a href="https://wa.me/?text=<?php echo urlencode( murailles_t( 'Je suis intéressé(e) par :', false ) . ' ' . get_the_title() . ' — ' . get_permalink() ); ?>" target="_blank" class="btn btn-success full-width fw-medium"><i class="fab fa-whatsapp me-2"></i><?php murailles_t( 'Contacter via WhatsApp' ); ?></a>
+														<a href="https://wa.me/?text=<?php echo urlencode( murailles_t( 'Je suis intéressé(e) par :', false ) . ' ' . get_the_title() . ' — ' . get_permalink() ); ?>" target="_blank" rel="noopener noreferrer" class="btn btn-success full-width fw-medium" aria-label="<?php echo esc_attr( sprintf( murailles_t( 'Contacter sur WhatsApp pour %s', false ), get_the_title() ) ); ?>"><i class="fab fa-whatsapp me-2" aria-hidden="true"></i><?php murailles_t( 'Contacter via WhatsApp' ); ?></a>
 													</div>
 												</div>
 											</div>
@@ -453,26 +453,90 @@ $similar = new WP_Query( array(
 											<input type="text" name="_mw_hp_url" value="" tabindex="-1" autocomplete="new-password" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px;pointer-events:none;">
 										<div class="form-group">
 											<div class="input-with-icon">
-												<input type="text" name="name" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre nom', false ) ); ?>" required>
-												<i class="ti-user"></i>
+												<input type="text" name="name" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre nom', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Votre nom', false ) ); ?>" required>
+												<i class="ti-user" aria-hidden="true"></i>
 											</div>
 										</div>
 										<div class="form-group">
 											<div class="input-with-icon">
-												<input type="email" name="email" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre email', false ) ); ?>" required>
-												<i class="ti-email"></i>
+												<input type="email" name="email" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre email', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Votre email', false ) ); ?>" required>
+												<i class="ti-email" aria-hidden="true"></i>
 											</div>
 										</div>
 										<div class="form-group">
 											<div class="input-with-icon">
-												<input type="text" name="phone" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre téléphone', false ) ); ?>">
-												<i class="ti-mobile"></i>
+												<input type="text" name="phone" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre téléphone', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Votre téléphone', false ) ); ?>">
+												<i class="ti-mobile" aria-hidden="true"></i>
 											</div>
 										</div>
 										<div class="form-group">
-											<textarea name="message" class="form-control light" rows="3" placeholder="<?php echo esc_attr( murailles_t( 'Je suis intéressé(e) par ce bien...', false ) ); ?>"></textarea>
+											<textarea name="message" class="form-control light" rows="3" placeholder="<?php echo esc_attr( murailles_t( 'Je suis intéressé(e) par ce bien...', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Message', false ) ); ?>"></textarea>
 										</div>
-										<button class="btn btn-danger full-width fw-medium"><?php murailles_t( 'Envoyer' ); ?></button>
+										<button type="submit" class="btn btn-danger full-width fw-medium"><?php murailles_t( 'Envoyer' ); ?></button>
+										</form>
+									</div>
+								</div>
+
+								<!-- Request a Viewing -->
+								<div class="sider_blocks_wrap">
+									<div class="side-booking-header">
+										<h4 class="m-0"><?php murailles_t( 'Demander une visite' ); ?></h4>
+									</div>
+									<div class="sider-block-body p-3">
+										<form class="murailles-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+											<input type="hidden" name="action" value="murailles_visit_request">
+											<?php wp_nonce_field( 'murailles_visit_request', '_murailles_nonce' ); ?>
+											<input type="hidden" name="property_id" value="<?php echo esc_attr( $id ); ?>">
+											<input type="hidden" name="page_url" value="<?php echo esc_url( get_permalink( $id ) ); ?>">
+											<input type="hidden" name="language" value="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr' ); ?>">
+											<input type="text" name="_mw_hp_url" value="" tabindex="-1" autocomplete="new-password" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px;pointer-events:none;">
+										<div class="form-group">
+											<div class="input-with-icon">
+												<input type="text" name="name" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre nom', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Votre nom', false ) ); ?>" required>
+												<i class="ti-user" aria-hidden="true"></i>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="input-with-icon">
+												<input type="email" name="email" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre email', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Votre email', false ) ); ?>" required>
+												<i class="ti-email" aria-hidden="true"></i>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="input-with-icon">
+												<input type="tel" name="phone" class="form-control light" placeholder="<?php echo esc_attr( murailles_t( 'Votre téléphone', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Votre téléphone', false ) ); ?>" required>
+												<i class="ti-mobile" aria-hidden="true"></i>
+											</div>
+										</div>
+										<div class="row g-2">
+											<div class="col-7">
+												<div class="form-group mb-2">
+													<label class="form-label small mb-1"><?php murailles_t( 'Date souhaitée' ); ?></label>
+													<input type="date" name="visit_date" class="form-control light" min="<?php echo esc_attr( current_time( 'Y-m-d' ) ); ?>" required>
+												</div>
+											</div>
+											<div class="col-5">
+												<div class="form-group mb-2">
+													<label class="form-label small mb-1"><?php murailles_t( 'Heure' ); ?></label>
+													<select name="visit_time" class="form-control light" required>
+														<option value=""><?php echo esc_html( murailles_t( '--:--', false ) ); ?></option>
+														<?php
+														// 09:00 → 18:30 in 30-minute slots.
+														for ( $h = 9; $h <= 18; $h++ ) {
+															foreach ( array( '00', '30' ) as $m ) {
+																$slot = sprintf( '%02d:%s', $h, $m );
+																echo '<option value="' . esc_attr( $slot ) . '">' . esc_html( $slot ) . '</option>';
+															}
+														}
+														?>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<textarea name="message" class="form-control light" rows="2" placeholder="<?php echo esc_attr( murailles_t( 'Précisions (optionnel)...', false ) ); ?>" aria-label="<?php echo esc_attr( murailles_t( 'Précisions', false ) ); ?>"></textarea>
+										</div>
+										<button type="submit" class="btn btn-danger full-width fw-medium"><i class="fa-regular fa-calendar-check me-2" aria-hidden="true"></i><?php murailles_t( 'Demander une visite' ); ?></button>
 										</form>
 									</div>
 								</div>
