@@ -1,0 +1,68 @@
+/**
+ * Front-office currency switcher (MAD / EUR / USD).
+ * Self-contained styling that blends with the Rentup theme accent (green).
+ */
+
+.murailles-currency-switcher {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+	margin: 8px 0 14px;
+}
+
+.murailles-currency-switcher .mcs-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #6b7280;
+	margin-right: 4px;
+}
+
+.murailles-currency-switcher .mcs-btn {
+	appearance: none;
+	border: 1px solid #d8dee6;
+	background: #fff;
+	color: #1a2332;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1;
+	padding: 7px 12px;
+	border-radius: 999px;
+	cursor: pointer;
+	transition: all .15s ease;
+}
+
+.murailles-currency-switcher .mcs-btn:hover {
+	border-color: #00aa6c;
+	color: #00aa6c;
+}
+
+.murailles-currency-switcher .mcs-btn.is-active {
+	background: #00aa6c;
+	border-color: #00aa6c;
+	color: #fff;
+	box-shadow: 0 2px 6px rgba(0, 170, 108, .25);
+}
+
+.murailles-currency-switcher .mcs-btn:focus-visible {
+	outline: 2px solid #00aa6c;
+	outline-offset: 2px;
+}
+
+/* The price text updated live — avoid layout shift while converting. */
+.murailles-price.js-price {
+	white-space: nowrap;
+}
+
+/* On listing cards, keep the switcher compact at the top of the grid. */
+.murailles-currency-switcher.is-listing {
+	margin-top: 0;
+	justify-content: flex-end;
+	width: 100%;
+}
+
+@media (max-width: 575px) {
+	.murailles-currency-switcher.is-listing {
+		justify-content: flex-start;
+	}
+}
