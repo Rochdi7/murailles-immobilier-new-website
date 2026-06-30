@@ -1009,7 +1009,7 @@ $(function() {
 			attributeFilter: ['role', 'aria-selected', 'aria-controls', 'aria-hidden', 'id', 'class', 'tabindex']
 		});
 	}
-	$('#navigation').find('.nav-toggle').on('click.muraillesState touchstart.muraillesState', function() {
+	$('#navigation').find('.nav-toggle').on('click.muraillesState', function() {
 		if ( window.innerWidth > 992 ) {
 			return;
 		}
@@ -1023,46 +1023,35 @@ $(function() {
 		muraillesEnhanceSlickAccessibility();
 	});
 
-	// Touch devices fire BOTH `touchstart` and a synthesized `click` (~300ms
-	// later) for a single tap. Binding the nav toggle to both caused a
-	// double-toggle (close → reopen / flicker) that read as the menu
-	// "refreshing". This guard swallows the duplicate event in that window.
-	var muraillesLastNavTap = 0;
-	function muraillesNavTapGuard( event ) {
-		var now = Date.now();
-		if ( event.type === 'touchstart' ) {
-			muraillesLastNavTap = now;
-			return false; // handle the touch
-		}
-		// It's a click: ignore if a touchstart just handled the same tap.
-		if ( now - muraillesLastNavTap < 600 ) {
-			return true; // duplicate — skip
-		}
-		return false;
-	}
+	// Single `click` binding — the viewport meta already removes the 300 ms
+	// mobile delay, so there is no need for `touchstart` here. Using both
+	// events was the root cause of the double-toggle (open → immediately close)
+	// that appeared as a "page refresh".
+	//
+	// The click that OPENS the menu also bubbles up to the document-level
+	// "click outside to close" handler below. Because both handlers live on
+	// `document`, stopPropagation can't reliably stop the sibling handler, so
+	// we record the moment the menu opened and have the outside-close handler
+	// ignore any click within that same tick.
+	var muraillesNavOpenedAt = 0;
 
-	$(document).on('click touchstart', '#navigation .nav-toggle', function(event) {
+	$(document).on('click', '#navigation .nav-toggle', function(event) {
 		if ( window.innerWidth > 992 ) {
 			return;
 		}
 		event.preventDefault();
 		event.stopPropagation();
-		if ( muraillesNavTapGuard( event ) ) {
-			return;
-		}
 		if ( muraillesNavIsOpen() ) {
 			muraillesCloseNav();
 			return;
 		}
+		muraillesNavOpenedAt = Date.now();
 		muraillesOpenNav();
 	});
 
-	$(document).on('click touchstart', '#navigation .nav-menus-wrapper-close-button, #navigation .nav-overlay-panel', function(event) {
+	$(document).on('click', '#navigation .nav-menus-wrapper-close-button, #navigation .nav-overlay-panel', function(event) {
 		event.preventDefault();
 		event.stopPropagation();
-		if ( muraillesNavTapGuard( event ) ) {
-			return;
-		}
 		muraillesCloseNav();
 	});
 
@@ -1133,8 +1122,13 @@ $(function() {
 		}
 	});
 
-	$(document).on('click touchstart', function(event) {
+	$(document).on('click', function(event) {
 		if ( window.innerWidth > 992 || ! muraillesNavIsOpen() ) {
+			return;
+		}
+
+		// Ignore the very click that just opened the menu (it bubbles here).
+		if ( Date.now() - muraillesNavOpenedAt < 400 ) {
 			return;
 		}
 

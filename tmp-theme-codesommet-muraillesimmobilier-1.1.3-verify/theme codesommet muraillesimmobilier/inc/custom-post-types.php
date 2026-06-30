@@ -915,7 +915,13 @@ function murailles_maybe_flush_rewrites() {
 	update_option( 'murailles_rewrite_version', MURAILLES_REWRITE_VERSION );
 }
 add_action( 'after_switch_theme', 'murailles_maybe_flush_rewrites', 99 );
-add_action( 'init', 'murailles_maybe_flush_rewrites', 99 );
+// IMPORTANT: never flush on the public `init` hook. flush_rewrite_rules() makes
+// WordPress rewrite the root .htaccess (save_mod_rewrite_rules), which on this
+// site would clobber the One.com headers + the load-styles/load-scripts allow
+// rule and 403 the admin assets. `admin_init` keeps the one-shot version-gated
+// flush but runs it only inside wp-admin for a logged-in request — never on
+// front-end traffic. The mu-plugin guard re-injects the required block anyway.
+add_action( 'admin_init', 'murailles_maybe_flush_rewrites', 99 );
 
 /* ╔═══════════════════════════════════════════════════╗
    ║  11. ADMIN UX — champs de contact biens           ║

@@ -23,22 +23,6 @@ Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains
 </IfModule>
 
 
-# BEGIN Murailles Core Allowlist
-# REQUIRED — keep this block above "# BEGIN WordPress" so it survives plugin
-# (AIOS / WP-Optimize / Really Simple Security / host) .htaccess rewrites.
-# Without it, wp-admin CSS/JS 403s and AJAX/uploads/cron break.
-# Do NOT remove. See SECURITY_CACHE_COMPATIBILITY_REPORT.md.
-<FilesMatch "^(load-styles|load-scripts)\.php$">
-    Require all granted
-</FilesMatch>
-<FilesMatch "^(admin-ajax|async-upload|update|plugins)\.php$">
-    Require all granted
-</FilesMatch>
-<FilesMatch "^wp-cron\.php$">
-    Require all granted
-</FilesMatch>
-# END Murailles Core Allowlist
-
 # BEGIN WordPress
 # The directives (lines) between "BEGIN WordPress" and "END WordPress" are
 # dynamically generated, and should only be modified via WordPress filters.

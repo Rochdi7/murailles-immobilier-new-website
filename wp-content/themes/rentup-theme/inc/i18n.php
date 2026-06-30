@@ -181,7 +181,11 @@ add_filter( 'pll_get_post_types', function ( $post_types ) {
  * Stored marker prevents re-running on every request. Bumping the marker
  * string forces a fresh flush after future code changes.
  */
-add_action( 'wp_loaded', function () {
+// One-shot, version-gated. Runs on `admin_init` (logged-in admin context) NOT
+// `wp_loaded`, because flush_rewrite_rules() makes WordPress rewrite the root
+// .htaccess and could drop the One.com headers + load-styles/load-scripts allow
+// rule on a public request. admin_init keeps it one-shot but off front-end traffic.
+add_action( 'admin_init', function () {
 	$marker = get_option( '_murailles_polylang_forced', '' );
 	$want   = 'v2:force_lang=1;hide_default=0;redirect_lang=1';
 	if ( $marker === $want ) { return; }

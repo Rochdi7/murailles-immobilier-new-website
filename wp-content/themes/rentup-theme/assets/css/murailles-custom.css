@@ -1318,6 +1318,19 @@ a > i[class*="fa-"]:only-child {
 	#navigation.navigation-landscape .nav-menus-wrapper-close-button,
 	#navigation.navigation-portrait .nav-menus-wrapper-close-button {
 		display: flex;
+		/* Hidden while the panel slides in; revealed once it's fully open. */
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition: opacity .2s ease;
+		/* Wait for the panel slide (.35s) to finish before fading in. */
+		transition-delay: .35s;
+	}
+	#navigation.navigation-landscape .nav-menus-wrapper.nav-menus-wrapper-open .nav-menus-wrapper-close-button,
+	#navigation.navigation-portrait .nav-menus-wrapper.nav-menus-wrapper-open .nav-menus-wrapper-close-button {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
 	}
 }
 
